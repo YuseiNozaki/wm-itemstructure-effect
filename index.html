@@ -11,6 +11,24 @@
   <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
   <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+    #jspsych-target {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .jspsych-content {
       max-width: 100%;
       margin: 0;
@@ -360,6 +378,20 @@
       },
       choices: jsPsych.NO_KEYS,
       on_load: function() {
+        // フルスクリーン化（全画面条件の場合のみ）
+        let vCond = jsPsych.timelineVariable('viewCondition');
+        if (vCond === 'fullscreen') {
+          const elem = document.documentElement;
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+          } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE/Edge */
+            elem.msRequestFullscreen();
+          }
+        }
         // Get trial parameters
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         const structure = jsPsych.timelineVariable('structure');
