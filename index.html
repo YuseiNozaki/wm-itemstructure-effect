@@ -191,7 +191,7 @@
           <div style="width: 80%; margin: 0 auto; text-align: left;">
             <p><strong>実験の目的:</strong> この実験では、人がものを探すときの性質について調査を行います。</p>
             <p><strong>データの取り扱い:</strong> 収集されるデータは研究目的のみに使用され、個人を特定できる情報は含まれません。</p>
-            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。</p>
+            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。最初の30試行の後に小休憩があります。</p>
             <p><strong>参加の任意性:</strong> 実験はいつでも中止することができます。中止されても不利益は生じません。</p>
             <p><strong>同意:</strong> 上記の内容を理解し、実験参加に同意される場合は、エンターキーを押して次に進んでください。</p>
           </div>
@@ -419,6 +419,9 @@
         return `<div id="search-container" style="width: 100vw; height: 100vh;"></div>`;
       },
       choices: jsPsych.NO_KEYS,
+      data: {
+        task: 'visual_search'
+      },
       on_load: function() {
         // フルスクリーン化はwelcome画面で行うため、ここでは不要
         // let vCond = jsPsych.timelineVariable('viewCondition');
@@ -824,17 +827,43 @@
           <p>エンターキーを押すと次に進みます。</p>
         `;
       },
+      data: {
+        task: 'search_feedback'
+      },
       choices: ['Enter']
     };
 
-    // End screen
+    // End screen with overall score
     const endScreen = {
       type: 'html-keyboard-response',
-      stimulus: `
-        <h1>実験終了</h1>
-        <p>実験にご参加いただき、ありがとうございました。</p>
-        <p>エンターキーを押すと終了します。</p>
-      `,
+      stimulus: function() {
+        // Calculate overall accuracy for visual search
+        const searchData = jsPsych.data.get().filter({task: 'visual_search'});
+        const correctSearches = searchData.filter({correct: true}).count();
+        const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
+        
+        // Calculate overall memory task accuracy if applicable
+        let memoryAccuracyText = '';
+        const memoryScores = jsPsych.data.get().select('memory_correct').values;
+        
+        if (memoryScores && memoryScores.length > 0) {
+          // Filter out undefined values and calculate mean
+          const filteredScores = memoryScores.filter(score => score !== undefined);
+          if (filteredScores.length > 0) {
+            const avgMemoryAccuracy = filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length;
+            const memoryAccuracy = Math.round(avgMemoryAccuracy * 100);
+            memoryAccuracyText = `<p>記憶課題の正答率: ${memoryAccuracy}%</p>`;
+          }
+        }
+        
+        return `
+          <h1>実験終了</h1>
+          <p>実験にご参加いただき、ありがとうございました。</p>
+          <p>視覚探索課題の正答率: ${searchAccuracy}%</p>
+          ${memoryAccuracyText}
+          <p>エンターキーを押すと終了します。</p>
+        `;
+      },
       choices: ['Enter']
     };
     
@@ -899,6 +928,9 @@
           timeline: [memoryGridRecall],
           conditional_function: function() {
             return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          },
+          data: {
+            task: 'memory_recall'
           }
         },
         searchFeedback
