@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>視覚探索実験</title>
+  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-survey-text.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-preload.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-instructions.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-canvas-keyboard-response.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    .jspsych-content {
+      max-width: 100%;
+      margin: 0;
+    }
+    #jspsych-visual-search-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+    }
+    #search-window {
+      position: absolute;
+      border: 2px solid black;
+      background-color: transparent;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      margin: 0 auto;
+    }
+    .memory-cell {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .memory-cell.highlighted {
+      background-color: #ffcc00;
+    }
+    .memory-cell.selected {
+      background-color: #66aaff;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
+  <div id="search-window" class="hidden"></div>
+  <script>
+    // jsPsych is already defined as a global variable in v6.3.1
+    // We'll initialize it later with jsPsych.init()
+
+    // Experiment parameters
+    const params = {
+      // Screen dimensions (will be updated at runtime)
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
+      
+      // Window dimensions (approximately 1/9 of screen)
+      windowWidth: Math.floor(window.innerWidth / 3),
+      windowHeight: Math.floor(window.innerHeight / 3),
+      
+      // Objects
+      numObjects: 30, // Total number of objects per trial
+      objectMinSize: 20,
+      objectMaxSize: 40,
+      
+      // Colors and shapes
+      colors: ['red', 'blue', 'green', 'yellow', 'purple'],
+      shapes: ['circle', 'triangle', 'square', 'diamond'],
+      
+      // Trials
+      trialsPerCondition: 10,
+      
+      // Memory task
+      memoryGridSize: 4, // 4x4 grid
+      memoryPositions: 3, // Number of positions to remember
+    };
+
+    // Trial factors
+    const factors = {
+      viewCondition: ['window', 'scroll', 'fullscreen'],
+      structure: ['structured', 'unstructured'],
+      memoryLoad: ['with-memory', 'without-memory']
+    };
+
+    // Track mouse movements
+    let mouseX = 0;
+    let mouseY = 0;
+    let mousePath = [];
+    let totalMovement = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let isMouseDown = false;
+
+    // Target and distractor objects
+    let objects = [];
+    let targetObject = null;
+
+    // Memory task variables
+    let memoryPositions = [];
+    let selectedMemoryPositions = [];
+
+    // Welcome screen
+    const welcome = {
+      type: 'html-keyboard-response',
+      stimulus: '<h1>視覚探索実験</h1>' +
+                '<p>実験に参加していただきありがとうございます。</p>' +
+                '<p>エンターキーを押すと次に進みます。</p>',
+      choices: ['Enter']
+    };
+
+    // Informed consent
+    const consent = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        return `
+          <h1>実験の説明と同意</h1>
+          <div style="width: 80%; margin: 0 auto; text-align: left;">
+            <p><strong>実験の目的:</strong> この実験では、人がものを探すときの性質について調査を行います。</p>
+            <p><strong>データの取り扱い:</strong> 収集されるデータは研究目的のみに使用され、個人を特定できる情報は含まれません。</p>
+            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。</p>
+            <p><strong>参加の任意性:</strong> 実験はいつでも中止することができます。中止されても不利益は生じません。</p>
+            <p><strong>同意:</strong> 上記の内容を理解し、実験参加に同意される場合は、エンターキーを押して次に進んでください。</p>
+          </div>
+          <p>エンターキーを押すと先に進みます。</p>
+        `;
+      },
+      choices: ['Enter']
+    };
+
+    // Demographic information
+    const demographics = {
+      type: 'survey-text',
+      questions: [
+        {
+          prompt: '年齢:',
+          name: 'age',
+          required: true
+        },
+        {
+          prompt: '性別:',
+          name: 'gender',
+          required: true
+        }
+      ],
+      button_label: '次へ'
+    };
+
+    // Instructions for visual search task
+    const visualSearchInstructions = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        const viewCondition = jsPsych.timelineVariable('viewCondition');
+        return `
+          <h1>視覚探索課題の説明</h1>
+          <p>この課題では、画面上に表示される様々な形や色のオブジェクトの中から特定のターゲットを探していただきます。</p>
+          <p>ターゲットは試行ごとに異なり、各試行の前に3秒間画面に表示されます。</p>
+          <p>ターゲットを見つけたら、クリックして選択してください。</p>
+          <p>現在の条件: <strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
+            viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
+          <p>${viewCondition === 'window' ? 
+            'ウィンドウ条件では、マウスでウィンドウを動かして画面を探索してください。' : 
+            viewCondition === 'scroll' ? 
+            'スクロール条件では、マウスで背景をドラッグして画面を探索してください。' : 
+            '全画面条件では、画面全体を見ることができます。'}</p>
+          <p>エンターキーを押すと開始します。</p>
+        `;
+      },
+      choices: ['Enter']
+    };
+
+    // Memory grid task - display
+    const memoryGridDisplay = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        // Generate the memory positions to remember
+        memoryPositions = [];
+        const gridSize = params.memoryGridSize;
+        
+        // Randomly select positions
+        while (memoryPositions.length < params.memoryPositions) {
+          const row = Math.floor(Math.random() * gridSize);
+          const col = Math.floor(Math.random() * gridSize);
+          const position = row * gridSize + col;
+          
+          // Ensure no duplicates
+          if (!memoryPositions.includes(position)) {
+            memoryPositions.push(position);
+          }
+        }
+        
+        // Create the grid HTML
+        let gridHTML = '<h1>位置記憶課題</h1>';
+        gridHTML += '<p>以下のグリッド内のハイライトされたセルの位置を記憶してください。</p>';
+        gridHTML += '<div id="memory-grid">';
+        
+        for (let i = 0; i < gridSize * gridSize; i++) {
+          const isHighlighted = memoryPositions.includes(i);
+          gridHTML += `<div class="memory-cell ${isHighlighted ? 'highlighted' : ''}" data-index="${i}"></div>`;
+        }
+        
+        gridHTML += '</div>';
+        gridHTML += '<p>5秒間表示された後、自動的に次へ進みます。</p>';
+        
+        return gridHTML;
+      },
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 5000, // Display for 5 seconds
+      data: {
+        task: 'memory_display',
+        memory_positions: function() { return memoryPositions; }
+      }
+    };
+
+    // Memory grid task - recall
+    const memoryGridRecall = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        // Reset selected positions
+        selectedMemoryPositions = [];
+        
+        // Create the grid HTML
+        let gridHTML = '<h1>位置記憶課題 - 回答</h1>';
+        gridHTML += '<p>先ほど記憶したセルをクリックしてください。</p>';
+        gridHTML += '<div id="memory-grid">';
+        
+        const gridSize = params.memoryGridSize;
+        for (let i = 0; i < gridSize * gridSize; i++) {
+          gridHTML += `<div class="memory-cell" data-index="${i}"></div>`;
+        }
+        
+        gridHTML += '</div>';
+        gridHTML += `<p>選択したセル: <span id="selected-count">0</span>/${params.memoryPositions}</p>`;
+        gridHTML += '<button id="memory-submit" disabled>回答する</button>';
+        
+        return gridHTML;
+      },
+      choices: jsPsych.NO_KEYS,
+      on_load: function() {
+        const cells = document.querySelectorAll('.memory-cell');
+        const submitButton = document.getElementById('memory-submit');
+        const selectedCountElement = document.getElementById('selected-count');
+        
+        cells.forEach(cell => {
+          cell.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            
+            // Toggle selection
+            if (this.classList.contains('selected')) {
+              this.classList.remove('selected');
+              selectedMemoryPositions = selectedMemoryPositions.filter(pos => pos !== index);
+            } else {
+              // Only allow selecting up to the required number
+              if (selectedMemoryPositions.length < params.memoryPositions) {
+                this.classList.add('selected');
+                selectedMemoryPositions.push(index);
+              }
+            }
+            
+            // Update counter and button state
+            selectedCountElement.textContent = selectedMemoryPositions.length;
+            submitButton.disabled = selectedMemoryPositions.length !== params.memoryPositions;
+          });
+        });
+        
+        submitButton.addEventListener('click', function() {
+          jsPsych.finishTrial({
+            memory_selected: selectedMemoryPositions,
+            memory_correct: calculateMemoryAccuracy(memoryPositions, selectedMemoryPositions)
+          });
+        });
+      }
+    };
+
+    // Calculate memory task accuracy
+    function calculateMemoryAccuracy(correct, selected) {
+      let correctCount = 0;
+      for (let pos of selected) {
+        if (correct.includes(pos)) {
+          correctCount++;
+        }
+      }
+      return correctCount / params.memoryPositions;
+    }
+
+    // Display target object
+    const showTarget = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        // Randomly select target color and shape
+        const targetColor = jsPsych.randomization.sampleWithoutReplacement(params.colors, 1)[0];
+        const targetShape = jsPsych.randomization.sampleWithoutReplacement(params.shapes, 1)[0];
+        
+        // Store in data for the visual search task
+        jsPsych.data.addProperties({
+          target_color: targetColor,
+          target_shape: targetShape
+        });
+        
+        return `
+          <h1>ターゲット</h1>
+          <p>以下のオブジェクトを探してください:</p>
+          <div style="margin: 20px auto; width: 100px; height: 100px;">
+            ${drawShape(targetShape, targetColor, 100, 100, 50)}
+          </div>
+          <p>3秒後に自動的に探索課題が始まります。</p>
+        `;
+      },
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 3000,
+      data: {
+        task: 'show_target'
+      }
+    };
+
+    // Draw a shape on canvas or SVG
+    function drawShape(shape, color, x, y, size) {
+      const halfSize = size / 2;
+      
+      switch (shape) {
+        case 'circle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize * 0.8}" fill="${color}" />
+                  </svg>`;
+        case 'triangle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <polygon points="${halfSize},${size * 0.2} ${size * 0.2},${size * 0.8} ${size * 0.8},${size * 0.8}" fill="${color}" />
+                  </svg>`;
+        case 'square':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <rect x="${size * 0.2}" y="${size * 0.2}" width="${size * 0.6}" height="${size * 0.6}" fill="${color}" />
+                  </svg>`;
+        case 'diamond':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <polygon points="${halfSize},${size * 0.2} ${size * 0.8},${halfSize} ${halfSize},${size * 0.8} ${size * 0.2},${halfSize}" fill="${color}" />
+                  </svg>`;
+        default:
+          return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" /></svg>`;
+      }
+    }
+
+    // Visual search task
+    const visualSearch = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        return `<div id="search-container" style="width: 100vw; height: 100vh;"></div>`;
+      },
+      choices: jsPsych.NO_KEYS,
+      on_load: function() {
+        // Get trial parameters
+        const viewCondition = jsPsych.timelineVariable('viewCondition');
+        const structure = jsPsych.timelineVariable('structure');
+        
+        // Get target information
+        const targetColor = jsPsych.data.get().last(1).values()[0].target_color;
+        const targetShape = jsPsych.data.get().last(1).values()[0].target_shape;
+        
+        // Setup canvas
+        const canvas = document.getElementById('jspsych-visual-search-canvas');
+        canvas.width = params.screenWidth;
+        canvas.height = params.screenHeight;
+        canvas.classList.remove('hidden');
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Setup search window for window and scroll conditions
+        const searchWindow = document.getElementById('search-window');
+        if (viewCondition !== 'fullscreen') {
+          searchWindow.style.width = params.windowWidth + 'px';
+          searchWindow.style.height = params.windowHeight + 'px';
+          searchWindow.classList.remove('hidden');
+          
+          if (viewCondition === 'window') {
+            searchWindow.style.left = (params.screenWidth - params.windowWidth) / 2 + 'px';
+            searchWindow.style.top = (params.screenHeight - params.windowHeight) / 2 + 'px';
+          } else { // scroll condition
+            searchWindow.style.left = (params.screenWidth - params.windowWidth) / 2 + 'px';
+            searchWindow.style.top = (params.screenHeight - params.windowHeight) / 2 + 'px';
+          }
+        }
+        
+        // Create visual search display
+        const searchArea = {
+          width: params.screenWidth,
+          height: params.screenHeight
+        };
+        
+        // Reset movement tracking
+        mousePath = [];
+        totalMovement = 0;
+        lastMouseX = params.screenWidth / 2;
+        lastMouseY = params.screenHeight / 2;
+        
+        // Generate objects
+        generateObjects(searchArea, targetColor, targetShape, structure);
+        
+        // Initial draw
+        drawSearchDisplay(ctx, viewCondition);
+        
+        // Start timer
+        const startTime = performance.now();
+        
+        // Setup event listeners
+        if (viewCondition === 'window') {
+          // Window condition - move the window
+          document.addEventListener('mousemove', moveWindow);
+        } else if (viewCondition === 'scroll') {
+          // Scroll condition - drag the background
+          canvas.addEventListener('mousedown', startDrag);
+          document.addEventListener('mousemove', dragBackground);
+          document.addEventListener('mouseup', endDrag);
+        }
+        
+        // Click to select object
+        canvas.addEventListener('click', checkSelection);
+        
+        // Event handler functions
+        function moveWindow(e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          
+          // Calculate movement distance
+          const dx = mouseX - lastMouseX;
+          const dy = mouseY - lastMouseY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Update total movement and path
+          totalMovement += distance;
+          mousePath.push({x: mouseX, y: mouseY, time: performance.now() - startTime});
+          
+          // Update last position
+          lastMouseX = mouseX;
+          lastMouseY = mouseY;
+          
+          // Move the window
+          const halfWindowWidth = params.windowWidth / 2;
+          const halfWindowHeight = params.windowHeight / 2;
+          
+          let windowX = mouseX - halfWindowWidth;
+          let windowY = mouseY - halfWindowHeight;
+          
+          // Keep window within screen bounds
+          windowX = Math.max(0, Math.min(windowX, params.screenWidth - params.windowWidth));
+          windowY = Math.max(0, Math.min(windowY, params.screenHeight - params.windowHeight));
+          
+          searchWindow.style.left = windowX + 'px';
+          searchWindow.style.top = windowY + 'px';
+          
+          // Update canvas clip region
+          drawSearchDisplay(ctx, viewCondition);
+        }
+        
+        function startDrag(e) {
+          isMouseDown = true;
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          lastMouseX = mouseX;
+          lastMouseY = mouseY;
+        }
+        
+        function dragBackground(e) {
+          if (!isMouseDown && viewCondition === 'scroll') return;
+          
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          
+          if (viewCondition === 'scroll' && isMouseDown) {
+            // Calculate movement distance
+            const dx = mouseX - lastMouseX;
+            const dy = mouseY - lastMouseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Update total movement and path
+            totalMovement += distance;
+            mousePath.push({x: mouseX, y: mouseY, time: performance.now() - startTime});
+            
+            // Move all objects
+            for (let i = 0; i < objects.length; i++) {
+              objects[i].x += dx;
+              objects[i].y += dy;
+            }
+            
+            // Update last position
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            
+            // Redraw
+            drawSearchDisplay(ctx, viewCondition);
+          }
+        }
+        
+        function endDrag() {
+          isMouseDown = false;
+        }
+        
+        function checkSelection(e) {
+          const clickX = e.clientX;
+          const clickY = e.clientY;
+          
+          // Check if click is within visible area for window/scroll conditions
+          if (viewCondition !== 'fullscreen') {
+            const windowRect = searchWindow.getBoundingClientRect();
+            if (clickX < windowRect.left || clickX > windowRect.right || 
+                clickY < windowRect.top || clickY > windowRect.bottom) {
+              return; // Click outside visible area
+            }
+          }
+          
+          // Find clicked object
+          let clickedObject = null;
+          
+          for (let i = 0; i < objects.length; i++) {
+            const obj = objects[i];
+            const dx = clickX - obj.x;
+            const dy = clickY - obj.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance <= obj.size / 2) {
+              clickedObject = obj;
+              break;
+            }
+          }
+          
+          // Check if target was found
+          const correct = clickedObject === targetObject;
+          const rt = performance.now() - startTime;
+          
+          // Remove event listeners
+          if (viewCondition === 'window') {
+            document.removeEventListener('mousemove', moveWindow);
+          } else if (viewCondition === 'scroll') {
+            canvas.removeEventListener('mousedown', startDrag);
+            document.removeEventListener('mousemove', dragBackground);
+            document.removeEventListener('mouseup', endDrag);
+          }
+          canvas.removeEventListener('click', checkSelection);
+          
+          // Hide canvas and window
+          canvas.classList.add('hidden');
+          searchWindow.classList.add('hidden');
+          
+          // Finish trial
+          jsPsych.finishTrial({
+            reaction_time: rt,
+            correct: correct,
+            view_condition: viewCondition,
+            structure: structure,
+            memory_load: jsPsych.timelineVariable('memoryLoad'),
+            target_color: targetColor,
+            target_shape: targetShape,
+            total_movement: totalMovement,
+            mouse_path: mousePath
+          });
+        }
+      }
+    };
+
+    // Generate objects for visual search
+    function generateObjects(area, targetColor, targetShape, structure) {
+      objects = [];
+      let positions = [];
+      
+      // Generate target object
+      const targetSize = Math.floor(Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize);
+      
+      let targetX, targetY;
+      
+      if (structure === 'structured') {
+        // For structured condition, create a grid or clusters
+        const isGrid = Math.random() < 0.5; // 50% chance for grid or clusters
+        
+        if (isGrid) {
+          // Create grid layout
+          const gridSize = Math.floor(Math.sqrt(params.numObjects));
+          const cellWidth = area.width / gridSize;
+          const cellHeight = area.height / gridSize;
+          
+          for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+              positions.push({
+                x: i * cellWidth + cellWidth / 2,
+                y: j * cellHeight + cellHeight / 2
+              });
+            }
+          }
+          
+          // Randomly place target at one of the grid positions
+          const targetPosition = Math.floor(Math.random() * positions.length);
+          targetX = positions[targetPosition].x;
+          targetY = positions[targetPosition].y;
+          
+          // Remove the target position
+          positions.splice(targetPosition, 1);
+        } else {
+          // Create clusters
+          const numClusters = Math.floor(Math.random() * 3) + 2; // 2-4 clusters
+          const clusterCenters = [];
+          
+          // Generate cluster centers
+          for (let i = 0; i < numClusters; i++) {
+            clusterCenters.push({
+              x: Math.random() * area.width,
+              y: Math.random() * area.height
+            });
+          }
+          
+          // Assign target to a random cluster
+          const targetCluster = Math.floor(Math.random() * numClusters);
+          
+          // Place target near the cluster center
+          const clusterRadius = Math.min(area.width, area.height) / 6;
+          const angle = Math.random() * 2 * Math.PI;
+          const distance = Math.random() * clusterRadius;
+          
+          targetX = clusterCenters[targetCluster].x + distance * Math.cos(angle);
+          targetY = clusterCenters[targetCluster].y + distance * Math.sin(angle);
+          
+          // Ensure target is within bounds
+          targetX = Math.max(targetSize, Math.min(area.width - targetSize, targetX));
+          targetY = Math.max(targetSize, Math.min(area.height - targetSize, targetY));
+          
+          // Generate positions for distractors around cluster centers
+          for (let i = 0; i < numClusters; i++) {
+            const itemsPerCluster = Math.floor(params.numObjects / numClusters);
+            
+            for (let j = 0; j < itemsPerCluster; j++) {
+              const angle = Math.random() * 2 * Math.PI;
+              const distance = Math.random() * clusterRadius;
+              
+              const x = clusterCenters[i].x + distance * Math.cos(angle);
+              const y = clusterCenters[i].y + distance * Math.sin(angle);
+              
+              positions.push({
+                x: Math.max(targetSize, Math.min(area.width - targetSize, x)),
+                y: Math.max(targetSize, Math.min(area.height - targetSize, y))
+              });
+            }
+          }
+        }
+      } else {
+        // Unstructured condition - random positions
+        targetX = Math.random() * (area.width - targetSize * 2) + targetSize;
+        targetY = Math.random() * (area.height - targetSize * 2) + targetSize;
+        
+        // Generate random positions for distractors
+        for (let i = 0; i < params.numObjects - 1; i++) {
+          let x, y, overlapping;
+          
+          do {
+            x = Math.random() * (area.width - targetSize * 2) + targetSize;
+            y = Math.random() * (area.height - targetSize * 2) + targetSize;
+            
+            // Check if too close to target
+            const dx = x - targetX;
+            const dy = y - targetY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            overlapping = distance < targetSize;
+            
+            // Check if too close to other positions
+            for (let j = 0; j < positions.length && !overlapping; j++) {
+              const dx = x - positions[j].x;
+              const dy = y - positions[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              if (distance < targetSize) {
+                overlapping = true;
+              }
+            }
+          } while (overlapping);
+          
+          positions.push({x: x, y: y});
+        }
+      }
+      
+      // Create the target object
+      targetObject = {
+        x: targetX,
+        y: targetY,
+        size: targetSize,
+        color: targetColor,
+        shape: targetShape,
+        isTarget: true
+      };
+      
+      objects.push(targetObject);
+      
+      // Create distractor objects
+      for (let i = 0; i < params.numObjects - 1; i++) {
+        if (i >= positions.length) break;
+        
+        let distractorColor, distractorShape;
+        
+        // Ensure at least one feature is different from target
+        if (Math.random() < 0.5) {
+          // Different color, same shape
+          distractorColor = jsPsych.randomization.sampleWithoutReplacement(
+            params.colors.filter(c => c !== targetColor), 1)[0];
+          distractorShape = targetShape;
+        } else {
+          // Same color, different shape
+          distractorColor = targetColor;
+          distractorShape = jsPsych.randomization.sampleWithoutReplacement(
+            params.shapes.filter(s => s !== targetShape), 1)[0];
+        }
+        
+        // Some distractors might differ in both features
+        if (Math.random() < 0.3) {
+          distractorColor = jsPsych.randomization.sampleWithoutReplacement(
+            params.colors.filter(c => c !== targetColor), 1)[0];
+          distractorShape = jsPsych.randomization.sampleWithoutReplacement(
+            params.shapes.filter(s => s !== targetShape), 1)[0];
+        }
+        
+        const size = Math.floor(Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize);
+        
+        objects.push({
+          x: positions[i].x,
+          y: positions[i].y,
+          size: size,
+          color: distractorColor,
+          shape: distractorShape,
+          isTarget: false
+        });
+      }
+    }
+
+    // Draw search display based on view condition
+    function drawSearchDisplay(ctx, viewCondition) {
+      ctx.clearRect(0, 0, params.screenWidth, params.screenHeight);
+      
+      if (viewCondition !== 'fullscreen') {
+        // Clip to window area
+        const searchWindow = document.getElementById('search-window');
+        const windowRect = searchWindow.getBoundingClientRect();
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(windowRect.left, windowRect.top, windowRect.width, windowRect.height);
+        ctx.clip();
+      }
+      
+      // Draw all objects
+      for (let i = 0; i < objects.length; i++) {
+        const obj = objects[i];
+        drawObject(ctx, obj.x, obj.y, obj.size, obj.color, obj.shape);
+      }
+      
+      if (viewCondition !== 'fullscreen') {
+        ctx.restore();
+      }
+    }
+
+    // Draw an object on the canvas
+    function drawObject(ctx, x, y, size, color, shape) {
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      
+      switch (shape) {
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'triangle':
+          ctx.beginPath();
+          ctx.moveTo(x, y - size / 2);
+          ctx.lineTo(x + size / 2, y + size / 2);
+          ctx.lineTo(x - size / 2, y + size / 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'square':
+          ctx.beginPath();
+          ctx.rect(x - size / 2, y - size / 2, size, size);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'diamond':
+          ctx.beginPath();
+          ctx.moveTo(x, y - size / 2);
+          ctx.lineTo(x + size / 2, y);
+          ctx.lineTo(x, y + size / 2);
+          ctx.lineTo(x - size / 2, y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+      }
+    }
+
+    // Feedback for visual search task
+    const searchFeedback = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        const data = jsPsych.data.get().last(1).values()[0];
+        const correct = data.correct;
+        
+        return `
+          <h1>${correct ? '正解!' : '不正解'}</h1>
+          <p>反応時間: ${Math.round(data.reaction_time)}ms</p>
+          <p>エンターキーを押すと次に進みます。</p>
+        `;
+      },
+      choices: ['Enter']
+    };
+
+    // End screen
+    const endScreen = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>実験終了</h1>
+        <p>実験にご参加いただき、ありがとうございました。</p>
+        <p>エンターキーを押すと終了します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Create factorial design
+    const factorialDesign = jsPsych.randomization.factorial(factors, params.trialsPerCondition);
+    
+    // Build timeline for a single trial based on condition
+    const trialProcedure = {
+      timeline: [
+        visualSearchInstructions,
+        // Memory task is only included for 'with-memory' condition
+        {
+          timeline: [memoryGridDisplay],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        showTarget,
+        visualSearch,
+        // Memory recall only for 'with-memory' condition
+        {
+          timeline: [memoryGridRecall],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        searchFeedback
+      ],
+      timeline_variables: factorialDesign,
+      randomize_order: true
+    };
+
+    // Full experiment timeline
+    const timeline = [
+      welcome,
+      consent,
+      demographics,
+      trialProcedure,
+      endScreen
+    ];
+
+    // Run the experiment
+    jsPsych.init({
+      display_element: 'jspsych-target',
+      timeline: timeline,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+  </script>
+</body>
+</html>
