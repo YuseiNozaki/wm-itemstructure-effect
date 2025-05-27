@@ -495,6 +495,7 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.classList.remove('hidden');
+        canvas.style.display = 'block'; // Ensure the canvas is visible (reset from previous trial)
         
         const ctx = canvas.getContext('2d');
         
@@ -504,6 +505,7 @@
           searchWindow.style.width = params.windowWidth + 'px';
           searchWindow.style.height = params.windowHeight + 'px';
           searchWindow.classList.remove('hidden');
+          searchWindow.style.display = 'block'; // Ensure search window is visible (reset from previous trial)
           // 中央に固定
           searchWindow.style.left = '50%';
           searchWindow.style.top = '50%';
