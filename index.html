@@ -100,7 +100,11 @@
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
-        elem.requestFullscreen();
+        elem.requestFullscreen().then(() => {
+          console.log("フルスクリーンモードに正常に移行しました");
+        }).catch(err => {
+          console.warn("フルスクリーン移行エラー:", err);
+        });
       } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
       } else if (elem.webkitRequestFullscreen) {
@@ -108,10 +112,71 @@
       } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
       }
+      
+      // キーイベントが適切に処理されるようにフォーカスを設定
+      setTimeout(() => {
+        if (document.getElementById('jspsych-target')) {
+          document.getElementById('jspsych-target').focus();
+        }
+      }, 100);
     }
 
-    // ウェルカム画面で一度だけフルスクリーン化するためのボタンを提供
-    // クリックイベントはここでは登録せず、ウェルカム画面のボタンでのみ行う
+    // 実験開始時にフルスクリーンモードに自動的に移行するよう設定
+    // ブラウザのセキュリティ制限のため、何らかのユーザー操作（キー入力など）に応じて実行する必要がある
+
+    // ブラウザテスト用のデバッグ関数
+    function testBrowserInteraction() {
+      console.log("ブラウザテスト: キー入力のテスト");
+      
+      // キーボード入力のテスト
+      window.addEventListener('keydown', function(e) {
+        console.log("キー入力を検出:", e.key);
+      });
+      
+      // カーソル操作のテスト
+      document.addEventListener('mousemove', function(e) {
+        // 大量のログを避けるため、100px移動ごとにログ
+        if (e.clientX % 100 < 5 && e.clientY % 100 < 5) {
+          console.log("カーソル位置:", e.clientX, e.clientY);
+        }
+      });
+      
+      console.log("ブラウザテスト: フルスクリーンの状態");
+      if (document.fullscreenElement || 
+          document.webkitFullscreenElement || 
+          document.mozFullScreenElement || 
+          document.msFullscreenElement) {
+        console.log("現在フルスクリーンモード");
+      } else {
+        console.log("フルスクリーンモードではない");
+      }
+    }
+    
+    // 実験開始時にテスト関数を実行
+    window.addEventListener('load', function() {
+      setTimeout(testBrowserInteraction, 2000);
+    });
+
+    // Listen for fullscreen changes to ensure keyboard interaction works
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    function handleFullscreenChange() {
+      if (document.fullscreenElement || 
+          document.webkitFullscreenElement || 
+          document.mozFullScreenElement || 
+          document.msFullscreenElement) {
+        console.log("フルスクリーンモードに切り替わりました");
+        // Ensure we can receive keyboard events
+        if (document.getElementById('jspsych-target')) {
+          document.getElementById('jspsych-target').focus();
+        }
+      } else {
+        console.log("フルスクリーンモードから抜けました");
+      }
+    }
 
     // Experiment parameters
     const params = {
@@ -169,14 +234,10 @@
       type: 'html-keyboard-response',
       stimulus: '<h1>視覚探索実験</h1>' +
                 '<p>実験に参加していただきありがとうございます。</p>' +
-                '<p>まず、「フルスクリーン開始」ボタンを押して全画面表示にしてください。</p>' +
-                '<p>その後、エンターキーを押すと次に進みます。</p>' +
-                '<button id="fullscreen-btn" style="padding: 10px 20px; margin-top: 20px; font-size: 16px;">フルスクリーン開始</button>',
+                '<p>エンターキーを押すと実験が開始され、自動的にフルスクリーンモードに切り替わります。</p>',
       choices: ['Enter'],
-      on_load: function() {
-        document.getElementById('fullscreen-btn').addEventListener('click', function() {
-          enterFullscreen();
-        });
+      on_finish: function() {
+        enterFullscreen();
       }
     };
 
@@ -965,6 +1026,16 @@
       timeline: timeline,
       on_finish: function() {
         jsPsych.data.displayData();
+      },
+      on_trial_start: function() {
+        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
+        if (!document.fullscreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.msFullscreenElement) {
+          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
+          console.log("フルスクリーンモードの再確認");
+        }
       }
     });
   </script>
