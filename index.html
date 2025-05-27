@@ -96,7 +96,7 @@
     // jsPsych is already defined as a global variable in v6.3.1
     // We'll initialize it later with jsPsych.init()
 
-    // 即座にフルスクリーンにする
+    // フルスクリーンモードを要求する関数
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
@@ -110,17 +110,8 @@
       }
     }
 
-    // ページ読み込み完了時にフルスクリーンにする
-    window.addEventListener('load', function() {
-      enterFullscreen();
-    });
-
-    // ユーザーがクリックした時もフルスクリーンにする（ブラウザの制限対策）
-    document.addEventListener('click', function() {
-      if (!document.fullscreenElement) {
-        enterFullscreen();
-      }
-    }, { once: true });
+    // ウェルカム画面で一度だけフルスクリーン化するためのボタンを提供
+    // クリックイベントはここでは登録せず、ウェルカム画面のボタンでのみ行う
 
     // Experiment parameters
     const params = {
@@ -178,8 +169,15 @@
       type: 'html-keyboard-response',
       stimulus: '<h1>視覚探索実験</h1>' +
                 '<p>実験に参加していただきありがとうございます。</p>' +
-                '<p>エンターキーを押すと次に進みます。</p>',
-      choices: ['Enter']
+                '<p>まず、「フルスクリーン開始」ボタンを押して全画面表示にしてください。</p>' +
+                '<p>その後、エンターキーを押すと次に進みます。</p>' +
+                '<button id="fullscreen-btn" style="padding: 10px 20px; margin-top: 20px; font-size: 16px;">フルスクリーン開始</button>',
+      choices: ['Enter'],
+      on_load: function() {
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+          enterFullscreen();
+        });
+      }
     };
 
     // Informed consent
@@ -423,8 +421,6 @@
         task: 'visual_search'
       },
       on_load: function() {
-        // フルスクリーン化はwelcome画面で行うため、ここでは不要
-        // let vCond = jsPsych.timelineVariable('viewCondition');
         // Get trial parameters
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         const structure = jsPsych.timelineVariable('structure');
