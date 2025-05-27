@@ -666,9 +666,9 @@
           }
           canvas.removeEventListener('click', checkSelection);
           
-          // Hide canvas and window
-          canvas.classList.add('hidden');
-          searchWindow.classList.add('hidden');
+          // Hide canvas and window immediately using direct style property
+          canvas.style.display = 'none';
+          searchWindow.style.display = 'none';
           
           // Finish trial
           jsPsych.finishTrial({
