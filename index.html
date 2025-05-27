@@ -96,11 +96,15 @@
     // jsPsych is already defined as a global variable in v6.3.1
     // We'll initialize it later with jsPsych.init()
 
-    // 即座にフルスクリーンにする
+    // フルスクリーンモードを要求する関数
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
-        elem.requestFullscreen();
+        elem.requestFullscreen().then(() => {
+          console.log("フルスクリーンモードに正常に移行しました");
+        }).catch(err => {
+          console.warn("フルスクリーン移行エラー:", err);
+        });
       } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
       } else if (elem.webkitRequestFullscreen) {
@@ -108,19 +112,71 @@
       } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
       }
+      
+      // キーイベントが適切に処理されるようにフォーカスを設定
+      setTimeout(() => {
+        if (document.getElementById('jspsych-target')) {
+          document.getElementById('jspsych-target').focus();
+        }
+      }, 100);
     }
 
-    // ページ読み込み完了時にフルスクリーンにする
+    // 実験開始時にフルスクリーンモードに自動的に移行するよう設定
+    // ブラウザのセキュリティ制限のため、何らかのユーザー操作（キー入力など）に応じて実行する必要がある
+
+    // ブラウザテスト用のデバッグ関数
+    function testBrowserInteraction() {
+      console.log("ブラウザテスト: キー入力のテスト");
+      
+      // キーボード入力のテスト
+      window.addEventListener('keydown', function(e) {
+        console.log("キー入力を検出:", e.key);
+      });
+      
+      // カーソル操作のテスト
+      document.addEventListener('mousemove', function(e) {
+        // 大量のログを避けるため、100px移動ごとにログ
+        if (e.clientX % 100 < 5 && e.clientY % 100 < 5) {
+          console.log("カーソル位置:", e.clientX, e.clientY);
+        }
+      });
+      
+      console.log("ブラウザテスト: フルスクリーンの状態");
+      if (document.fullscreenElement || 
+          document.webkitFullscreenElement || 
+          document.mozFullScreenElement || 
+          document.msFullscreenElement) {
+        console.log("現在フルスクリーンモード");
+      } else {
+        console.log("フルスクリーンモードではない");
+      }
+    }
+    
+    // 実験開始時にテスト関数を実行
     window.addEventListener('load', function() {
-      enterFullscreen();
+      setTimeout(testBrowserInteraction, 2000);
     });
 
-    // ユーザーがクリックした時もフルスクリーンにする（ブラウザの制限対策）
-    document.addEventListener('click', function() {
-      if (!document.fullscreenElement) {
-        enterFullscreen();
+    // Listen for fullscreen changes to ensure keyboard interaction works
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    function handleFullscreenChange() {
+      if (document.fullscreenElement || 
+          document.webkitFullscreenElement || 
+          document.mozFullScreenElement || 
+          document.msFullscreenElement) {
+        console.log("フルスクリーンモードに切り替わりました");
+        // Ensure we can receive keyboard events
+        if (document.getElementById('jspsych-target')) {
+          document.getElementById('jspsych-target').focus();
+        }
+      } else {
+        console.log("フルスクリーンモードから抜けました");
       }
-    }, { once: true });
+    }
 
     // Experiment parameters
     const params = {
@@ -142,7 +198,7 @@
       shapes: ['circle', 'triangle', 'square', 'diamond'],
       
       // Trials
-      trialsPerCondition: 10,
+      trialsPerCondition: 5,
       
       // Memory task
       memoryGridSize: 4, // 4x4 grid
@@ -178,8 +234,11 @@
       type: 'html-keyboard-response',
       stimulus: '<h1>視覚探索実験</h1>' +
                 '<p>実験に参加していただきありがとうございます。</p>' +
-                '<p>エンターキーを押すと次に進みます。</p>',
-      choices: ['Enter']
+                '<p>エンターキーを押すと実験が開始され、自動的にフルスクリーンモードに切り替わります。</p>',
+      choices: ['Enter'],
+      on_finish: function() {
+        enterFullscreen();
+      }
     };
 
     // Informed consent
@@ -191,7 +250,7 @@
           <div style="width: 80%; margin: 0 auto; text-align: left;">
             <p><strong>実験の目的:</strong> この実験では、人がものを探すときの性質について調査を行います。</p>
             <p><strong>データの取り扱い:</strong> 収集されるデータは研究目的のみに使用され、個人を特定できる情報は含まれません。</p>
-            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。</p>
+            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。最初の30試行の後に小休憩があります。</p>
             <p><strong>参加の任意性:</strong> 実験はいつでも中止することができます。中止されても不利益は生じません。</p>
             <p><strong>同意:</strong> 上記の内容を理解し、実験参加に同意される場合は、エンターキーを押して次に進んでください。</p>
           </div>
@@ -419,9 +478,10 @@
         return `<div id="search-container" style="width: 100vw; height: 100vh;"></div>`;
       },
       choices: jsPsych.NO_KEYS,
+      data: {
+        task: 'visual_search'
+      },
       on_load: function() {
-        // フルスクリーン化はwelcome画面で行うため、ここでは不要
-        // let vCond = jsPsych.timelineVariable('viewCondition');
         // Get trial parameters
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         const structure = jsPsych.timelineVariable('structure');
@@ -631,102 +691,52 @@
       objects = [];
       let positions = [];
       
-      // Generate target object
-      const targetSize = Math.floor(Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize);
+      // Use uniform object size
+      const objectSize = (params.objectMaxSize + params.objectMinSize) / 2;
       
       let targetX, targetY;
       
       if (structure === 'structured') {
-        // For structured condition, create a grid or clusters
-        const isGrid = Math.random() < 0.5; // 50% chance for grid or clusters
+        // For structured condition, create a grid layout
+        const gridSize = Math.floor(Math.sqrt(params.numObjects));
+        const cellWidth = area.width / gridSize;
+        const cellHeight = area.height / gridSize;
         
-        if (isGrid) {
-          // Create grid layout
-          const gridSize = Math.floor(Math.sqrt(params.numObjects));
-          const cellWidth = area.width / gridSize;
-          const cellHeight = area.height / gridSize;
-          
-          for (let i = 0; i < gridSize; i++) {
-            for (let j = 0; j < gridSize; j++) {
-              positions.push({
-                x: i * cellWidth + cellWidth / 2,
-                y: j * cellHeight + cellHeight / 2
-              });
-            }
-          }
-          
-          // Randomly place target at one of the grid positions
-          const targetPosition = Math.floor(Math.random() * positions.length);
-          targetX = positions[targetPosition].x;
-          targetY = positions[targetPosition].y;
-          
-          // Remove the target position
-          positions.splice(targetPosition, 1);
-        } else {
-          // Create clusters
-          const numClusters = Math.floor(Math.random() * 3) + 2; // 2-4 clusters
-          const clusterCenters = [];
-          
-          // Generate cluster centers
-          for (let i = 0; i < numClusters; i++) {
-            clusterCenters.push({
-              x: Math.random() * area.width,
-              y: Math.random() * area.height
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            positions.push({
+              x: i * cellWidth + cellWidth / 2,
+              y: j * cellHeight + cellHeight / 2
             });
           }
-          
-          // Assign target to a random cluster
-          const targetCluster = Math.floor(Math.random() * numClusters);
-          
-          // Place target near the cluster center
-          const clusterRadius = Math.min(area.width, area.height) / 6;
-          const angle = Math.random() * 2 * Math.PI;
-          const distance = Math.random() * clusterRadius;
-          
-          targetX = clusterCenters[targetCluster].x + distance * Math.cos(angle);
-          targetY = clusterCenters[targetCluster].y + distance * Math.sin(angle);
-          
-          // Ensure target is within bounds
-          targetX = Math.max(targetSize, Math.min(area.width - targetSize, targetX));
-          targetY = Math.max(targetSize, Math.min(area.height - targetSize, targetY));
-          
-          // Generate positions for distractors around cluster centers
-          for (let i = 0; i < numClusters; i++) {
-            const itemsPerCluster = Math.floor(params.numObjects / numClusters);
-            
-            for (let j = 0; j < itemsPerCluster; j++) {
-              const angle = Math.random() * 2 * Math.PI;
-              const distance = Math.random() * clusterRadius;
-              
-              const x = clusterCenters[i].x + distance * Math.cos(angle);
-              const y = clusterCenters[i].y + distance * Math.sin(angle);
-              
-              positions.push({
-                x: Math.max(targetSize, Math.min(area.width - targetSize, x)),
-                y: Math.max(targetSize, Math.min(area.height - targetSize, y))
-              });
-            }
-          }
         }
+        
+        // Randomly place target at one of the grid positions
+        const targetPosition = Math.floor(Math.random() * positions.length);
+        targetX = positions[targetPosition].x;
+        targetY = positions[targetPosition].y;
+        
+        // Remove the target position
+        positions.splice(targetPosition, 1);
       } else {
         // Unstructured condition - random positions
-        targetX = Math.random() * (area.width - targetSize * 2) + targetSize;
-        targetY = Math.random() * (area.height - targetSize * 2) + targetSize;
+        targetX = Math.random() * (area.width - objectSize * 2) + objectSize;
+        targetY = Math.random() * (area.height - objectSize * 2) + objectSize;
         
         // Generate random positions for distractors
         for (let i = 0; i < params.numObjects - 1; i++) {
           let x, y, overlapping;
           
           do {
-            x = Math.random() * (area.width - targetSize * 2) + targetSize;
-            y = Math.random() * (area.height - targetSize * 2) + targetSize;
+            x = Math.random() * (area.width - objectSize * 2) + objectSize;
+            y = Math.random() * (area.height - objectSize * 2) + objectSize;
             
             // Check if too close to target
             const dx = x - targetX;
             const dy = y - targetY;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            overlapping = distance < targetSize;
+            overlapping = distance < objectSize;
             
             // Check if too close to other positions
             for (let j = 0; j < positions.length && !overlapping; j++) {
@@ -734,7 +744,7 @@
               const dy = y - positions[j].y;
               const distance = Math.sqrt(dx * dx + dy * dy);
               
-              if (distance < targetSize) {
+              if (distance < objectSize) {
                 overlapping = true;
               }
             }
@@ -748,7 +758,7 @@
       targetObject = {
         x: targetX,
         y: targetY,
-        size: targetSize,
+        size: objectSize,
         color: targetColor,
         shape: targetShape,
         isTarget: true
@@ -783,12 +793,10 @@
             params.shapes.filter(s => s !== targetShape), 1)[0];
         }
         
-        const size = Math.floor(Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize);
-        
         objects.push({
           x: positions[i].x,
           y: positions[i].y,
-          size: size,
+          size: objectSize,
           color: distractorColor,
           shape: distractorShape,
           isTarget: false
@@ -876,24 +884,90 @@
           <p>エンターキーを押すと次に進みます。</p>
         `;
       },
+      data: {
+        task: 'search_feedback'
+      },
       choices: ['Enter']
     };
 
-    // End screen
+    // End screen with overall score
     const endScreen = {
       type: 'html-keyboard-response',
+      stimulus: function() {
+        // Calculate overall accuracy for visual search
+        const searchData = jsPsych.data.get().filter({task: 'visual_search'});
+        const correctSearches = searchData.filter({correct: true}).count();
+        const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
+        
+        // Calculate overall memory task accuracy if applicable
+        let memoryAccuracyText = '';
+        const memoryScores = jsPsych.data.get().select('memory_correct').values;
+        
+        if (memoryScores && memoryScores.length > 0) {
+          // Filter out undefined values and calculate mean
+          const filteredScores = memoryScores.filter(score => score !== undefined);
+          if (filteredScores.length > 0) {
+            const avgMemoryAccuracy = filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length;
+            const memoryAccuracy = Math.round(avgMemoryAccuracy * 100);
+            memoryAccuracyText = `<p>記憶課題の正答率: ${memoryAccuracy}%</p>`;
+          }
+        }
+        
+        return `
+          <h1>実験終了</h1>
+          <p>実験にご参加いただき、ありがとうございました。</p>
+          <p>視覚探索課題の正答率: ${searchAccuracy}%</p>
+          ${memoryAccuracyText}
+          <p>エンターキーを押すと終了します。</p>
+        `;
+      },
+      choices: ['Enter']
+    };
+    
+    // Midpoint message
+    const midpointMessage = {
+      type: 'html-keyboard-response',
       stimulus: `
-        <h1>実験終了</h1>
-        <p>実験にご参加いただき、ありがとうございました。</p>
-        <p>エンターキーを押すと終了します。</p>
+        <h1>半分終了</h1>
+        <p>お疲れさまでした。ここで半分終了です。</p>
+        <p>ここからは課題を追加します。</p>
+        <p>エンターキーを押すと次に進みます。</p>
+      `,
+      choices: ['Enter']
+    };
+    
+    // WM task explanation
+    const wmTaskExplanation = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>位置記憶課題の説明</h1>
+        <p>これから、視覚探索課題に加えて、位置記憶課題も行っていただきます。</p>
+        <p>各試行の開始時に4×4のグリッド上で3つのハイライトされたセルが表示されます。</p>
+        <p>それらの位置を記憶し、視覚探索課題の後に同じ位置を選択してください。</p>
+        <p>エンターキーを押すと次に進みます。</p>
       `,
       choices: ['Enter']
     };
 
-    // Create factorial design
-    const factorialDesign = jsPsych.randomization.factorial(factors, params.trialsPerCondition);
+    // Create separate factorial designs for with-memory and without-memory conditions
+    const viewAndStructureFactors = {
+      viewCondition: ['window', 'scroll', 'fullscreen'],
+      structure: ['structured', 'unstructured']
+    };
     
-    // Build timeline for a single trial based on condition
+    // First block without memory task
+    const withoutMemoryDesign = jsPsych.randomization.factorial(viewAndStructureFactors, params.trialsPerCondition);
+    withoutMemoryDesign.forEach(trial => {
+      trial.memoryLoad = 'without-memory';
+    });
+    
+    // Second block with memory task
+    const withMemoryDesign = jsPsych.randomization.factorial(viewAndStructureFactors, params.trialsPerCondition);
+    withMemoryDesign.forEach(trial => {
+      trial.memoryLoad = 'with-memory';
+    });
+    
+    // Build timeline procedure for a single trial
     const trialProcedure = {
       timeline: [
         visualSearchInstructions,
@@ -911,11 +985,26 @@
           timeline: [memoryGridRecall],
           conditional_function: function() {
             return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          },
+          data: {
+            task: 'memory_recall'
           }
         },
         searchFeedback
-      ],
-      timeline_variables: factorialDesign,
+      ]
+    };
+    
+    // First block (without memory)
+    const firstBlockProcedure = {
+      ...trialProcedure,
+      timeline_variables: withoutMemoryDesign,
+      randomize_order: true
+    };
+    
+    // Second block (with memory)
+    const secondBlockProcedure = {
+      ...trialProcedure,
+      timeline_variables: withMemoryDesign,
       randomize_order: true
     };
 
@@ -924,7 +1013,10 @@
       welcome,
       consent,
       demographics,
-      trialProcedure,
+      firstBlockProcedure,
+      midpointMessage,
+      wmTaskExplanation,
+      secondBlockProcedure,
       endScreen
     ];
 
@@ -934,6 +1026,16 @@
       timeline: timeline,
       on_finish: function() {
         jsPsych.data.displayData();
+      },
+      on_trial_start: function() {
+        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
+        if (!document.fullscreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.msFullscreenElement) {
+          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
+          console.log("フルスクリーンモードの再確認");
+        }
       }
     });
   </script>
