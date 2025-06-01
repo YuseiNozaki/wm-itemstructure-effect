@@ -222,6 +222,8 @@
     let isMouseDown = false;
     let currentDragDistance = 0; // Track drag distance for current interaction
     let justFinishedDrag = false; // Track if a drag operation just finished
+    let dragOffsetX = 0; // Offset between cursor and window left edge when drag starts
+    let dragOffsetY = 0; // Offset between cursor and window top edge when drag starts
 
     // Target and distractor objects
     let objects = [];
@@ -573,6 +575,12 @@
           lastMouseX = mouseX;
           lastMouseY = mouseY;
           currentDragDistance = 0; // Reset drag distance for new interaction
+          
+          // Calculate offset between cursor and window position
+          const searchWindow = document.getElementById('search-window');
+          const windowRect = searchWindow.getBoundingClientRect();
+          dragOffsetX = mouseX - windowRect.left;
+          dragOffsetY = mouseY - windowRect.top;
         }
         
         function dragWindow(e) {
@@ -596,12 +604,9 @@
             lastMouseX = mouseX;
             lastMouseY = mouseY;
             
-            // Move the window
-            const halfWindowWidth = params.windowWidth / 2;
-            const halfWindowHeight = params.windowHeight / 2;
-            
-            let windowX = mouseX - halfWindowWidth;
-            let windowY = mouseY - halfWindowHeight;
+            // Move the window using the stored offset
+            let windowX = mouseX - dragOffsetX;
+            let windowY = mouseY - dragOffsetY;
             
             // Keep window within screen bounds
             windowX = Math.max(0, Math.min(windowX, params.screenWidth - params.windowWidth));
