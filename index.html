@@ -221,6 +221,7 @@
     let lastMouseY = 0;
     let isMouseDown = false;
     let currentDragDistance = 0; // Track drag distance for current interaction
+    let justFinishedDrag = false; // Track if a drag operation just finished
 
     // Target and distractor objects
     let objects = [];
@@ -511,6 +512,13 @@
           searchWindow.style.left = '50%';
           searchWindow.style.top = '50%';
           searchWindow.style.transform = 'translate(-50%, -50%)';
+          
+          // Enable pointer events for window condition to allow dragging
+          if (viewCondition === 'window') {
+            searchWindow.style.pointerEvents = 'auto';
+          } else {
+            searchWindow.style.pointerEvents = 'none';
+          }
         }
         
         // Create visual search display
@@ -523,6 +531,7 @@
         mousePath = [];
         totalMovement = 0;
         currentDragDistance = 0; // Reset current drag distance for new trial
+        justFinishedDrag = false; // Reset drag finish flag for new trial
         lastMouseX = params.screenWidth / 2;
         lastMouseY = params.screenHeight / 2;
         
@@ -537,8 +546,12 @@
         
         // Setup event listeners
         if (viewCondition === 'window') {
-          // Window condition - move the window
-          document.addEventListener('mousemove', moveWindow);
+          // Window condition - drag to move the window
+          searchWindow.addEventListener('mousedown', startWindowDrag);
+          document.addEventListener('mousemove', dragWindow);
+          document.addEventListener('mouseup', endWindowDrag);
+          // Add click event listener to search window for object selection
+          searchWindow.addEventListener('click', checkSelection);
         } else if (viewCondition === 'scroll') {
           // Scroll condition - drag the background
           canvas.addEventListener('mousedown', startDrag);
@@ -546,43 +559,71 @@
           document.addEventListener('mouseup', endDrag);
         }
         
-        // Click to select object
-        canvas.addEventListener('click', checkSelection);
+        // Click to select object (for fullscreen and scroll conditions)
+        if (viewCondition !== 'window') {
+          canvas.addEventListener('click', checkSelection);
+        }
         
         // Event handler functions
-        function moveWindow(e) {
+        function startWindowDrag(e) {
+          // Only start drag if clicking within the window
+          isMouseDown = true;
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          lastMouseX = mouseX;
+          lastMouseY = mouseY;
+          currentDragDistance = 0; // Reset drag distance for new interaction
+        }
+        
+        function dragWindow(e) {
+          if (!isMouseDown && viewCondition === 'window') return; // Only move during drag
+          
           mouseX = e.clientX;
           mouseY = e.clientY;
           
-          // Calculate movement distance
-          const dx = mouseX - lastMouseX;
-          const dy = mouseY - lastMouseY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          // Update total movement and path
-          totalMovement += distance;
-          mousePath.push({x: mouseX, y: mouseY, time: performance.now() - startTime});
-          
-          // Update last position
-          lastMouseX = mouseX;
-          lastMouseY = mouseY;
-          
-          // Move the window
-          const halfWindowWidth = params.windowWidth / 2;
-          const halfWindowHeight = params.windowHeight / 2;
-          
-          let windowX = mouseX - halfWindowWidth;
-          let windowY = mouseY - halfWindowHeight;
-          
-          // Keep window within screen bounds
-          windowX = Math.max(0, Math.min(windowX, params.screenWidth - params.windowWidth));
-          windowY = Math.max(0, Math.min(windowY, params.screenHeight - params.windowHeight));
-          
-          searchWindow.style.left = windowX + 'px';
-          searchWindow.style.top = windowY + 'px';
-          
-          // Update canvas clip region
-          drawSearchDisplay(ctx, viewCondition);
+          if (viewCondition === 'window' && isMouseDown) {
+            // Calculate movement distance
+            const dx = mouseX - lastMouseX;
+            const dy = mouseY - lastMouseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Update total movement and path
+            totalMovement += distance;
+            currentDragDistance += distance; // Track current interaction drag distance
+            mousePath.push({x: mouseX, y: mouseY, time: performance.now() - startTime});
+            
+            // Update last position
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            
+            // Move the window
+            const halfWindowWidth = params.windowWidth / 2;
+            const halfWindowHeight = params.windowHeight / 2;
+            
+            let windowX = mouseX - halfWindowWidth;
+            let windowY = mouseY - halfWindowHeight;
+            
+            // Keep window within screen bounds
+            windowX = Math.max(0, Math.min(windowX, params.screenWidth - params.windowWidth));
+            windowY = Math.max(0, Math.min(windowY, params.screenHeight - params.windowHeight));
+            
+            searchWindow.style.left = windowX + 'px';
+            searchWindow.style.top = windowY + 'px';
+            
+            // Update canvas clip region
+            drawSearchDisplay(ctx, viewCondition);
+          }
+        }
+        
+        function endWindowDrag() {
+          isMouseDown = false;
+          // If there was significant drag, mark it to prevent immediate clicks
+          if (currentDragDistance > 5) {
+            justFinishedDrag = true;
+            setTimeout(() => {
+              justFinishedDrag = false;
+            }, 50); // Small delay to prevent click events immediately after drag
+          }
         }
         
         function startDrag(e) {
@@ -634,10 +675,10 @@
           const clickX = e.clientX;
           const clickY = e.clientY;
           
-          // For scroll condition, check if significant dragging occurred
+          // For scroll/window conditions, check if significant dragging occurred
           // If user dragged more than 5 pixels, don't treat this as a selection click
-          if (viewCondition === 'scroll' && currentDragDistance > 5) {
-            return; // Ignore click after significant drag
+          if ((viewCondition === 'scroll' || viewCondition === 'window') && (currentDragDistance > 5 || justFinishedDrag)) {
+            return; // Ignore click after significant drag or immediately after drag
           }
           
           // Check if click is within visible area for window/scroll conditions
@@ -670,13 +711,25 @@
           
           // Remove event listeners
           if (viewCondition === 'window') {
-            document.removeEventListener('mousemove', moveWindow);
+            searchWindow.removeEventListener('mousedown', startWindowDrag);
+            document.removeEventListener('mousemove', dragWindow);
+            document.removeEventListener('mouseup', endWindowDrag);
+            searchWindow.removeEventListener('click', checkSelection);
+            // Reset pointer events for search window
+            searchWindow.style.pointerEvents = 'none';
           } else if (viewCondition === 'scroll') {
             canvas.removeEventListener('mousedown', startDrag);
             document.removeEventListener('mousemove', dragBackground);
             document.removeEventListener('mouseup', endDrag);
           }
-          canvas.removeEventListener('click', checkSelection);
+          
+          if (viewCondition !== 'window') {
+            canvas.removeEventListener('click', checkSelection);
+          }
+          
+          // Reset drag state
+          isMouseDown = false;
+          justFinishedDrag = false;
           
           // Hide canvas and window immediately using direct style property
           canvas.style.display = 'none';
