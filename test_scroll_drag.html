@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Scroll Drag Behavior</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+    #test-container {
+      width: 400px;
+      height: 300px;
+      border: 2px solid #000;
+      position: relative;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    #test-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+    }
+    #results {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    .test-object {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      border-radius: 50%;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test: Scroll Drag vs Click Selection</h1>
+  
+  <p>This test validates the scroll drag behavior:</p>
+  <ul>
+    <li><strong>Expected:</strong> Dragging to scroll should NOT select objects</li>
+    <li><strong>Expected:</strong> Simple clicking should select objects</li>
+  </ul>
+  
+  <div id="test-container">
+    <canvas id="test-canvas" width="400" height="300"></canvas>
+  </div>
+  
+  <div>
+    <button onclick="resetTest()">Reset Test</button>
+    <button onclick="runAutomatedTest()">Run Automated Test</button>
+  </div>
+  
+  <div id="results">
+    <h3>Test Results:</h3>
+    <div id="test-log"></div>
+  </div>
+
+  <script>
+    // Simplified version of the scroll behavior for testing
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
+    let totalDragDistance = 0;
+    let currentDragDistance = 0; // Track drag distance for current interaction
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    
+    const canvas = document.getElementById('test-canvas');
+    const ctx = canvas.getContext('2d');
+    const testLog = document.getElementById('test-log');
+    
+    // Test objects
+    let testObjects = [
+      { x: 100, y: 100, size: 30, color: 'red' },
+      { x: 200, y: 150, size: 30, color: 'blue' },
+      { x: 300, y: 200, size: 30, color: 'green' }
+    ];
+    
+    function log(message) {
+      testLog.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+    }
+    
+    function drawObjects() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      testObjects.forEach(obj => {
+        ctx.fillStyle = obj.color;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, obj.size / 2, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+    }
+    
+    // Current implementation (with the bug)
+    function startDrag(e) {
+      isMouseDown = true;
+      const rect = canvas.getBoundingClientRect();
+      mouseStartX = lastMouseX = e.clientX - rect.left;
+      mouseStartY = lastMouseY = e.clientY - rect.top;
+      totalDragDistance = 0;
+      currentDragDistance = 0; // Reset current drag distance for new interaction
+      log('Started drag at (' + mouseStartX + ', ' + mouseStartY + ')');
+    }
+    
+    function dragBackground(e) {
+      if (!isMouseDown) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      
+      const dx = mouseX - lastMouseX;
+      const dy = mouseY - lastMouseY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      totalDragDistance += distance;
+      currentDragDistance += distance; // Track current interaction drag distance
+      
+      // Move all objects (simulate scrolling by moving objects)
+      testObjects.forEach(obj => {
+        obj.x += dx;
+        obj.y += dy;
+      });
+      
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      
+      drawObjects();
+      log('Dragging: current distance = ' + currentDragDistance.toFixed(1));
+    }
+    
+    function endDrag() {
+      isMouseDown = false;
+      log('Ended drag. Current distance: ' + currentDragDistance.toFixed(1));
+    }
+    
+    function checkSelection(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      
+      // NEW FIXED BEHAVIOR: Check if significant dragging occurred
+      // If user dragged more than 5 pixels, don't treat this as a selection click
+      if (currentDragDistance > 5) {
+        log('✅ FIXED: Ignoring click after drag distance: ' + currentDragDistance.toFixed(1) + ' (> 5 threshold)');
+        return; // Ignore click after significant drag
+      }
+      
+      let clickedObject = null;
+      testObjects.forEach(obj => {
+        const dx = clickX - obj.x;
+        const dy = clickY - obj.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance <= obj.size / 2) {
+          clickedObject = obj;
+        }
+      });
+      
+      if (clickedObject) {
+        log('✅ Selected ' + clickedObject.color + ' object at (' + clickX + ', ' + clickY + ') after drag distance: ' + currentDragDistance.toFixed(1));
+      } else {
+        log('Click at (' + clickX + ', ' + clickY + ') - no object selected. Drag distance: ' + currentDragDistance.toFixed(1));
+      }
+    }
+    
+    // Event listeners
+    canvas.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', dragBackground);
+    document.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('click', checkSelection);
+    
+    function resetTest() {
+      testObjects = [
+        { x: 100, y: 100, size: 30, color: 'red' },
+        { x: 200, y: 150, size: 30, color: 'blue' },
+        { x: 300, y: 200, size: 30, color: 'green' }
+      ];
+      testLog.innerHTML = '';
+      totalDragDistance = 0;
+      currentDragDistance = 0;
+      drawObjects();
+      log('Test reset - try dragging objects around, then try simple clicks');
+    }
+    
+    function runAutomatedTest() {
+      log('🤖 Running automated test...');
+      // This would simulate drag and click events
+      log('Manual testing required: 1) Try dragging objects around, 2) Try simple clicks');
+    }
+    
+    // Initialize
+    resetTest();
+  </script>
+</body>
+</html>
