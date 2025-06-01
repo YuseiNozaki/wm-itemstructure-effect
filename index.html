@@ -221,6 +221,7 @@
     let lastMouseY = 0;
     let isMouseDown = false;
     let currentDragDistance = 0; // Track drag distance for current interaction
+    let justFinishedDrag = false; // Track if a drag operation just finished
 
     // Target and distractor objects
     let objects = [];
@@ -511,6 +512,13 @@
           searchWindow.style.left = '50%';
           searchWindow.style.top = '50%';
           searchWindow.style.transform = 'translate(-50%, -50%)';
+          
+          // Enable pointer events for window condition to allow dragging
+          if (viewCondition === 'window') {
+            searchWindow.style.pointerEvents = 'auto';
+          } else {
+            searchWindow.style.pointerEvents = 'none';
+          }
         }
         
         // Create visual search display
@@ -523,6 +531,7 @@
         mousePath = [];
         totalMovement = 0;
         currentDragDistance = 0; // Reset current drag distance for new trial
+        justFinishedDrag = false; // Reset drag finish flag for new trial
         lastMouseX = params.screenWidth / 2;
         lastMouseY = params.screenHeight / 2;
         
@@ -604,6 +613,13 @@
         
         function endWindowDrag() {
           isMouseDown = false;
+          // If there was significant drag, mark it to prevent immediate clicks
+          if (currentDragDistance > 5) {
+            justFinishedDrag = true;
+            setTimeout(() => {
+              justFinishedDrag = false;
+            }, 50); // Small delay to prevent click events immediately after drag
+          }
         }
         
         function startDrag(e) {
@@ -657,8 +673,8 @@
           
           // For scroll/window conditions, check if significant dragging occurred
           // If user dragged more than 5 pixels, don't treat this as a selection click
-          if ((viewCondition === 'scroll' || viewCondition === 'window') && currentDragDistance > 5) {
-            return; // Ignore click after significant drag
+          if ((viewCondition === 'scroll' || viewCondition === 'window') && (currentDragDistance > 5 || justFinishedDrag)) {
+            return; // Ignore click after significant drag or immediately after drag
           }
           
           // Check if click is within visible area for window/scroll conditions
@@ -694,12 +710,18 @@
             searchWindow.removeEventListener('mousedown', startWindowDrag);
             document.removeEventListener('mousemove', dragWindow);
             document.removeEventListener('mouseup', endWindowDrag);
+            // Reset pointer events for search window
+            searchWindow.style.pointerEvents = 'none';
           } else if (viewCondition === 'scroll') {
             canvas.removeEventListener('mousedown', startDrag);
             document.removeEventListener('mousemove', dragBackground);
             document.removeEventListener('mouseup', endDrag);
           }
           canvas.removeEventListener('click', checkSelection);
+          
+          // Reset drag state
+          isMouseDown = false;
+          justFinishedDrag = false;
           
           // Hide canvas and window immediately using direct style property
           canvas.style.display = 'none';
