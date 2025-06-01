@@ -220,6 +220,7 @@
     let lastMouseX = 0;
     let lastMouseY = 0;
     let isMouseDown = false;
+    let currentDragDistance = 0; // Track drag distance for current interaction
 
     // Target and distractor objects
     let objects = [];
@@ -521,6 +522,7 @@
         // Reset movement tracking
         mousePath = [];
         totalMovement = 0;
+        currentDragDistance = 0; // Reset current drag distance for new trial
         lastMouseX = params.screenWidth / 2;
         lastMouseY = params.screenHeight / 2;
         
@@ -589,6 +591,7 @@
           mouseY = e.clientY;
           lastMouseX = mouseX;
           lastMouseY = mouseY;
+          currentDragDistance = 0; // Reset drag distance for new interaction
         }
         
         function dragBackground(e) {
@@ -605,6 +608,7 @@
             
             // Update total movement and path
             totalMovement += distance;
+            currentDragDistance += distance; // Track current interaction drag distance
             mousePath.push({x: mouseX, y: mouseY, time: performance.now() - startTime});
             
             // Move all objects
@@ -629,6 +633,12 @@
         function checkSelection(e) {
           const clickX = e.clientX;
           const clickY = e.clientY;
+          
+          // For scroll condition, check if significant dragging occurred
+          // If user dragged more than 5 pixels, don't treat this as a selection click
+          if (viewCondition === 'scroll' && currentDragDistance > 5) {
+            return; // Ignore click after significant drag
+          }
           
           // Check if click is within visible area for window/scroll conditions
           if (viewCondition !== 'fullscreen') {
