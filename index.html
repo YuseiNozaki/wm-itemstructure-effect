@@ -400,6 +400,15 @@
           if (!incorrectPositions.includes(position) && !memoryPositions.includes(position)) {
             incorrectPositions.push(position);
           }
+          
+          // Safety check to prevent infinite loop (should not happen with 4x4 grid and 3 positions)
+          if (incorrectPositions.length === 0 && (memoryPositions.length + incorrectPositions.length) >= gridSize * gridSize - 3) {
+            // Fallback: just pick different positions even if some overlap (very unlikely scenario)
+            const allPositions = Array.from({length: gridSize * gridSize}, (_, i) => i);
+            const availablePositions = allPositions.filter(pos => !memoryPositions.includes(pos));
+            incorrectPositions = availablePositions.slice(0, params.memoryPositions);
+            break;
+          }
         }
         
         // Randomly decide which grid (left or right) shows the correct positions
