@@ -324,7 +324,7 @@
         return `
           <h1>視覚探索課題の説明</h1>
           <p>この課題では、画面上に表示される様々な形や色のオブジェクトの中から特定のターゲットを探していただきます。</p>
-          <p>ターゲットは試行ごとに異なり、各試行の前に3秒間画面に表示されます。</p>
+          <p>ターゲットは試行ごとに異なり、各試行の前に1秒間画面に表示されます。</p>
           <p>ターゲットを見つけたら、クリックして選択してください。</p>
           <p>現在の条件: <strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
             viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
@@ -370,12 +370,12 @@
         }
         
         gridHTML += '</div>';
-        gridHTML += '<p>5秒間表示された後、自動的に次へ進みます。</p>';
+        gridHTML += '<p>3秒間表示された後、自動的に次へ進みます。</p>';
         
         return gridHTML;
       },
       choices: jsPsych.NO_KEYS,
-      trial_duration: 5000, // Display for 5 seconds
+      trial_duration: 3000, // Display for 3 seconds
       data: {
         task: 'memory_display',
         memory_positions: function() { return memoryPositions; }
@@ -501,11 +501,11 @@
           <div style="margin: 20px auto; width: 100px; height: 100px;">
             ${drawShape(targetShape, targetColor, 100, 100, 50)}
           </div>
-          <p>3秒後に自動的に探索課題が始まります。</p>
+          <p>1秒後に自動的に探索課題が始まります。</p>
         `;
       },
       choices: jsPsych.NO_KEYS,
-      trial_duration: 3000,
+      trial_duration: 1000,
       data: {
         task: 'show_target'
       }
