@@ -56,6 +56,8 @@
     let mousePath = [];
     let viewCondition = 'window';
     let startTime = 0;
+    let dragOffsetX = 0; // Offset between cursor and window left edge when drag starts
+    let dragOffsetY = 0; // Offset between cursor and window top edge when drag starts
     
     // Mock window and parameters
     const params = {
@@ -84,6 +86,15 @@
       lastMouseX = mouseX;
       lastMouseY = mouseY;
       currentDragDistance = 0; // Reset drag distance for new interaction
+      
+      // Calculate offset between cursor and window position
+      const windowLeft = parseInt(searchWindow.style.left) || 300;
+      const windowTop = parseInt(searchWindow.style.top) || 225;
+      
+      // Remove any CSS transform (simulate the fix)
+      // In real implementation, this removes translate(-50%, -50%)
+      dragOffsetX = mouseX - windowLeft;
+      dragOffsetY = mouseY - windowTop;
     }
     
     function dragWindow(e) {
@@ -107,12 +118,9 @@
         lastMouseX = mouseX;
         lastMouseY = mouseY;
         
-        // Move the window
-        const halfWindowWidth = params.windowWidth / 2;
-        const halfWindowHeight = params.windowHeight / 2;
-        
-        let windowX = mouseX - halfWindowWidth;
-        let windowY = mouseY - halfWindowHeight;
+        // Move the window using the stored offset
+        let windowX = mouseX - dragOffsetX;
+        let windowY = mouseY - dragOffsetY;
         
         // Keep window within screen bounds
         windowX = Math.max(0, Math.min(windowX, params.screenWidth - params.windowWidth));
