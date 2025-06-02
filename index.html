@@ -819,7 +819,8 @@
             target_color: targetColor,
             target_shape: targetShape,
             total_movement: totalMovement,
-            mouse_path: mousePath
+            mouse_path: mousePath,
+            task: 'visual_search'
           });
         }
       }
@@ -1014,17 +1015,37 @@
     const searchFeedback = {
       type: 'html-keyboard-response',
       stimulus: function() {
-        const data = jsPsych.data.get().last(1).values()[0];
-        const correct = data.correct;
+        // Get the last visual search task data specifically
+        const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
+        const correct = searchData.correct;
         
         return `
           <h1>${correct ? '正解!' : '不正解'}</h1>
-          <p>反応時間: ${Math.round(data.reaction_time)}ms</p>
+          <p>反応時間: ${Math.round(searchData.reaction_time)}ms</p>
           <p>エンターキーを押すと次に進みます。</p>
         `;
       },
       data: {
         task: 'search_feedback'
+      },
+      choices: ['Enter']
+    };
+
+    // Feedback for memory task
+    const memoryFeedback = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        // Get the last memory task data specifically
+        const memoryData = jsPsych.data.get().filter({task: 'memory_recall'}).last(1).values()[0];
+        const correct = memoryData.memory_correct === 1;
+        
+        return `
+          <h1>${correct ? '正解!' : '不正解'}</h1>
+          <p>エンターキーを押すと次に進みます。</p>
+        `;
+      },
+      data: {
+        task: 'memory_feedback'
       },
       choices: ['Enter']
     };
@@ -1120,6 +1141,13 @@
         },
         showTarget,
         visualSearch,
+        // Search feedback for 'with-memory' condition comes immediately after visual search
+        {
+          timeline: [searchFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
         // Memory recall only for 'with-memory' condition
         {
           timeline: [memoryGridRecall],
@@ -1130,7 +1158,20 @@
             task: 'memory_recall'
           }
         },
-        searchFeedback
+        // Memory feedback only for 'with-memory' condition
+        {
+          timeline: [memoryFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        // Search feedback for 'without-memory' condition comes at the end
+        {
+          timeline: [searchFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'without-memory';
+          }
+        }
       ]
     };
     
