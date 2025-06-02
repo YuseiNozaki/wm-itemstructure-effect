@@ -579,6 +579,13 @@
           // Calculate offset between cursor and window position
           const searchWindow = document.getElementById('search-window');
           const windowRect = searchWindow.getBoundingClientRect();
+          
+          // Remove CSS transform and set absolute positioning
+          searchWindow.style.transform = 'none';
+          searchWindow.style.left = windowRect.left + 'px';
+          searchWindow.style.top = windowRect.top + 'px';
+          
+          // Now calculate the offset with the corrected position
           dragOffsetX = mouseX - windowRect.left;
           dragOffsetY = mouseY - windowRect.top;
         }

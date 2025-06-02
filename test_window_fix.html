@@ -90,6 +90,9 @@
       // Calculate offset between cursor and window position
       const windowLeft = parseInt(searchWindow.style.left) || 300;
       const windowTop = parseInt(searchWindow.style.top) || 225;
+      
+      // Remove any CSS transform (simulate the fix)
+      // In real implementation, this removes translate(-50%, -50%)
       dragOffsetX = mouseX - windowLeft;
       dragOffsetY = mouseY - windowTop;
     }
