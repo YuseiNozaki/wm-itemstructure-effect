@@ -481,6 +481,21 @@
       return correctCount / params.memoryPositions;
     }
 
+    // Fixation point display
+    const fixationPoint = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+          <div style="font-size: 60px; font-weight: bold; color: black;">+</div>
+        </div>
+      `,
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000,
+      data: {
+        task: 'fixation_point'
+      }
+    };
+
     // Display target object
     const showTarget = {
       type: 'html-keyboard-response',
@@ -1139,6 +1154,7 @@
             return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
           }
         },
+        fixationPoint,
         showTarget,
         visualSearch,
         // Search feedback for 'with-memory' condition comes immediately after visual search

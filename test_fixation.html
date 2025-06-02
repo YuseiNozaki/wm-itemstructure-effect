@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fixation Point Test</title>
+  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+    #jspsych-target {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+    .jspsych-content {
+      max-width: 100vw;
+      max-height: 100vh;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    // Test fixation point display
+    const fixationPoint = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+          <div style="font-size: 60px; font-weight: bold; color: black;">+</div>
+        </div>
+      `,
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000,
+      data: {
+        task: 'fixation_point'
+      }
+    };
+
+    // Draw a shape on SVG
+    function drawShape(shape, color, x, y, size) {
+      const halfSize = size / 2;
+      
+      switch (shape) {
+        case 'circle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize * 0.8}" fill="${color}" />
+                  </svg>`;
+        case 'triangle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <polygon points="${halfSize},${size * 0.2} ${size * 0.2},${size * 0.8} ${size * 0.8},${size * 0.8}" fill="${color}" />
+                  </svg>`;
+        default:
+          return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" /></svg>`;
+      }
+    }
+
+    // Test target display
+    const showTarget = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        return `
+          <h1>ターゲット</h1>
+          <p>以下のオブジェクトを探してください:</p>
+          <div style="margin: 20px auto; width: 100px; height: 100px;">
+            ${drawShape('circle', 'red', 100, 100, 50)}
+          </div>
+          <p>1秒後に自動的に探索課題が始まります。</p>
+        `;
+      },
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000,
+      data: {
+        task: 'show_target'
+      }
+    };
+
+    // End screen
+    const endScreen = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>テスト完了</h1>
+        <p>注視点→ターゲットの流れが正しく動作しました。</p>
+        <p>注視点が1秒間表示された後、ターゲットが1秒間表示されました。</p>
+        <p>エンターキーを押すと終了します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Test timeline
+    const timeline = [
+      fixationPoint,
+      showTarget,
+      endScreen
+    ];
+
+    // Run the test
+    jsPsych.init({
+      display_element: 'jspsych-target',
+      timeline: timeline,
+      on_finish: function() {
+        console.log('Fixation point test completed');
+      }
+    });
+  </script>
+</body>
+</html>
