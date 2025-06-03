@@ -279,24 +279,7 @@
       }
     };
 
-    // Informed consent
-    const consent = {
-      type: 'html-keyboard-response',
-      stimulus: function() {
-        return `
-          <h1>実験の説明と同意</h1>
-          <div style="width: 80%; margin: 0 auto; text-align: left;">
-            <p><strong>実験の目的:</strong> この実験では、人がものを探すときの性質について調査を行います。</p>
-            <p><strong>データの取り扱い:</strong> 収集されるデータは研究目的のみに使用され、個人を特定できる情報は含まれません。</p>
-            <p><strong>実験の長さ:</strong> 実験は合計で約30分かかります。最初の30試行の後に小休憩があります。</p>
-            <p><strong>参加の任意性:</strong> 実験はいつでも中止することができます。中止されても不利益は生じません。</p>
-            <p><strong>同意:</strong> 上記の内容を理解し、実験参加に同意される場合は、エンターキーを押して次に進んでください。</p>
-          </div>
-          <p>エンターキーを押すと先に進みます。</p>
-        `;
-      },
-      choices: ['Enter']
-    };
+
 
     // Demographic information
     const demographics = {
@@ -306,10 +289,19 @@
           prompt: '年齢:',
           name: 'age',
           required: true
-        },
+        }
+      ],
+      button_label: '次へ'
+    };
+
+    // Gender selection  
+    const genderSelection = {
+      type: 'survey-multi-choice',
+      questions: [
         {
           prompt: '性別:',
           name: 'gender',
+          options: ['男性', '女性', 'その他'],
           required: true
         }
       ],
@@ -325,6 +317,7 @@
           <h1>視覚探索課題の説明</h1>
           <p>この課題では、画面上に表示される様々な形や色のオブジェクトの中から特定のターゲットを探していただきます。</p>
           <p>ターゲットは試行ごとに異なり、各試行の前に1秒間画面に表示されます。</p>
+          <p>ターゲットの画面では、探すべきオブジェクトのみが表示されます。その後、自動的に探索課題が始まります。</p>
           <p>ターゲットを見つけたら、クリックして選択してください。</p>
           <p>現在の条件: <strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
             viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
@@ -511,12 +504,9 @@
         });
         
         return `
-          <h1>ターゲット</h1>
-          <p>以下のオブジェクトを探してください:</p>
           <div style="margin: 20px auto; width: 100px; height: 100px;">
             ${drawShape(targetShape, targetColor, 100, 100, 50)}
           </div>
-          <p>1秒後に自動的に探索課題が始まります。</p>
         `;
       },
       choices: jsPsych.NO_KEYS,
@@ -1208,8 +1198,8 @@
     // Full experiment timeline
     const timeline = [
       welcome,
-      consent,
       demographics,
+      genderSelection,
       firstBlockProcedure,
       midpointMessage,
       wmTaskExplanation,
