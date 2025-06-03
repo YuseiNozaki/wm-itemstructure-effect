@@ -131,6 +131,21 @@
     // jsPsych is already defined as a global variable in v6.3.1
     // We'll initialize it later with jsPsych.init()
 
+    // Early focus management setup - before jsPsych initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      const targetElement = document.getElementById('jspsych-target');
+      if (targetElement) {
+        targetElement.focus();
+        
+        // Add immediate global click handler
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('input, select, textarea, button, .jspsych-survey-multi-choice-option, .memory-cell, .memory-choice-grid, canvas')) {
+            targetElement.focus();
+          }
+        });
+      }
+    });
+
     // フルスクリーンモードを要求する関数
     function enterFullscreen() {
       const elem = document.documentElement;
@@ -205,7 +220,16 @@
     function handleGlobalClick(e) {
       // Only restore focus if click is not on form elements or interactive content
       if (!e.target.closest('input, select, textarea, button, .jspsych-survey-multi-choice-option, .memory-cell, .memory-choice-grid, canvas')) {
-        setTimeout(ensureFocus, 10);
+        // Use immediate focus restoration for better responsiveness
+        ensureFocus();
+      }
+    }
+
+    // More aggressive focus restoration for problematic scenarios
+    function forceEnsureFocus() {
+      const targetElement = document.getElementById('jspsych-target');
+      if (targetElement) {
+        targetElement.focus();
       }
     }
 
@@ -305,10 +329,16 @@
                 '<p>実験に参加していただきありがとうございます。</p>' +
                 '<p>エンターキーを押すと実験が開始され、自動的にフルスクリーンモードに切り替わります。</p>',
       choices: ['Enter'],
+      on_load: function() {
+        // Ensure focus for the welcome screen
+        setTimeout(ensureFocus, 100);
+      },
       on_finish: function() {
         // Add fullscreen listeners only when entering fullscreen
         addFullscreenListeners();
         enterFullscreen();
+        // Ensure focus is maintained after entering fullscreen
+        setTimeout(ensureFocus, 200);
       }
     };
 
@@ -1282,8 +1312,14 @@
       on_load: function() {
         // Add global click handler for focus restoration
         document.addEventListener('click', handleGlobalClick);
+        // Also add focus restoration on various events that might steal focus
+        document.addEventListener('focusout', function() {
+          setTimeout(ensureFocus, 10);
+        });
         // Ensure initial focus
         setTimeout(ensureFocus, 100);
+        // Additional safety - restore focus on window events
+        window.addEventListener('focus', ensureFocus);
       }
     });
   </script>

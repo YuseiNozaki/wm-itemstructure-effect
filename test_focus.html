@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Focus Test</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+        }
+        #jspsych-target {
+            width: 100%;
+            height: 300px;
+            border: 2px solid blue;
+            outline: none;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        #jspsych-target:focus {
+            background: #e0e0e0;
+            border-color: red;
+        }
+        .test-button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Focus Management Test</h1>
+    
+    <div id="jspsych-target" tabindex="0">
+        This is the main target element (should be focusable)
+        <br>Press Enter when focused here
+    </div>
+    
+    <div>
+        <button class="test-button" onclick="testFocus()">Test Focus</button>
+        <button class="test-button" onclick="clickOutside()">Click Outside</button>
+        <input type="text" placeholder="Input field" class="test-button">
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="log" id="log"></div>
+
+    <script>
+        // Focus management functions (same as in main file)
+        function ensureFocus() {
+            const targetElement = document.getElementById('jspsych-target');
+            if (targetElement && document.activeElement !== targetElement) {
+                log('Focus restored to target element');
+                targetElement.focus();
+            } else {
+                log('Target element already has focus or not found');
+            }
+        }
+
+        // Global click handler to restore focus when clicking empty areas
+        function handleGlobalClick(e) {
+            log(`Click detected on: ${e.target.tagName} (class: ${e.target.className})`);
+            // Only restore focus if click is not on form elements or interactive content
+            if (!e.target.closest('input, select, textarea, button, .jspsych-survey-multi-choice-option, .memory-cell, .memory-choice-grid, canvas')) {
+                log('Click on empty area detected, restoring focus...');
+                setTimeout(ensureFocus, 10);
+            } else {
+                log('Click on interactive element, not restoring focus');
+            }
+        }
+
+        function testFocus() {
+            log('Testing focus...');
+            ensureFocus();
+        }
+
+        function clickOutside() {
+            log('Simulating click outside...');
+            // Focus on body to simulate clicking outside
+            document.body.focus();
+            setTimeout(ensureFocus, 10);
+        }
+
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Add event listeners
+        document.addEventListener('click', handleGlobalClick);
+        
+        // Add keyboard event listener to test Enter key
+        document.addEventListener('keydown', function(e) {
+            log(`Key pressed: ${e.key} (activeElement: ${document.activeElement.tagName})`);
+            if (e.key === 'Enter') {
+                log('ENTER KEY DETECTED!');
+            }
+        });
+
+        // Focus the target element initially
+        window.addEventListener('load', function() {
+            log('Page loaded, setting initial focus...');
+            setTimeout(ensureFocus, 100);
+        });
+    </script>
+</body>
+</html>
