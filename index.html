@@ -382,8 +382,58 @@
       on_load: function() {
         // Temporarily remove fullscreen listeners during form interaction
         removeFullscreenListeners();
+        
+        // Add specific keyboard handling for gender selection
+        setTimeout(() => {
+          const handleGenderKeydown = function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+              // Check if any gender option is selected
+              const selectedGender = document.querySelector('input[name="Q0"]:checked');
+              if (selectedGender) {
+                // Find the submit button - try multiple possible selectors
+                let submitButton = document.querySelector('#jspsych-survey-multi-choice-next');
+                if (!submitButton) {
+                  submitButton = document.querySelector('button[type="submit"]');
+                }
+                if (!submitButton) {
+                  submitButton = document.querySelector('.jspsych-btn');
+                }
+                if (!submitButton) {
+                  submitButton = document.querySelector('button');
+                }
+                
+                if (submitButton) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  submitButton.click();
+                  return false;
+                }
+              }
+            }
+          };
+          
+          // Add keydown listener to document and target element for gender selection
+          document.addEventListener('keydown', handleGenderKeydown, true);
+          const target = document.getElementById('jspsych-target');
+          if (target) {
+            target.addEventListener('keydown', handleGenderKeydown, true);
+          }
+          
+          // Store reference to remove it later
+          window.genderKeydownHandler = handleGenderKeydown;
+        }, 100);
       },
       on_finish: function() {
+        // Remove the gender-specific keydown handler
+        if (window.genderKeydownHandler) {
+          document.removeEventListener('keydown', window.genderKeydownHandler, true);
+          const target = document.getElementById('jspsych-target');
+          if (target) {
+            target.removeEventListener('keydown', window.genderKeydownHandler, true);
+          }
+          window.genderKeydownHandler = null;
+        }
+        
         // Re-add fullscreen listeners after form completion
         addFullscreenListeners();
         // Ensure focus is restored after form completion
