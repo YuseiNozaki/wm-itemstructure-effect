@@ -191,11 +191,28 @@
     //   setTimeout(testBrowserInteraction, 2000);
     // });
 
-    // Listen for fullscreen changes to ensure keyboard interaction works
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    // Fullscreen management - only add listeners when needed to avoid conflicts with forms
+    let fullscreenListenersActive = false;
+    
+    function addFullscreenListeners() {
+      if (!fullscreenListenersActive) {
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        fullscreenListenersActive = true;
+      }
+    }
+    
+    function removeFullscreenListeners() {
+      if (fullscreenListenersActive) {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+        fullscreenListenersActive = false;
+      }
+    }
 
     function handleFullscreenChange() {
       if (document.fullscreenElement || 
@@ -203,10 +220,6 @@
           document.mozFullScreenElement || 
           document.msFullscreenElement) {
         console.log("フルスクリーンモードに切り替わりました");
-        // フォーカス管理を改善 - フォームの入力を邪魔しないようにする
-        // if (document.getElementById('jspsych-target')) {
-        //   document.getElementById('jspsych-target').focus();
-        // }
       } else {
         console.log("フルスクリーンモードから抜けました");
       }
@@ -275,6 +288,8 @@
                 '<p>エンターキーを押すと実験が開始され、自動的にフルスクリーンモードに切り替わります。</p>',
       choices: ['Enter'],
       on_finish: function() {
+        // Add fullscreen listeners only when entering fullscreen
+        addFullscreenListeners();
         enterFullscreen();
       }
     };
@@ -291,7 +306,15 @@
           required: true
         }
       ],
-      button_label: '次へ'
+      button_label: '次へ',
+      on_load: function() {
+        // Temporarily remove fullscreen listeners during form interaction
+        removeFullscreenListeners();
+      },
+      on_finish: function() {
+        // Re-add fullscreen listeners after form completion
+        addFullscreenListeners();
+      }
     };
 
     // Gender selection  
@@ -305,7 +328,15 @@
           required: true
         }
       ],
-      button_label: '次へ'
+      button_label: '次へ',
+      on_load: function() {
+        // Temporarily remove fullscreen listeners during form interaction
+        removeFullscreenListeners();
+      },
+      on_finish: function() {
+        // Re-add fullscreen listeners after form completion
+        addFullscreenListeners();
+      }
     };
 
     // Instructions for visual search task
