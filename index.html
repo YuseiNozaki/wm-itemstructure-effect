@@ -32,6 +32,7 @@
       top: 0;
       left: 0;
       z-index: 10;
+      outline: none; /* Remove focus outline to avoid visual distraction */
     }
     .jspsych-content {
       max-width: 100vw;
@@ -123,7 +124,7 @@
   </style>
 </head>
 <body>
-  <div id="jspsych-target"></div>
+  <div id="jspsych-target" tabindex="0"></div>
   <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
   <div id="search-window" class="hidden"></div>
   <script>
@@ -148,11 +149,12 @@
       }
       
       // フォーカス管理を改善 - フォームの邪魔をしないようにする
-      // setTimeout(() => {
-      //   if (document.getElementById('jspsych-target')) {
-      //     document.getElementById('jspsych-target').focus();
-      //   }
-      // }, 100);
+      setTimeout(() => {
+        const targetElement = document.getElementById('jspsych-target');
+        if (targetElement) {
+          targetElement.focus();
+        }
+      }, 100);
     }
 
     // 実験開始時にフルスクリーンモードに自動的に移行するよう設定
@@ -190,6 +192,22 @@
     // window.addEventListener('load', function() {
     //   setTimeout(testBrowserInteraction, 2000);
     // });
+
+    // Focus management functions
+    function ensureFocus() {
+      const targetElement = document.getElementById('jspsych-target');
+      if (targetElement && document.activeElement !== targetElement) {
+        targetElement.focus();
+      }
+    }
+
+    // Global click handler to restore focus when clicking empty areas
+    function handleGlobalClick(e) {
+      // Only restore focus if click is not on form elements or interactive content
+      if (!e.target.closest('input, select, textarea, button, .jspsych-survey-multi-choice-option, .memory-cell, .memory-choice-grid, canvas')) {
+        setTimeout(ensureFocus, 10);
+      }
+    }
 
     // Fullscreen management - only add listeners when needed to avoid conflicts with forms
     let fullscreenListenersActive = false;
@@ -314,6 +332,8 @@
       on_finish: function() {
         // Re-add fullscreen listeners after form completion
         addFullscreenListeners();
+        // Ensure focus is restored after form completion
+        setTimeout(ensureFocus, 100);
       }
     };
 
@@ -336,6 +356,8 @@
       on_finish: function() {
         // Re-add fullscreen listeners after form completion
         addFullscreenListeners();
+        // Ensure focus is restored after form completion
+        setTimeout(ensureFocus, 100);
       }
     };
 
@@ -1254,6 +1276,14 @@
           // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
           console.log("フルスクリーンモードの再確認");
         }
+        // Ensure focus is on the main element at the start of each trial
+        setTimeout(ensureFocus, 50);
+      },
+      on_load: function() {
+        // Add global click handler for focus restoration
+        document.addEventListener('click', handleGlobalClick);
+        // Ensure initial focus
+        setTimeout(ensureFocus, 100);
       }
     });
   </script>
