@@ -79,12 +79,16 @@
       type: 'html-keyboard-response',
       stimulus: function() {
         return `
-          <h1>ターゲット</h1>
-          <p>以下のオブジェクトを探してください:</p>
-          <div style="margin: 20px auto; width: 100px; height: 100px;">
-            ${drawShape('circle', 'red', 100, 100, 50)}
+          <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div>
+              <h1 style="text-align: center; margin-bottom: 10px;">ターゲット</h1>
+              <p style="text-align: center; margin-bottom: 20px;">以下のオブジェクトを探してください:</p>
+              <div style="width: 100px; height: 100px; margin: 0 auto;">
+                ${drawShape('circle', 'red', 100, 100, 50)}
+              </div>
+              <p style="text-align: center; margin-top: 20px;">1秒後に自動的に探索課題が始まります。</p>
+            </div>
           </div>
-          <p>1秒後に自動的に探索課題が始まります。</p>
         `;
       },
       choices: jsPsych.NO_KEYS,

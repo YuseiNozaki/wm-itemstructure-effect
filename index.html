@@ -535,8 +535,10 @@
         });
         
         return `
-          <div style="margin: 20px auto; width: 100px; height: 100px;">
-            ${drawShape(targetShape, targetColor, 100, 100, 50)}
+          <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div style="width: 100px; height: 100px;">
+              ${drawShape(targetShape, targetColor, 100, 100, 50)}
+            </div>
           </div>
         `;
       },
