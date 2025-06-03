@@ -147,49 +147,49 @@
         elem.msRequestFullscreen();
       }
       
-      // キーイベントが適切に処理されるようにフォーカスを設定
-      setTimeout(() => {
-        if (document.getElementById('jspsych-target')) {
-          document.getElementById('jspsych-target').focus();
-        }
-      }, 100);
+      // フォーカス管理を改善 - フォームの邪魔をしないようにする
+      // setTimeout(() => {
+      //   if (document.getElementById('jspsych-target')) {
+      //     document.getElementById('jspsych-target').focus();
+      //   }
+      // }, 100);
     }
 
     // 実験開始時にフルスクリーンモードに自動的に移行するよう設定
     // ブラウザのセキュリティ制限のため、何らかのユーザー操作（キー入力など）に応じて実行する必要がある
 
-    // ブラウザテスト用のデバッグ関数
-    function testBrowserInteraction() {
-      console.log("ブラウザテスト: キー入力のテスト");
-      
-      // キーボード入力のテスト
-      window.addEventListener('keydown', function(e) {
-        console.log("キー入力を検出:", e.key);
-      });
-      
-      // カーソル操作のテスト
-      document.addEventListener('mousemove', function(e) {
-        // 大量のログを避けるため、100px移動ごとにログ
-        if (e.clientX % 100 < 5 && e.clientY % 100 < 5) {
-          console.log("カーソル位置:", e.clientX, e.clientY);
-        }
-      });
-      
-      console.log("ブラウザテスト: フルスクリーンの状態");
-      if (document.fullscreenElement || 
-          document.webkitFullscreenElement || 
-          document.mozFullScreenElement || 
-          document.msFullscreenElement) {
-        console.log("現在フルスクリーンモード");
-      } else {
-        console.log("フルスクリーンモードではない");
-      }
-    }
+    // ブラウザテスト用のデバッグ関数 (削除済み - イベントリスナーの競合を避けるため)
+    // function testBrowserInteraction() {
+    //   console.log("ブラウザテスト: キー入力のテスト");
+    //   
+    //   // キーボード入力のテスト
+    //   window.addEventListener('keydown', function(e) {
+    //     console.log("キー入力を検出:", e.key);
+    //   });
+    //   
+    //   // カーソル操作のテスト
+    //   document.addEventListener('mousemove', function(e) {
+    //     // 大量のログを避けるため、100px移動ごとにログ
+    //     if (e.clientX % 100 < 5 && e.clientY % 100 < 5) {
+    //       console.log("カーソル位置:", e.clientX, e.clientY);
+    //     }
+    //   });
+    //   
+    //   console.log("ブラウザテスト: フルスクリーンの状態");
+    //   if (document.fullscreenElement || 
+    //       document.webkitFullscreenElement || 
+    //       document.mozFullScreenElement || 
+    //       document.msFullscreenElement) {
+    //     console.log("現在フルスクリーンモード");
+    //   } else {
+    //     console.log("フルスクリーンモードではない");
+    //   }
+    // }
     
-    // 実験開始時にテスト関数を実行
-    window.addEventListener('load', function() {
-      setTimeout(testBrowserInteraction, 2000);
-    });
+    // 実験開始時にテスト関数を実行 (削除済み)
+    // window.addEventListener('load', function() {
+    //   setTimeout(testBrowserInteraction, 2000);
+    // });
 
     // Listen for fullscreen changes to ensure keyboard interaction works
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -203,10 +203,10 @@
           document.mozFullScreenElement || 
           document.msFullscreenElement) {
         console.log("フルスクリーンモードに切り替わりました");
-        // Ensure we can receive keyboard events
-        if (document.getElementById('jspsych-target')) {
-          document.getElementById('jspsych-target').focus();
-        }
+        // フォーカス管理を改善 - フォームの入力を邪魔しないようにする
+        // if (document.getElementById('jspsych-target')) {
+        //   document.getElementById('jspsych-target').focus();
+        // }
       } else {
         console.log("フルスクリーンモードから抜けました");
       }
