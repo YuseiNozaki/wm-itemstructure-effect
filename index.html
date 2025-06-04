@@ -1146,6 +1146,91 @@
       choices: ['Enter']
     };
 
+    // Practice introduction
+    const practiceIntroduction = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>練習試行</h1>
+        <p>まず、各条件での操作方法を練習していただきます。</p>
+        <p>ウィンドウ条件、スクロール条件、全画面条件を1回ずつ体験します。</p>
+        <p>各条件の前に詳しい説明を行いますので、操作方法をしっかりと確認してください。</p>
+        <p>エンターキーを押すと練習を開始します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Practice condition explanations
+    const windowPracticeExplanation = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>ウィンドウ条件の練習</h1>
+        <p>この条件では、画面の一部分だけを見ることができる小さなウィンドウが表示されます。</p>
+        <p>マウスでウィンドウをドラッグして移動させることで、画面全体を探索できます。</p>
+        <p>ターゲットを見つけたら、ウィンドウ内でクリックして選択してください。</p>
+        <p><strong>重要：</strong>ウィンドウを移動させるにはマウスボタンを押したままドラッグしてください。</p>
+        <p>エンターキーを押すと練習試行を開始します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    const scrollPracticeExplanation = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>スクロール条件の練習</h1>
+        <p>この条件では、画面の一部分だけを見ることができる表示領域があります。</p>
+        <p>マウスで背景をドラッグすることで、表示内容をスクロールして画面全体を探索できます。</p>
+        <p>ターゲットを見つけたら、表示領域内でクリックして選択してください。</p>
+        <p><strong>重要：</strong>背景をドラッグして内容をスクロールさせてください。</p>
+        <p>エンターキーを押すと練習試行を開始します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    const fullscreenPracticeExplanation = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>全画面条件の練習</h1>
+        <p>この条件では、画面全体にオブジェクトが表示されます。</p>
+        <p>マウスを動かす必要はなく、画面全体を見回してターゲットを探してください。</p>
+        <p>ターゲットを見つけたら、直接クリックして選択してください。</p>
+        <p>エンターキーを押すと練習試行を開始します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Main experiment begins screen
+    const mainExperimentBegins = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>練習終了</h1>
+        <p>お疲れさまでした。練習試行が終了しました。</p>
+        <p><strong>これから本番の実験を開始します。</strong></p>
+        <p>本番では、各条件がランダムな順序で複数回繰り返されます。</p>
+        <p>練習で学んだ操作方法を思い出して、できるだけ正確に、そして速くターゲットを見つけてください。</p>
+        <p>エンターキーを押すと本番の実験を開始します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Create practice trials - one for each view condition
+    const practiceTrials = [
+      {
+        viewCondition: 'window',
+        structure: 'structured',
+        memoryLoad: 'without-memory'
+      },
+      {
+        viewCondition: 'scroll', 
+        structure: 'structured',
+        memoryLoad: 'without-memory'
+      },
+      {
+        viewCondition: 'fullscreen',
+        structure: 'structured', 
+        memoryLoad: 'without-memory'
+      }
+    ];
+
     // Create separate factorial designs for with-memory and without-memory conditions
     const viewAndStructureFactors = {
       viewCondition: ['window', 'scroll', 'fullscreen'],
@@ -1212,6 +1297,37 @@
       ]
     };
     
+    // Practice trial procedures
+    const windowPracticeProcedure = {
+      timeline: [
+        windowPracticeExplanation,
+        {
+          ...trialProcedure,
+          timeline_variables: [practiceTrials[0]]
+        }
+      ]
+    };
+
+    const scrollPracticeProcedure = {
+      timeline: [
+        scrollPracticeExplanation,
+        {
+          ...trialProcedure,
+          timeline_variables: [practiceTrials[1]]
+        }
+      ]
+    };
+
+    const fullscreenPracticeProcedure = {
+      timeline: [
+        fullscreenPracticeExplanation,
+        {
+          ...trialProcedure,
+          timeline_variables: [practiceTrials[2]]
+        }
+      ]
+    };
+    
     // First block (without memory)
     const firstBlockProcedure = {
       ...trialProcedure,
@@ -1231,6 +1347,11 @@
       welcome,
       demographics,
       genderSelection,
+      practiceIntroduction,
+      windowPracticeProcedure,
+      scrollPracticeProcedure,
+      fullscreenPracticeProcedure,
+      mainExperimentBegins,
       firstBlockProcedure,
       midpointMessage,
       wmTaskExplanation,
