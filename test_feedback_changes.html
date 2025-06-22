@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Feedback Changes</title>
+  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  
+  <script>
+    // Mock visual search data for testing
+    jsPsych.data.addDataToLastTrial({
+      task: 'visual_search',
+      correct: true,
+      reaction_time: 1234
+    });
+
+    // Test the modified searchFeedback behavior
+    const searchFeedback = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        // Get the last visual search task data specifically
+        const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
+        const correct = searchData.correct;
+        
+        return `
+          <h1>${correct ? '正解!' : '不正解'}</h1>
+        `;
+      },
+      data: {
+        task: 'search_feedback'
+      },
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000
+    };
+
+    const endScreen = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <h1>テスト完了</h1>
+        <p>フィードバック画面が1秒間表示され、自動的に進みました。</p>
+        <p>反応時間は表示されず、エンターキー不要でした。</p>
+        <p>エンターキーを押すと終了します。</p>
+      `,
+      choices: ['Enter']
+    };
+
+    // Test timeline
+    const timeline = [
+      searchFeedback,
+      endScreen
+    ];
+
+    // Run the test
+    jsPsych.init({
+      display_element: 'jspsych-target',
+      timeline: timeline,
+      on_finish: function() {
+        console.log('Test completed successfully');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1055,14 +1055,13 @@
         
         return `
           <h1>${correct ? '正解!' : '不正解'}</h1>
-          <p>反応時間: ${Math.round(searchData.reaction_time)}ms</p>
-          <p>エンターキーを押すと次に進みます。</p>
         `;
       },
       data: {
         task: 'search_feedback'
       },
-      choices: ['Enter']
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000
     };
 
     // Feedback for memory task
