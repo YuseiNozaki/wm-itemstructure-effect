@@ -2,14 +2,14 @@
 <html>
 <head>
   <title>visual search task</title>
-  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-survey-text.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-preload.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-instructions.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-canvas-keyboard-response.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
-  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/jspsych@8"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2"></script>
+  <link href="https://unpkg.com/jspsych@8/css/jspsych.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       margin: 0;
@@ -127,8 +127,23 @@
   <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
   <div id="search-window" class="hidden"></div>
   <script>
-    // jsPsych is already defined as a global variable in v6.3.1
-    // We'll initialize it later with jsPsych.init()
+    // Initialize jsPsych v8 instance
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      },
+      on_trial_start: function() {
+        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
+        if (!document.fullscreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.msFullscreenElement) {
+          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
+          console.log("フルスクリーンモードの再確認");
+        }
+      }
+    });
 
     // フルスクリーンモードを要求する関数
     function enterFullscreen() {
@@ -282,7 +297,7 @@
 
     // Welcome screen
     const welcome = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
                 '<p>エンターキーを押すと実験が開始されます。</p>',
       choices: ['Enter'],
@@ -297,7 +312,7 @@
 
     // Demographic information
     const demographics = {
-      type: 'survey-text',
+      type: jsPsychSurveyText,
       questions: [
         {
           prompt: '年齢:',
@@ -318,7 +333,7 @@
 
     // Gender selection  
     const genderSelection = {
-      type: 'survey-multi-choice',
+      type: jsPsychSurveyMultiChoice,
       questions: [
         {
           prompt: '性別:',
@@ -340,7 +355,7 @@
 
     // Instructions for visual search task
     const visualSearchInstructions = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         return `
@@ -363,7 +378,7 @@
 
     // Memory grid task - display
     const memoryGridDisplay = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Generate the memory positions to remember
         memoryPositions = [];
@@ -396,7 +411,7 @@
         
         return gridHTML;
       },
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       trial_duration: 3000, // Display for 3 seconds
       data: {
         task: 'memory_display',
@@ -406,7 +421,7 @@
 
     // Memory grid task - recall (2-choice format)
     const memoryGridRecall = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Generate incorrect positions (different from the original)
         const gridSize = params.memoryGridSize;
@@ -473,7 +488,7 @@
         
         return gridHTML;
       },
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       on_load: function() {
         const grids = document.querySelectorAll('.memory-choice-grid');
         
@@ -505,13 +520,13 @@
 
     // Fixation point display
     const fixationPoint = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
           <div style="font-size: 60px; font-weight: bold; color: black;">+</div>
         </div>
       `,
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       trial_duration: 1000,
       data: {
         task: 'fixation_point'
@@ -520,7 +535,7 @@
 
     // Display target object
     const showTarget = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Randomly select target color and shape
         const targetColor = jsPsych.randomization.sampleWithoutReplacement(params.colors, 1)[0];
@@ -538,7 +553,7 @@
           </div>
         `;
       },
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       trial_duration: 1000,
       data: {
         task: 'show_target'
@@ -573,11 +588,11 @@
 
     // Visual search task
     const visualSearch = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         return `<div id="search-container" style="width: 100vw; height: 100vh;"></div>`;
       },
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       data: {
         task: 'visual_search'
       },
@@ -1047,7 +1062,7 @@
 
     // Feedback for visual search task
     const searchFeedback = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Get the last visual search task data specifically
         const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
@@ -1060,13 +1075,13 @@
       data: {
         task: 'search_feedback'
       },
-      choices: jsPsych.NO_KEYS,
+      choices: "NO_KEYS",
       trial_duration: 1000
     };
 
     // Feedback for memory task
     const memoryFeedback = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Get the last memory task data specifically
         const memoryData = jsPsych.data.get().filter({task: 'memory_recall'}).last(1).values()[0];
@@ -1085,7 +1100,7 @@
 
     // End screen with overall score
     const endScreen = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         // Calculate overall accuracy for visual search
         const searchData = jsPsych.data.get().filter({task: 'visual_search'});
@@ -1119,7 +1134,7 @@
     
     // Midpoint message
     const midpointMessage = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <h1>半分終了</h1>
         <p>お疲れさまでした。ここで半分終了です。</p>
@@ -1131,7 +1146,7 @@
     
     // WM task explanation
     const wmTaskExplanation = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <h1>位置記憶課題の説明</h1>
         <p>これからは追加で、位置記憶課題も行います。</p>
@@ -1234,24 +1249,8 @@
       endScreen
     ];
 
-    // Run the experiment
-    jsPsych.init({
-      display_element: 'jspsych-target',
-      timeline: timeline,
-      on_finish: function() {
-        jsPsych.data.displayData();
-      },
-      on_trial_start: function() {
-        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
-        if (!document.fullscreenElement && 
-            !document.webkitFullscreenElement && 
-            !document.mozFullScreenElement && 
-            !document.msFullscreenElement) {
-          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
-          console.log("フルスクリーンモードの再確認");
-        }
-      }
-    });
+    // Run the experiment using jsPsych v8 API
+    jsPsych.run(timeline);
   </script>
 </body>
 </html>
