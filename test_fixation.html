@@ -2,9 +2,9 @@
 <html>
 <head>
   <title>Fixation Point Test</title>
-  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
-  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
-  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/jspsych@8.2.1/dist/jspsych.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.min.js"></script>
+  <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       margin: 0;
@@ -41,15 +41,23 @@
 <body>
   <div id="jspsych-target"></div>
   <script>
+    // Initialize jsPsych v8
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        console.log('Fixation point test completed');
+      }
+    });
+
     // Test fixation point display
     const fixationPoint = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
           <div style="font-size: 60px; font-weight: bold; color: black;">+</div>
         </div>
       `,
-      choices: jsPsych.NO_KEYS,
+      choices: 'NO_KEYS',
       trial_duration: 1000,
       data: {
         task: 'fixation_point'
@@ -76,7 +84,7 @@
 
     // Test target display
     const showTarget = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         return `
           <h1>ターゲット</h1>
@@ -87,7 +95,7 @@
           <p>1秒後に自動的に探索課題が始まります。</p>
         `;
       },
-      choices: jsPsych.NO_KEYS,
+      choices: 'NO_KEYS',
       trial_duration: 1000,
       data: {
         task: 'show_target'
@@ -96,7 +104,7 @@
 
     // End screen
     const endScreen = {
-      type: 'html-keyboard-response',
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <h1>テスト完了</h1>
         <p>注視点→ターゲットの流れが正しく動作しました。</p>
@@ -114,13 +122,7 @@
     ];
 
     // Run the test
-    jsPsych.init({
-      display_element: 'jspsych-target',
-      timeline: timeline,
-      on_finish: function() {
-        console.log('Fixation point test completed');
-      }
-    });
+    jsPsych.run(timeline);
   </script>
 </body>
 </html>
