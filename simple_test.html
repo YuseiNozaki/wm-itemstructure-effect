@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Minimal jsPsych v8 Test</title>
+  <script src="https://unpkg.com/jspsych@8.2.1/dist/jspsych.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.min.js"></script>
+  <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target'
+    });
+    
+    const timeline = [{
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<p>Hello World! This is jsPsych v8. Press any key.</p>'
+    }];
+    
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>

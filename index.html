@@ -127,23 +127,7 @@
   <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
   <div id="search-window" class="hidden"></div>
   <script>
-    // Initialize jsPsych v8
-    const jsPsych = initJsPsych({
-      display_element: 'jspsych-target',
-      on_finish: function() {
-        jsPsych.data.displayData();
-      },
-      on_trial_start: function() {
-        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
-        if (!document.fullscreenElement && 
-            !document.webkitFullscreenElement && 
-            !document.mozFullScreenElement && 
-            !document.msFullscreenElement) {
-          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
-          console.log("フルスクリーンモードの再確認");
-        }
-      }
-    });
+    // Initialize jsPsych instance (v8 pattern)
 
     // フルスクリーンモードを要求する関数
     function enterFullscreen() {
@@ -1249,7 +1233,24 @@
       endScreen
     ];
 
-    // Run the experiment
+    // Create jsPsych instance and run the experiment
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      },
+      on_trial_start: function() {
+        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
+        if (!document.fullscreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.msFullscreenElement) {
+          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
+          console.log("フルスクリーンモードの再確認");
+        }
+      }
+    });
+
     jsPsych.run(timeline);
   </script>
 </body>
