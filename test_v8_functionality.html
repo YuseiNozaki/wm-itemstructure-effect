@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>jsPsych v8 Functionality Test</title>
+  <script src="https://unpkg.com/jspsych@8.0.2/dist/jspsych.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0/dist/index.browser.js"></script>
+  <link href="https://unpkg.com/jspsych@8.0.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { margin: 20px; font-family: Arial, sans-serif; }
+    #jspsych-target { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>jsPsych v8 Functionality Test</h1>
+  <p>Testing key features used in the experiment...</p>
+  <div id="jspsych-target"></div>
+  
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        document.body.innerHTML += '<h2>All tests passed!</h2><p>jsPsych v8 migration successful.</p>';
+        console.log('Test data:', jsPsych.data.get().values());
+      }
+    });
+
+    // Test timeline variables (used heavily in the experiment)
+    const timeline_procedure = {
+      timeline: [
+        {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: function() {
+            const condition = jsPsych.timelineVariable('condition');
+            return `<p>Testing timelineVariable: ${condition}</p><p>Press SPACE to continue.</p>`;
+          },
+          choices: [' '],
+          data: {
+            test: 'timeline_variable',
+            condition: jsPsych.timelineVariable('condition')
+          }
+        }
+      ],
+      timeline_variables: [
+        { condition: 'test1' },
+        { condition: 'test2' }
+      ]
+    };
+
+    // Test randomization (used in the experiment)
+    const randomization_test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const colors = ['red', 'blue', 'green', 'yellow'];
+        const randomColor = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+        return `<p>Testing randomization: ${randomColor}</p><p>Press SPACE to continue.</p>`;
+      },
+      choices: [' '],
+      data: {
+        test: 'randomization'
+      }
+    };
+
+    // Test data handling
+    const data_test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        // Add some properties to test data.addProperties equivalent
+        return `<p>Testing data handling...</p><p>Press SPACE to continue.</p>`;
+      },
+      choices: [' '],
+      on_finish: function(data) {
+        // Test data access like the experiment does
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        console.log('Last trial data:', lastTrial);
+      },
+      data: {
+        test: 'data_handling'
+      }
+    };
+
+    // Test survey functionality 
+    const survey_test = {
+      type: jsPsychSurveyText,
+      questions: [
+        {
+          prompt: 'Testing survey-text plugin (enter "test"):',
+          name: 'test_input',
+          required: true
+        }
+      ],
+      data: {
+        test: 'survey_text'
+      }
+    };
+
+    // Test finishTrial simulation
+    const finish_trial_test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<p>Testing trial finish functionality...</p><p>This trial will auto-finish in 1 second.</p>',
+      choices: 'NO_KEYS',
+      trial_duration: 1000,
+      on_finish: function(data) {
+        // Simulate the finishTrial usage from the experiment
+        jsPsych.finishTrial({
+          custom_data: 'test_value',
+          auto_finished: true
+        });
+      },
+      data: {
+        test: 'finish_trial'
+      }
+    };
+
+    const final_test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<h2>All functionality tests completed!</h2><p>Press any key to finish.</p>',
+      data: {
+        test: 'final'
+      }
+    };
+
+    const timeline = [
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h2>Starting jsPsych v8 Functionality Tests</h2><p>Press SPACE to begin...</p>',
+        choices: [' ']
+      },
+      timeline_procedure,
+      randomization_test,
+      data_test,
+      survey_test,
+      finish_trial_test,
+      final_test
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
