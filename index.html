@@ -2,14 +2,14 @@
 <html>
 <head>
   <title>visual search task</title>
-  <script src="https://unpkg.com/jspsych@8"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-preload@2"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-instructions@2"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@2"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2"></script>
-  <link href="https://unpkg.com/jspsych@8/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       margin: 0;
@@ -127,7 +127,8 @@
   <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
   <div id="search-window" class="hidden"></div>
   <script>
-    // Initialize jsPsych v8 instance
+    // Initialize jsPsych v7 instance (upgraded from v6.3.1)
+    // Note: Targeting v7.x as the latest stable version (v8.x may not be available yet)
     const jsPsych = initJsPsych({
       display_element: 'jspsych-target',
       on_finish: function() {
@@ -1249,7 +1250,7 @@
       endScreen
     ];
 
-    // Run the experiment using jsPsych v8 API
+    // Run the experiment using jsPsych v7 API (upgraded from v6.3.1)
     jsPsych.run(timeline);
   </script>
 </body>

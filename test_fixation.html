@@ -2,9 +2,9 @@
 <html>
 <head>
   <title>Fixation Point Test</title>
-  <script src="https://unpkg.com/jspsych@8"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2"></script>
-  <link href="https://unpkg.com/jspsych@8/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       margin: 0;
@@ -41,7 +41,7 @@
 <body>
   <div id="jspsych-target"></div>
   <script>
-    // Initialize jsPsych v8
+    // Initialize jsPsych v7 (upgraded from v6.3.1)
     const jsPsych = initJsPsych({
       display_element: 'jspsych-target',
       on_finish: function() {
@@ -121,7 +121,7 @@
       endScreen
     ];
 
-    // Run the test using jsPsych v8 API
+    // Run the test using jsPsych v7 API (upgraded from v6.3.1)
     jsPsych.run(timeline);
   </script>
 </body>
