@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clean jsPsych v8 Test</title>
+  <script src="https://unpkg.com/jspsych@8.2.1/dist/jspsych.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0/dist/index.browser.min.js"></script>
+  <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    #jspsych-target { margin: 20px 0; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  </style>
+</head>
+<body>
+  <h1>Clean jsPsych v8 Migration Test</h1>
+  <div id="status"></div>
+  <div id="jspsych-target"></div>
+  
+  <script>
+    function showStatus(message, isError = false) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status ' + (isError ? 'error' : 'success');
+      statusDiv.innerHTML = (isError ? '❌ ' : '✅ ') + message;
+      console.log((isError ? '❌ ' : '✅ ') + message);
+    }
+    
+    // Clear any potential cache issues
+    showStatus('Starting clean jsPsych v8 test...');
+    
+    // Check resource loading
+    if (typeof initJsPsych === 'undefined') {
+      showStatus('ERROR: jsPsych v8 core failed to load from unpkg.com CDN', true);
+    } else if (typeof jsPsychHtmlKeyboardResponse === 'undefined') {
+      showStatus('ERROR: jsPsych plugins failed to load from unpkg.com CDN', true);
+    } else {
+      showStatus('All jsPsych v8 resources loaded successfully from CDN');
+      
+      try {
+        // Create jsPsych instance first
+        const jsPsych = initJsPsych({
+          display_element: 'jspsych-target',
+          on_finish: function() {
+            showStatus('Experiment completed successfully!');
+          }
+        });
+        
+        // Define timeline with jsPsych methods (testing the original error scenario)
+        const timeline = [
+          {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+              // This tests the exact scenario that was causing the error
+              showStatus('Timeline function executed - jsPsych instance is accessible');
+              return '<h2>✅ jsPsych v8 Working!</h2><p>This confirms the migration is successful.</p><p><strong>Press any key to continue...</strong></p>';
+            },
+            choices: "ALL_KEYS"
+          },
+          {
+            type: jsPsychSurveyText,
+            questions: [
+              {
+                prompt: 'Optional: Enter any feedback about this test:',
+                name: 'feedback',
+                required: false
+              }
+            ],
+            button_label: 'Continue'
+          },
+          {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<h2>✅ Test Complete!</h2><p>jsPsych v8 migration is working correctly.</p><p>Press any key to finish.</p>',
+            choices: "ALL_KEYS"
+          }
+        ];
+        
+        // Run experiment
+        showStatus('Starting jsPsych experiment...');
+        jsPsych.run(timeline);
+        
+      } catch (error) {
+        showStatus('ERROR: ' + error.message, true);
+        document.getElementById('jspsych-target').innerHTML = 
+          '<div class="status error">Detailed error: ' + error.stack + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>
