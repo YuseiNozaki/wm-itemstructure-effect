@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>jsPsych v8 Research</title>
+  <script src="https://unpkg.com/jspsych@8.2.1/dist/jspsych.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@2.0.0/dist/index.browser.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@2.0.0/dist/index.browser.min.js"></script>
+  <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    // Test v8 API equivalents for key functions used in the original code
+    console.log('Testing jsPsych v8 API...');
+    
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        console.log('Experiment completed');
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test timeline variables
+    const testTimelineVariable = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const condition = jsPsych.timelineVariable('condition');
+        return `<p>Condition: ${condition}</p><p>Press any key to continue.</p>`;
+      }
+    };
+
+    // Test data access
+    const testDataAccess = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const data = jsPsych.data.get().last(1);
+        return `<p>Previous data: ${JSON.stringify(data.values())}</p><p>Press any key to continue.</p>`;
+      }
+    };
+
+    // Test randomization
+    const testRandomization = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const colors = ['red', 'blue', 'green'];
+        const randomColor = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+        return `<p>Random color: ${randomColor}</p><p>Press any key to continue.</p>`;
+      }
+    };
+
+    // Test factorial design
+    const factorialTest = {
+      timeline: [testTimelineVariable],
+      timeline_variables: jsPsych.randomization.factorial({
+        condition: ['A', 'B'],
+        value: [1, 2]
+      }),
+      randomize_order: true
+    };
+
+    const timeline = [
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>jsPsych v8 API Test</h1><p>Testing key functions...</p><p>Press any key to start.</p>'
+      },
+      testRandomization,
+      factorialTest,
+      testDataAccess,
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>Test Complete</h1><p>Check console for results.</p>',
+        choices: 'NO_KEYS',
+        trial_duration: 3000
+      }
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
