@@ -127,6 +127,22 @@
   <canvas id="jspsych-visual-search-canvas" class="hidden"></canvas>
   <div id="search-window" class="hidden"></div>
   <script>
+    // Debug: Check if jsPsych v8 resources loaded correctly
+    console.log('=== jsPsych v8 Debug Info ===');
+    console.log('initJsPsych function:', typeof initJsPsych);
+    console.log('jsPsychHtmlKeyboardResponse:', typeof jsPsychHtmlKeyboardResponse);
+    console.log('jsPsychSurveyText:', typeof jsPsychSurveyText);
+    console.log('jsPsychSurveyMultiChoice:', typeof jsPsychSurveyMultiChoice);
+    
+    if (typeof initJsPsych === 'undefined') {
+      document.getElementById('jspsych-target').innerHTML = '<div style="color: red; padding: 20px; font-size: 18px;">ERROR: jsPsych v8 core failed to load. Check your internet connection and CDN access to unpkg.com.</div>';
+    } else if (typeof jsPsychHtmlKeyboardResponse === 'undefined') {
+      document.getElementById('jspsych-target').innerHTML = '<div style="color: red; padding: 20px; font-size: 18px;">ERROR: jsPsych plugins failed to load. Check CDN access for @jspsych/plugin-* packages.</div>';
+    } else {
+      console.log('✓ All jsPsych v8 resources loaded successfully');
+    }
+  </script>
+  <script>
     // Initialize jsPsych instance (v8 pattern)
 
     // フルスクリーンモードを要求する関数
@@ -1234,24 +1250,38 @@
     ];
 
     // Create jsPsych instance and run the experiment
-    const jsPsych = initJsPsych({
-      display_element: 'jspsych-target',
-      on_finish: function() {
-        jsPsych.data.displayData();
-      },
-      on_trial_start: function() {
-        // 各試行の開始時に、実験がフルスクリーンモードであることを確認
-        if (!document.fullscreenElement && 
-            !document.webkitFullscreenElement && 
-            !document.mozFullScreenElement && 
-            !document.msFullscreenElement) {
-          // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
-          console.log("フルスクリーンモードの再確認");
+    try {
+      console.log('Initializing jsPsych experiment...');
+      
+      const jsPsych = initJsPsych({
+        display_element: 'jspsych-target',
+        on_finish: function() {
+          jsPsych.data.displayData();
+        },
+        on_trial_start: function() {
+          // 各試行の開始時に、実験がフルスクリーンモードであることを確認
+          if (!document.fullscreenElement && 
+              !document.webkitFullscreenElement && 
+              !document.mozFullScreenElement && 
+              !document.msFullscreenElement) {
+            // フルスクリーンではない場合、再度要求（ブラウザによってはユーザー操作が必要）
+            console.log("フルスクリーンモードの再確認");
+          }
         }
-      }
-    });
+      });
 
-    jsPsych.run(timeline);
+      console.log('jsPsych initialized successfully, starting experiment...');
+      jsPsych.run(timeline);
+      
+    } catch (error) {
+      console.error('Error initializing or running jsPsych experiment:', error);
+      document.getElementById('jspsych-target').innerHTML = 
+        '<div style="color: red; padding: 20px; font-size: 18px;">' +
+        '<h2>Experiment Error</h2>' +
+        '<p>Failed to start the experiment: ' + error.message + '</p>' +
+        '<p>Please check the browser console (F12) for more details.</p>' +
+        '</div>';
+    }
   </script>
 </body>
 </html>

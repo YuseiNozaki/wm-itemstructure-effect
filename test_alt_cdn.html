@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>jsPsych v8 Alternative CDN Test</title>
+  <!-- Try different CDN URLs -->
+  <script src="https://unpkg.com/jspsych@8.2.1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+  <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    console.log("Testing alternative CDN URLs...");
+    console.log("initJsPsych available:", typeof initJsPsych);
+    console.log("jsPsychHtmlKeyboardResponse available:", typeof jsPsychHtmlKeyboardResponse);
+    
+    if (typeof initJsPsych !== 'undefined') {
+      const jsPsych = initJsPsych({
+        display_element: 'jspsych-target'
+      });
+      
+      const timeline = [{
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<p>Alternative CDN test working! Press any key.</p>'
+      }];
+      
+      jsPsych.run(timeline);
+    } else {
+      document.getElementById('jspsych-target').innerHTML = 
+        '<p style="color: red;">initJsPsych not found - CDN loading failed</p>';
+    }
+  </script>
+</body>
+</html>
