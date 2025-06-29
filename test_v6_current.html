@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Current v6.3.1</title>
+  <script src="https://unpkg.com/jspsych@6.3.1/jspsych.js"></script>
+  <script src="https://unpkg.com/jspsych@6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <link href="https://unpkg.com/jspsych@6.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    // Simple test of current v6.3.1 functionality
+    const welcome = {
+      type: 'html-keyboard-response',
+      stimulus: '<h1>jsPsych v6.3.1 Test</h1><p>Press any key to continue.</p>',
+      choices: jsPsych.ALL_KEYS
+    };
+
+    const trial = {
+      type: 'html-keyboard-response',
+      stimulus: '<p>This is a test trial. Press SPACE to continue.</p>',
+      choices: [' '],
+      data: { task: 'test' }
+    };
+
+    const end = {
+      type: 'html-keyboard-response',
+      stimulus: '<h1>Test Complete</h1><p>jsPsych v6.3.1 is working correctly.</p>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 2000
+    };
+
+    const timeline = [welcome, trial, end];
+
+    jsPsych.init({
+      display_element: 'jspsych-target',
+      timeline: timeline,
+      on_finish: function() {
+        console.log('v6.3.1 test completed successfully');
+      }
+    });
+  </script>
+</body>
+</html>
