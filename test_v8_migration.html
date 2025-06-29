@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>jsPsych v8 Migration Test</title>
+  <!-- jsPsych v8 core -->
+  <script src="https://unpkg.com/jspsych@8.0.2/dist/jspsych.js"></script>
+  <!-- jsPsych v8 plugins -->
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@2.0.0/dist/index.browser.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0/dist/index.browser.js"></script>
+  <!-- jsPsych v8 CSS -->
+  <link href="https://unpkg.com/jspsych@8.0.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      margin: 20px;
+      font-family: Arial, sans-serif;
+    }
+    #jspsych-target {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>jsPsych v8 Migration Test</h1>
+  <p>Testing basic functionality with v8...</p>
+  <div id="jspsych-target"></div>
+  
+  <script>
+    // Test basic jsPsych v8 functionality
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        console.log('jsPsych v8 test completed');
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test basic trial
+    const welcome = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h2>Welcome to jsPsych v8 Test</h2>
+        <p>Press any key to continue.</p>
+      `
+    };
+
+    // Test timelineVariable equivalent
+    const test_trial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `<p>Test trial. Press SPACE to continue.</p>`;
+      },
+      choices: [' ']
+    };
+
+    // Test data access and randomization
+    const data_test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        // Test randomization
+        const colors = ['red', 'blue', 'green'];
+        const randomColor = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+        
+        return `<p>Random color: ${randomColor}</p><p>Press any key to finish.</p>`;
+      },
+      on_finish: function(data) {
+        // Test data handling
+        console.log('Trial data:', data);
+      }
+    };
+
+    const timeline = [welcome, test_trial, data_test];
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
