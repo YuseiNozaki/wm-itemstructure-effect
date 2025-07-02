@@ -632,6 +632,10 @@
           } else {
             searchWindow.style.pointerEvents = 'none';
           }
+        } else {
+          // Ensure search window is hidden for fullscreen condition
+          searchWindow.style.display = 'none';
+          searchWindow.classList.add('hidden');
         }
         
         // Create visual search display
@@ -686,6 +690,7 @@
           lastMouseX = mouseX;
           lastMouseY = mouseY;
           currentDragDistance = 0; // Reset drag distance for new interaction
+          console.log('Starting window drag at:', mouseX, mouseY);
           
           // Calculate offset between cursor and window position
           const searchWindow = document.getElementById('search-window');
@@ -702,7 +707,7 @@
         }
         
         function dragWindow(e) {
-          if (!isMouseDown && viewCondition === 'window') return; // Only move during drag
+          if (!isMouseDown || viewCondition !== 'window') return; // Only move during drag
           
           mouseX = e.clientX;
           mouseY = e.clientY;
@@ -732,6 +737,7 @@
             
             searchWindow.style.left = windowX + 'px';
             searchWindow.style.top = windowY + 'px';
+            console.log('Moving window to:', windowX, windowY);
             
             // Update canvas clip region
             drawSearchDisplay(ctx, viewCondition);
@@ -756,10 +762,11 @@
           lastMouseX = mouseX;
           lastMouseY = mouseY;
           currentDragDistance = 0; // Reset drag distance for new interaction
+          console.log('Starting background drag at:', mouseX, mouseY);
         }
         
         function dragBackground(e) {
-          if (!isMouseDown && viewCondition === 'scroll') return;
+          if (!isMouseDown || viewCondition !== 'scroll') return;
           
           mouseX = e.clientX;
           mouseY = e.clientY;
@@ -780,6 +787,7 @@
               objects[i].x += dx;
               objects[i].y += dy;
             }
+            console.log('Moving objects by:', dx, dy);
             
             // Update last position
             lastMouseX = mouseX;
@@ -856,7 +864,9 @@
           
           // Hide canvas and window immediately using direct style property
           canvas.style.display = 'none';
+          canvas.classList.add('hidden');
           searchWindow.style.display = 'none';
+          searchWindow.classList.add('hidden');
           
           // Finish trial
           jsPsych.finishTrial({
@@ -1064,9 +1074,11 @@
     const searchFeedback = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
+        console.log('Feedback trial starting'); // Debug log
         // Get the last visual search task data specifically
         const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
         const correct = searchData.correct;
+        console.log('Search result:', correct); // Debug log
         
         return `
           <h1>${correct ? '正解!' : '不正解'}</h1>
@@ -1076,7 +1088,13 @@
         task: 'search_feedback'
       },
       choices: "NO_KEYS",
-      trial_duration: 1000
+      trial_duration: 1000,
+      on_load: function() {
+        console.log('Feedback trial loaded and displayed'); // Debug log
+      },
+      on_finish: function() {
+        console.log('Feedback trial finished'); // Debug log
+      }
     };
 
     // Feedback for memory task
