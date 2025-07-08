@@ -212,11 +212,14 @@
     
     function addFullscreenListeners() {
       if (!fullscreenListenersActive) {
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-        fullscreenListenersActive = true;
+        // Add a small delay to ensure DOM is ready
+        setTimeout(() => {
+          document.addEventListener('fullscreenchange', handleFullscreenChange);
+          document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+          document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+          document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+          fullscreenListenersActive = true;
+        }, 50);
       }
     }
     
@@ -231,13 +234,17 @@
     }
 
     function handleFullscreenChange() {
-      if (document.fullscreenElement || 
-          document.webkitFullscreenElement || 
-          document.mozFullScreenElement || 
-          document.msFullscreenElement) {
-        console.log("フルスクリーンモードに切り替わりました");
-      } else {
-        console.log("フルスクリーンモードから抜けました");
+      try {
+        if (document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullScreenElement || 
+            document.msFullscreenElement) {
+          console.log("フルスクリーンモードに切り替わりました");
+        } else {
+          console.log("フルスクリーンモードから抜けました");
+        }
+      } catch (error) {
+        console.warn("フルスクリーン状態の確認中にエラーが発生しました:", error);
       }
     }
 
@@ -313,11 +320,12 @@
 
     // Demographic information
     const demographics = {
-      type: jsPsychSurveyText,
+      type: jsPsychSurveyMultiChoice,
       questions: [
         {
           prompt: '年齢:',
           name: 'age',
+          options: Array.from({length: 100}, (_, i) => (i + 1).toString()),
           required: true
         }
       ],
@@ -325,6 +333,13 @@
       on_load: function() {
         // Temporarily remove fullscreen listeners during form interaction
         removeFullscreenListeners();
+        // Prevent default click propagation to avoid conflicts
+        setTimeout(() => {
+          const formContainer = document.querySelector('#jspsych-target');
+          if (formContainer) {
+            formContainer.style.pointerEvents = 'auto';
+          }
+        }, 100);
       },
       on_finish: function() {
         // Re-add fullscreen listeners after form completion
@@ -347,6 +362,13 @@
       on_load: function() {
         // Temporarily remove fullscreen listeners during form interaction
         removeFullscreenListeners();
+        // Prevent default click propagation to avoid conflicts
+        setTimeout(() => {
+          const formContainer = document.querySelector('#jspsych-target');
+          if (formContainer) {
+            formContainer.style.pointerEvents = 'auto';
+          }
+        }, 100);
       },
       on_finish: function() {
         // Re-add fullscreen listeners after form completion

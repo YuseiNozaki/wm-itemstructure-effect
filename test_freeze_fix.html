@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Freeze Bug Fix</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      color: #fff;
+    }
+    #jspsych-target {
+      background-color: #000;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    const jsPsych = initJsPsych({
+      on_finish: function(data) {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Fullscreen management - same as main experiment
+    let fullscreenListenersActive = false;
+    
+    function addFullscreenListeners() {
+      if (!fullscreenListenersActive) {
+        setTimeout(() => {
+          document.addEventListener('fullscreenchange', handleFullscreenChange);
+          document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+          document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+          document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+          fullscreenListenersActive = true;
+          console.log('Fullscreen listeners added');
+        }, 50);
+      }
+    }
+    
+    function removeFullscreenListeners() {
+      if (fullscreenListenersActive) {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+        fullscreenListenersActive = false;
+        console.log('Fullscreen listeners removed');
+      }
+    }
+
+    function handleFullscreenChange() {
+      try {
+        if (document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullScreenElement || 
+            document.msFullscreenElement) {
+          console.log("フルスクリーンモードに切り替わりました");
+        } else {
+          console.log("フルスクリーンモードから抜けました");
+        }
+      } catch (error) {
+        console.warn("フルスクリーン状態の確認中にエラーが発生しました:", error);
+      }
+    }
+
+    function enterFullscreen() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().then(() => {
+          console.log("フルスクリーンモードに正常に移行しました");
+        }).catch(err => {
+          console.warn("フルスクリーン移行エラー:", err);
+        });
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    }
+
+    // Welcome screen
+    const welcome = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<h1>フリーズバグテスト</h1>' +
+                '<p>エンターキーを押すとフルスクリーンになり、年齢入力画面に進みます。</p>' +
+                '<p>年齢入力画面で画面内の任意の場所をクリックしてみてください。フリーズしないはずです。</p>',
+      choices: ['Enter'],
+      on_finish: function() {
+        addFullscreenListeners();
+        enterFullscreen();
+      }
+    };
+
+    // Age selection with improved event handling
+    const ageSelection = {
+      type: jsPsychSurveyMultiChoice,
+      questions: [
+        {
+          prompt: '年齢を選択してください（画面内をクリックしてもフリーズしないかテストしてください）:',
+          name: 'age',
+          options: Array.from({length: 20}, (_, i) => (i + 18).toString()), // Shorter list for testing
+          required: true
+        }
+      ],
+      button_label: '次へ',
+      on_load: function() {
+        console.log('Age form loading - removing fullscreen listeners');
+        removeFullscreenListeners();
+        setTimeout(() => {
+          const formContainer = document.querySelector('#jspsych-target');
+          if (formContainer) {
+            formContainer.style.pointerEvents = 'auto';
+            console.log('Form container pointer events set to auto');
+          }
+          // Test click handling
+          document.addEventListener('click', function(e) {
+            console.log('Click detected at:', e.clientX, e.clientY, 'Target:', e.target.tagName);
+          });
+        }, 100);
+      },
+      on_finish: function() {
+        console.log('Age form finished - re-adding fullscreen listeners');
+        addFullscreenListeners();
+      }
+    };
+
+    // Gender selection  
+    const genderSelection = {
+      type: jsPsychSurveyMultiChoice,
+      questions: [
+        {
+          prompt: '性別を選択してください（画面内をクリックしてもフリーズしないかテストしてください）:',
+          name: 'gender',
+          options: ['男性', '女性', 'その他'],
+          required: true
+        }
+      ],
+      button_label: '完了',
+      on_load: function() {
+        console.log('Gender form loading - removing fullscreen listeners');
+        removeFullscreenListeners();
+        setTimeout(() => {
+          const formContainer = document.querySelector('#jspsych-target');
+          if (formContainer) {
+            formContainer.style.pointerEvents = 'auto';
+            console.log('Form container pointer events set to auto');
+          }
+        }, 100);
+      },
+      on_finish: function() {
+        console.log('Gender form finished - re-adding fullscreen listeners');
+        addFullscreenListeners();
+      }
+    };
+
+    const timeline = [welcome, ageSelection, genderSelection];
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
