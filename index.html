@@ -308,71 +308,120 @@
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
                 '<p>エンターキーを押すと実験が開始されます。</p>',
-      choices: ['Enter'],
+      choices: ['Enter']
+    };
+
+
+
+    // Demographic information - Age selection with dropdown
+    const demographics = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
+        html += '<h2>年齢を選択してください</h2>';
+        html += '<form id="age-form" style="margin: 20px 0;">';
+        html += '<div style="margin: 20px 0;">';
+        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 18px;">年齢:</label>';
+        html += '<select id="age-select" name="age" required style="padding: 10px; font-size: 16px; width: 200px; border: 2px solid #ccc; border-radius: 5px;">';
+        html += '<option value="">選択してください</option>';
+        
+        // Generate age options from 1 to 100
+        for (let i = 1; i <= 100; i++) {
+          html += `<option value="${i}">${i}</option>`;
+        }
+        
+        html += '</select>';
+        html += '</div>';
+        html += '<div style="margin: 20px 0;">';
+        html += '<button type="submit" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>';
+        html += '</div>';
+        html += '</form>';
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Temporarily remove fullscreen listeners during form interaction
+        removeFullscreenListeners();
+        
+        const form = document.getElementById('age-form');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const ageSelect = document.getElementById('age-select');
+          const selectedAge = ageSelect.value;
+          
+          if (selectedAge) {
+            // Store the age data
+            jsPsych.data.addProperties({
+              age: selectedAge
+            });
+            
+            // Finish the trial
+            jsPsych.finishTrial({
+              age: selectedAge
+            });
+          } else {
+            alert('年齢を選択してください。');
+          }
+        });
+      }
+    };
+
+    // Gender selection with dropdown
+    const genderSelection = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
+        html += '<h2>性別を選択してください</h2>';
+        html += '<form id="gender-form" style="margin: 20px 0;">';
+        html += '<div style="margin: 20px 0;">';
+        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 18px;">性別:</label>';
+        html += '<select id="gender-select" name="gender" required style="padding: 10px; font-size: 16px; width: 200px; border: 2px solid #ccc; border-radius: 5px;">';
+        html += '<option value="">選択してください</option>';
+        html += '<option value="男性">男性</option>';
+        html += '<option value="女性">女性</option>';
+        html += '<option value="その他">その他</option>';
+        html += '</select>';
+        html += '</div>';
+        html += '<div style="margin: 20px 0;">';
+        html += '<button type="submit" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>';
+        html += '</div>';
+        html += '</form>';
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Temporarily remove fullscreen listeners during form interaction
+        removeFullscreenListeners();
+        
+        const form = document.getElementById('gender-form');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const genderSelect = document.getElementById('gender-select');
+          const selectedGender = genderSelect.value;
+          
+          if (selectedGender) {
+            // Store the gender data
+            jsPsych.data.addProperties({
+              gender: selectedGender
+            });
+            
+            // Finish the trial
+            jsPsych.finishTrial({
+              gender: selectedGender
+            });
+          } else {
+            alert('性別を選択してください。');
+          }
+        });
+      },
       on_finish: function() {
-        // Add fullscreen listeners only when entering fullscreen
+        // After demographics are complete, activate fullscreen
         addFullscreenListeners();
         enterFullscreen();
-      }
-    };
-
-
-
-    // Demographic information
-    const demographics = {
-      type: jsPsychSurveyMultiChoice,
-      questions: [
-        {
-          prompt: '年齢:',
-          name: 'age',
-          options: Array.from({length: 100}, (_, i) => (i + 1).toString()),
-          required: true
-        }
-      ],
-      button_label: '次へ',
-      on_load: function() {
-        // Temporarily remove fullscreen listeners during form interaction
-        removeFullscreenListeners();
-        // Prevent default click propagation to avoid conflicts
-        setTimeout(() => {
-          const formContainer = document.querySelector('#jspsych-target');
-          if (formContainer) {
-            formContainer.style.pointerEvents = 'auto';
-          }
-        }, 100);
-      },
-      on_finish: function() {
-        // Re-add fullscreen listeners after form completion
-        addFullscreenListeners();
-      }
-    };
-
-    // Gender selection  
-    const genderSelection = {
-      type: jsPsychSurveyMultiChoice,
-      questions: [
-        {
-          prompt: '性別:',
-          name: 'gender',
-          options: ['男性', '女性', 'その他'],
-          required: true
-        }
-      ],
-      button_label: '次へ',
-      on_load: function() {
-        // Temporarily remove fullscreen listeners during form interaction
-        removeFullscreenListeners();
-        // Prevent default click propagation to avoid conflicts
-        setTimeout(() => {
-          const formContainer = document.querySelector('#jspsych-target');
-          if (formContainer) {
-            formContainer.style.pointerEvents = 'auto';
-          }
-        }, 100);
-      },
-      on_finish: function() {
-        // Re-add fullscreen listeners after form completion
-        addFullscreenListeners();
       }
     };
 
