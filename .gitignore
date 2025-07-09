@@ -1,0 +1,6 @@
+# Test files for development
+test_age_gender.html
+test_freeze_fix.html
+
+# Temporary files
+/tmp/
