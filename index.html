@@ -47,10 +47,9 @@
       left: 0;
       width: 100vw !important;
       height: 100vh !important;
-      cursor: pointer;
-      z-index: 20;
-      display: block;
+      z-index: 5; /* Lower z-index to avoid interfering with main content */
       margin: 0 auto;
+      pointer-events: none; /* Initially disable pointer events */
     }
     #search-window {
       position: fixed;
@@ -118,7 +117,7 @@
       background-color: #ffcc00;
     }
     .hidden {
-      display: none;
+      display: none !important;
     }
   </style>
 </head>
@@ -308,7 +307,11 @@
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
                 '<p>エンターキーを押すと実験が開始されます。</p>',
-      choices: ['Enter']
+      choices: ['Enter'],
+      on_load: function() {
+        // Ensure no fullscreen listeners are active during welcome
+        removeFullscreenListeners();
+      }
     };
 
 
@@ -342,7 +345,7 @@
       },
       choices: "NO_KEYS",
       on_load: function() {
-        // Temporarily remove fullscreen listeners during form interaction
+        // Ensure no fullscreen listeners are active during demographics
         removeFullscreenListeners();
         
         const form = document.getElementById('age-form');
@@ -394,7 +397,7 @@
       },
       choices: "NO_KEYS",
       on_load: function() {
-        // Temporarily remove fullscreen listeners during form interaction
+        // Ensure no fullscreen listeners are active during demographics
         removeFullscreenListeners();
         
         const form = document.getElementById('gender-form');
@@ -420,8 +423,10 @@
       },
       on_finish: function() {
         // After demographics are complete, activate fullscreen
-        addFullscreenListeners();
-        enterFullscreen();
+        setTimeout(() => {
+          addFullscreenListeners();
+          enterFullscreen();
+        }, 100);
       }
     };
 
@@ -682,7 +687,10 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.classList.remove('hidden');
-        canvas.style.display = 'block'; // Ensure the canvas is visible (reset from previous trial)
+        canvas.style.display = 'block';
+        canvas.style.cursor = 'pointer'; // Only set cursor during visual search
+        canvas.style.zIndex = '20'; // Set higher z-index during visual search
+        canvas.style.pointerEvents = 'auto'; // Enable pointer events during visual search
         
         const ctx = canvas.getContext('2d');
         
@@ -928,6 +936,9 @@
           
           // Hide canvas and window immediately using direct style property
           canvas.style.display = 'none';
+          canvas.style.cursor = 'default'; // Reset cursor
+          canvas.style.zIndex = '5'; // Reset z-index
+          canvas.style.pointerEvents = 'none'; // Disable pointer events
           searchWindow.style.display = 'none';
           
           // Finish trial
