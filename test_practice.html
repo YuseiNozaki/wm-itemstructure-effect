@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test practice explanation
+    const practiceExplanation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
+          <h1>練習について</h1>
+          <p style="font-size: 18px; margin: 20px 0;">はじめに3回練習を行います</p>
+          <p style="font-size: 16px; margin: 20px 0;">
+            3つの表示条件（全画面・ウィンドウ・スクロール）をそれぞれ1回ずつ体験していただきます。<br>
+            練習では本番と同じ課題を行い、毎回フィードバックが表示されます。
+          </p>
+          <p style="font-size: 16px; margin: 20px 0;">
+            <strong>エンターキーを押して練習を開始してください。</strong>
+          </p>
+        </div>
+      `,
+      choices: ['Enter']
+    };
+
+    // Test completion choice
+    const practiceCompletionChoice = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
+        html += '<h1>練習完了</h1>';
+        html += '<p style="font-size: 18px; margin: 20px 0;">3回の練習が完了しました。</p>';
+        html += '<p style="font-size: 16px; margin: 20px 0;">以下から選択してください：</p>';
+        html += '<div style="margin: 30px 0;">';
+        html += '<button id="practice-again-btn" style="padding: 15px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">もう一度練習する</button>';
+        html += '<button id="proceed-main-btn" style="padding: 15px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">本番へ進む</button>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const practiceAgainBtn = document.getElementById('practice-again-btn');
+        const proceedMainBtn = document.getElementById('proceed-main-btn');
+        
+        practiceAgainBtn.addEventListener('click', function() {
+          jsPsych.finishTrial({
+            choice: 'practice_again'
+          });
+        });
+        
+        proceedMainBtn.addEventListener('click', function() {
+          jsPsych.finishTrial({
+            choice: 'proceed_main'
+          });
+        });
+      }
+    };
+
+    // Test timeline
+    const timeline = [
+      practiceExplanation,
+      practiceCompletionChoice
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
