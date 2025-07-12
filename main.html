@@ -343,6 +343,10 @@
     let memoryPositions = [];
     let selectedMemoryPositions = [];
 
+    // Trial progress tracking variables
+    let currentMainTrialNumber = 0;
+    const totalMainTrials = 60; // 3 viewConditions × 2 structures × 5 trialsPerCondition × 2 blocks
+
     // Welcome screen
     const welcome = {
       type: jsPsychHtmlKeyboardResponse,
@@ -491,8 +495,19 @@
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
         const viewCondition = jsPsych.timelineVariable('viewCondition');
+        const isPractice = jsPsych.timelineVariable('isPractice') || false;
+        
+        // Generate progress display for main trials only
+        let progressDisplay = '';
+        if (!isPractice) {
+          // Increment trial counter for main trials
+          currentMainTrialNumber++;
+          progressDisplay = `<p style="font-size: 16px; margin: 10px 0; font-weight: bold; color: #007bff;">進捗: ${currentMainTrialNumber}回/${totalMainTrials}回</p>`;
+        }
+        
         return `
           <h1>実験の説明</h1>
+          ${progressDisplay}
           <p>現在の条件: <strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
             viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
           <p>${viewCondition === 'window' ? 
