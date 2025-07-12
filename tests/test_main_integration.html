@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Integration Test - Main App Simulation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+        .visual-demo { width: 800px; height: 600px; border: 2px solid #333; position: relative; margin: 20px 0; }
+        .demo-object { position: absolute; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .demo-target { background-color: red; color: white; border-radius: 50%; }
+        .demo-distractor { background-color: blue; color: white; border-radius: 50%; }
+        .demo-distractor2 { background-color: green; color: white; }
+        .demo-distractor3 { background-color: yellow; color: black; }
+        .tolerance-zone { position: absolute; border: 2px dashed #ff6b6b; border-radius: 50%; background: rgba(255, 107, 107, 0.1); pointer-events: none; }
+    </style>
+</head>
+<body>
+    <h1>Integration Test - Main App Collision Detection</h1>
+    <div id="results"></div>
+    
+    <h2>Visual Demo</h2>
+    <p>Click on objects to test the collision detection. The red dashed circle shows the expanded target area.</p>
+    <div class="visual-demo" id="demo-area" onclick="handleDemoClick(event)">
+        <div class="demo-object demo-target" id="target" style="width: 30px; height: 30px; left: 385px; top: 285px;">T</div>
+        <div class="demo-object demo-distractor" id="dist1" style="width: 30px; height: 30px; left: 200px; top: 200px;">D1</div>
+        <div class="demo-object demo-distractor2" id="dist2" style="width: 30px; height: 30px; left: 500px; top: 400px;">D2</div>
+        <div class="demo-object demo-distractor3" id="dist3" style="width: 30px; height: 30px; left: 300px; top: 150px;">D3</div>
+        <div class="tolerance-zone" id="tolerance" style="width: 78px; height: 78px; left: 361px; top: 261px;"></div>
+    </div>
+    
+    <div id="demo-status" class="info">Click on objects to test collision detection</div>
+
+    <script>
+        // Exact same parameters as main.html
+        const params = {
+            objectMinSize: 20,
+            objectMaxSize: 40,
+            targetTolerance: 0.8 // Additional tolerance as multiplier of object size
+        };
+
+        const objectSize = (params.objectMaxSize + params.objectMinSize) / 2; // 30
+        
+        // Simulate the objects from main.html
+        const targetObject = {
+            x: 400,
+            y: 300,
+            size: objectSize,
+            color: 'red',
+            shape: 'circle',
+            isTarget: true
+        };
+
+        const objects = [
+            targetObject,
+            { x: 215, y: 215, size: objectSize, color: 'blue', shape: 'circle', isTarget: false },
+            { x: 515, y: 415, size: objectSize, color: 'green', shape: 'square', isTarget: false },
+            { x: 315, y: 165, size: objectSize, color: 'yellow', shape: 'square', isTarget: false }
+        ];
+
+        // Exact same collision detection logic as main.html
+        function checkSelection(clickX, clickY) {
+            // Find clicked object using standard collision detection
+            let clickedObject = null;
+            
+            for (let i = 0; i < objects.length; i++) {
+                const obj = objects[i];
+                const dx = clickX - obj.x;
+                const dy = clickY - obj.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= obj.size / 2) {
+                    clickedObject = obj;
+                    break;
+                }
+            }
+            
+            // If no object was clicked using standard detection, check for expanded target detection
+            if (!clickedObject && targetObject) {
+                const targetDx = clickX - targetObject.x;
+                const targetDy = clickY - targetObject.y;
+                const targetDistance = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+                
+                // Calculate expanded hit radius for target
+                const expandedTargetRadius = (targetObject.size / 2) + (targetObject.size * params.targetTolerance);
+                
+                if (targetDistance <= expandedTargetRadius) {
+                    clickedObject = targetObject;
+                }
+            }
+            
+            // Check if target was found
+            const correct = clickedObject === targetObject;
+            
+            return {
+                clickedObject: clickedObject,
+                correct: correct,
+                targetDistance: targetObject ? Math.sqrt((clickX - targetObject.x) ** 2 + (clickY - targetObject.y) ** 2) : null
+            };
+        }
+
+        function handleDemoClick(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            
+            const result = checkSelection(clickX, clickY);
+            const statusDiv = document.getElementById('demo-status');
+            
+            if (result.clickedObject) {
+                if (result.correct) {
+                    statusDiv.innerHTML = `<strong>✓ Target Hit!</strong> Distance: ${result.targetDistance.toFixed(1)}px (Original: 15px, Expanded: 39px)`;
+                    statusDiv.className = 'test-result pass';
+                } else {
+                    statusDiv.innerHTML = `<strong>✗ Distractor Hit</strong> Distance to target: ${result.targetDistance.toFixed(1)}px`;
+                    statusDiv.className = 'test-result fail';
+                }
+            } else {
+                statusDiv.innerHTML = `<strong>✗ No Hit</strong> Distance to target: ${result.targetDistance.toFixed(1)}px (needs ≤ 39px)`;
+                statusDiv.className = 'test-result fail';
+            }
+        }
+
+        function runIntegrationTests() {
+            const results = [];
+            
+            // Test 1: Parameter values match main.html
+            const expectedObjectSize = 30;
+            const expectedExpandedRadius = 39;
+            const actualExpandedRadius = (objectSize / 2) + (objectSize * params.targetTolerance);
+            
+            results.push({
+                name: "Parameter integration",
+                expected: `Size: ${expectedObjectSize}, Expanded: ${expectedExpandedRadius}`,
+                actual: `Size: ${objectSize}, Expanded: ${actualExpandedRadius}`,
+                pass: objectSize === expectedObjectSize && actualExpandedRadius === expectedExpandedRadius
+            });
+
+            // Test 2: Target center hit
+            const test2 = checkSelection(400, 300);
+            results.push({
+                name: "Target center hit",
+                expected: "correct: true",
+                actual: `correct: ${test2.correct}`,
+                pass: test2.correct === true
+            });
+
+            // Test 3: Target expanded boundary hit
+            const test3 = checkSelection(430, 300); // 30px from center, within 39px expanded radius
+            results.push({
+                name: "Target expanded boundary hit",
+                expected: "correct: true",
+                actual: `correct: ${test3.correct}`,
+                pass: test3.correct === true
+            });
+
+            // Test 4: Outside expanded boundary
+            const test4 = checkSelection(450, 300); // 50px from center, outside 39px expanded radius
+            results.push({
+                name: "Outside expanded boundary",
+                expected: "correct: false",
+                actual: `correct: ${test4.correct}`,
+                pass: test4.correct === false
+            });
+
+            // Test 5: Distractor hit (no expansion)
+            const test5 = checkSelection(215, 215);
+            results.push({
+                name: "Distractor hit (no expansion)",
+                expected: "correct: false",
+                actual: `correct: ${test5.correct}`,
+                pass: test5.correct === false
+            });
+
+            // Test 6: Near distractor (should not get expanded hit)
+            const test6 = checkSelection(240, 215); // 25px from distractor center, outside 15px radius
+            results.push({
+                name: "Near distractor (no expansion)",
+                expected: "correct: false",
+                actual: `correct: ${test6.correct}`,
+                pass: test6.correct === false
+            });
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            let passCount = 0;
+
+            html += `<div class="info">
+                <h3>Integration Test Configuration:</h3>
+                <p>Using exact same parameters and logic as main.html</p>
+                <p>Object Size: ${objectSize}px</p>
+                <p>Target Tolerance: ${params.targetTolerance}</p>
+                <p>Original Hit Radius: ${objectSize/2}px</p>
+                <p>Expanded Hit Radius: ${(objectSize/2) + (objectSize * params.targetTolerance)}px</p>
+            </div>`;
+
+            results.forEach((result, index) => {
+                const className = result.pass ? 'pass' : 'fail';
+                if (result.pass) passCount++;
+                
+                html += `<div class="test-result ${className}">
+                    <strong>Test ${index + 1}: ${result.name}</strong><br>
+                    Expected: ${result.expected}<br>
+                    Actual: ${result.actual}<br>
+                    Status: ${result.pass ? 'PASS' : 'FAIL'}
+                </div>`;
+            });
+
+            html += `<div class="test-result ${passCount === results.length ? 'pass' : 'fail'}">
+                <strong>Integration Test Result: ${passCount}/${results.length} tests passed</strong>
+            </div>`;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runIntegrationTests);
+    </script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expanded Collision Detection Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .test-results {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    
+    .test-pass {
+      color: #28a745;
+      font-weight: bold;
+    }
+    
+    .test-fail {
+      color: #dc3545;
+      font-weight: bold;
+    }
+    
+    .visual-test {
+      border: 2px solid #333;
+      margin: 20px 0;
+      position: relative;
+      width: 800px;
+      height: 600px;
+      background: #f0f0f0;
+    }
+    
+    .test-object {
+      position: absolute;
+      border: 2px solid #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .target-object {
+      background-color: red;
+      color: white;
+    }
+    
+    .distractor-object {
+      background-color: blue;
+      color: white;
+    }
+    
+    .tolerance-indicator {
+      position: absolute;
+      border: 2px dashed #ff6b6b;
+      border-radius: 50%;
+      pointer-events: none;
+      background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .click-indicator {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #333;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    
+    .status-display {
+      margin: 20px 0;
+      padding: 15px;
+      background: #e9ecef;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .controls {
+      margin: 20px 0;
+    }
+    
+    .control-button {
+      padding: 10px 20px;
+      margin: 0 5px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .control-button:hover {
+      background: #0056b3;
+    }
+    
+    .parameter-controls {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    
+    .parameter-controls label {
+      display: inline-block;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    
+    .parameter-controls input {
+      padding: 5px;
+      margin: 0 5px;
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Expanded Collision Detection Test</h1>
+    <p>This test validates that the expanded target collision detection works correctly for research purposes.</p>
+    
+    <div class="test-results">
+      <h3>Automated Test Results:</h3>
+      <div id="automated-test-results">
+        <p>Running automated tests...</p>
+      </div>
+    </div>
+    
+    <div class="parameter-controls">
+      <h3>Test Parameters:</h3>
+      <label>Object Size: <input type="number" id="object-size" value="30" min="20" max="60"></label>
+      <label>Target Tolerance: <input type="number" id="target-tolerance" value="0.8" min="0" max="2" step="0.1"></label>
+      <button class="control-button" onclick="updateParameters()">Update Parameters</button>
+    </div>
+    
+    <div class="controls">
+      <button class="control-button" onclick="runVisualTest()">Start Visual Test</button>
+      <button class="control-button" onclick="clearIndicators()">Clear Indicators</button>
+      <button class="control-button" onclick="showToleranceAreas()">Show/Hide Tolerance Areas</button>
+    </div>
+    
+    <div class="status-display" id="status-display">
+      Click "Start Visual Test" to begin interactive testing
+    </div>
+    
+    <div class="visual-test" id="visual-test" onclick="handleClick(event)">
+      <div class="test-object target-object" id="target-object">T</div>
+      <div class="test-object distractor-object" id="distractor-1">D1</div>
+      <div class="test-object distractor-object" id="distractor-2">D2</div>
+      <div class="tolerance-indicator" id="tolerance-indicator"></div>
+    </div>
+    
+    <div class="test-results">
+      <h3>Test Cases Checklist:</h3>
+      <div id="test-checklist">
+        <div>✓ Target clicked within original boundary → Should be correct</div>
+        <div>✓ Target clicked within expanded boundary → Should be correct</div>
+        <div>✓ Distractor clicked within boundary → Should be incorrect</div>
+        <div>✓ Click outside all boundaries → Should be incorrect</div>
+        <div>✓ Click in expanded area of distractor → Should be incorrect</div>
+        <div>✓ Different object sizes work correctly</div>
+        <div>✓ Different tolerance values work correctly</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Test configuration
+    let testConfig = {
+      objectSize: 30,
+      targetTolerance: 0.8,
+      showTolerance: false
+    };
+    
+    // Test objects
+    let testObjects = [];
+    let targetObject = null;
+    let visualTestActive = false;
+    
+    function runAutomatedTests() {
+      const results = [];
+      
+      // Test 1: Basic collision detection logic
+      const testDistance1 = calculateDistance(100, 100, 115, 115); // 15√2 ≈ 21.2
+      const testHit1 = testDistance1 <= 15; // Should be false (outside original boundary)
+      results.push({
+        test: 'Basic collision detection - outside boundary',
+        expected: false,
+        actual: testHit1,
+        pass: testHit1 === false
+      });
+      
+      // Test 2: Expanded target collision detection
+      const expandedRadius = 15 + (30 * 0.8); // 15 + 24 = 39
+      const testHit2 = testDistance1 <= expandedRadius; // Should be true (inside expanded boundary)
+      results.push({
+        test: 'Expanded target collision detection',
+        expected: true,
+        actual: testHit2,
+        pass: testHit2 === true
+      });
+      
+      // Test 3: Tolerance parameter calculation
+      const tolerance1 = calculateExpandedRadius(30, 0.8);
+      const tolerance2 = calculateExpandedRadius(40, 1.0);
+      const tolerance3 = calculateExpandedRadius(20, 0.5);
+      results.push({
+        test: 'Tolerance parameter calculation',
+        expected: 'T1=39, T2=60, T3=20',
+        actual: `T1=${tolerance1}, T2=${tolerance2}, T3=${tolerance3}`,
+        pass: tolerance1 === 39 && tolerance2 === 60 && tolerance3 === 20
+      });
+      
+      // Test 4: Different object sizes
+      const sizes = [20, 30, 40, 50];
+      const tolerances = sizes.map(size => calculateExpandedRadius(size, 0.8));
+      const expectedTolerances = [26, 39, 52, 65];
+      const toleranceTest = tolerances.every((t, i) => t === expectedTolerances[i]);
+      results.push({
+        test: 'Different object sizes',
+        expected: expectedTolerances.join(', '),
+        actual: tolerances.join(', '),
+        pass: toleranceTest
+      });
+      
+      // Test 5: Edge cases
+      const edgeTest1 = calculateExpandedRadius(30, 0); // No tolerance
+      const edgeTest2 = calculateExpandedRadius(30, 2.0); // Large tolerance
+      results.push({
+        test: 'Edge cases - tolerance limits',
+        expected: 'Zero=15, Large=75',
+        actual: `Zero=${edgeTest1}, Large=${edgeTest2}`,
+        pass: edgeTest1 === 15 && edgeTest2 === 75
+      });
+      
+      // Display results
+      displayAutomatedResults(results);
+      
+      return results.every(r => r.pass);
+    }
+    
+    function calculateDistance(x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    function calculateExpandedRadius(objectSize, tolerance) {
+      return (objectSize / 2) + (objectSize * tolerance);
+    }
+    
+    function displayAutomatedResults(results) {
+      const resultsDiv = document.getElementById('automated-test-results');
+      let html = '';
+      let allPassed = true;
+      
+      results.forEach(result => {
+        const statusClass = result.pass ? 'test-pass' : 'test-fail';
+        const statusText = result.pass ? 'PASS' : 'FAIL';
+        allPassed = allPassed && result.pass;
+        
+        html += `
+          <div>
+            <strong>${result.test}:</strong> 
+            <span class="${statusClass}">${statusText}</span><br>
+            Expected: ${result.expected}<br>
+            Actual: ${result.actual}<br><br>
+          </div>
+        `;
+      });
+      
+      html += `<div><strong>Overall Status: </strong><span class="${allPassed ? 'test-pass' : 'test-fail'}">${allPassed ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED'}</span></div>`;
+      
+      resultsDiv.innerHTML = html;
+    }
+    
+    function updateParameters() {
+      testConfig.objectSize = parseInt(document.getElementById('object-size').value);
+      testConfig.targetTolerance = parseFloat(document.getElementById('target-tolerance').value);
+      
+      setupVisualTest();
+      updateStatusDisplay('Parameters updated. Click objects to test collision detection.');
+    }
+    
+    function runVisualTest() {
+      visualTestActive = true;
+      setupVisualTest();
+      updateStatusDisplay('Visual test active. Click on objects to test collision detection.');
+    }
+    
+    function setupVisualTest() {
+      const container = document.getElementById('visual-test');
+      const target = document.getElementById('target-object');
+      const distractor1 = document.getElementById('distractor-1');
+      const distractor2 = document.getElementById('distractor-2');
+      const tolerance = document.getElementById('tolerance-indicator');
+      
+      // Position objects
+      const centerX = 400;
+      const centerY = 300;
+      const objectSize = testConfig.objectSize;
+      
+      // Target in center
+      target.style.width = objectSize + 'px';
+      target.style.height = objectSize + 'px';
+      target.style.left = (centerX - objectSize/2) + 'px';
+      target.style.top = (centerY - objectSize/2) + 'px';
+      
+      // Distractors positioned around target
+      distractor1.style.width = objectSize + 'px';
+      distractor1.style.height = objectSize + 'px';
+      distractor1.style.left = (centerX - objectSize/2 - 150) + 'px';
+      distractor1.style.top = (centerY - objectSize/2 - 100) + 'px';
+      
+      distractor2.style.width = objectSize + 'px';
+      distractor2.style.height = objectSize + 'px';
+      distractor2.style.left = (centerX - objectSize/2 + 150) + 'px';
+      distractor2.style.top = (centerY - objectSize/2 + 100) + 'px';
+      
+      // Setup tolerance indicator
+      const expandedRadius = calculateExpandedRadius(objectSize, testConfig.targetTolerance);
+      tolerance.style.width = (expandedRadius * 2) + 'px';
+      tolerance.style.height = (expandedRadius * 2) + 'px';
+      tolerance.style.left = (centerX - expandedRadius) + 'px';
+      tolerance.style.top = (centerY - expandedRadius) + 'px';
+      tolerance.style.display = testConfig.showTolerance ? 'block' : 'none';
+      
+      // Setup test objects array
+      testObjects = [
+        {
+          id: 'target-object',
+          x: centerX,
+          y: centerY,
+          size: objectSize,
+          isTarget: true
+        },
+        {
+          id: 'distractor-1',
+          x: centerX - 150,
+          y: centerY - 100,
+          size: objectSize,
+          isTarget: false
+        },
+        {
+          id: 'distractor-2',
+          x: centerX + 150,
+          y: centerY + 100,
+          size: objectSize,
+          isTarget: false
+        }
+      ];
+      
+      targetObject = testObjects[0];
+    }
+    
+    function handleClick(event) {
+      if (!visualTestActive) return;
+      
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
+      
+      // Add click indicator
+      addClickIndicator(clickX, clickY);
+      
+      // Test collision detection
+      const result = testCollisionDetection(clickX, clickY);
+      updateStatusDisplay(result.message);
+    }
+    
+    function testCollisionDetection(clickX, clickY) {
+      // Standard collision detection first
+      let hitObject = null;
+      
+      for (let obj of testObjects) {
+        const distance = calculateDistance(clickX, clickY, obj.x, obj.y);
+        if (distance <= obj.size / 2) {
+          hitObject = obj;
+          break;
+        }
+      }
+      
+      // If no standard hit and we have a target, check expanded detection
+      if (!hitObject && targetObject) {
+        const targetDistance = calculateDistance(clickX, clickY, targetObject.x, targetObject.y);
+        const expandedRadius = calculateExpandedRadius(targetObject.size, testConfig.targetTolerance);
+        
+        if (targetDistance <= expandedRadius) {
+          hitObject = targetObject;
+        }
+      }
+      
+      // Generate result message
+      if (hitObject) {
+        if (hitObject.isTarget) {
+          return {
+            success: true,
+            message: `✓ Target hit! Distance: ${calculateDistance(clickX, clickY, hitObject.x, hitObject.y).toFixed(1)}px (Original radius: ${hitObject.size/2}px, Expanded radius: ${calculateExpandedRadius(hitObject.size, testConfig.targetTolerance).toFixed(1)}px)`
+          };
+        } else {
+          return {
+            success: false,
+            message: `✗ Distractor hit. Distance: ${calculateDistance(clickX, clickY, hitObject.x, hitObject.y).toFixed(1)}px (Radius: ${hitObject.size/2}px)`
+          };
+        }
+      } else {
+        const targetDistance = calculateDistance(clickX, clickY, targetObject.x, targetObject.y);
+        return {
+          success: false,
+          message: `✗ No object hit. Distance to target: ${targetDistance.toFixed(1)}px (Expanded radius: ${calculateExpandedRadius(targetObject.size, testConfig.targetTolerance).toFixed(1)}px)`
+        };
+      }
+    }
+    
+    function addClickIndicator(x, y) {
+      const indicator = document.createElement('div');
+      indicator.className = 'click-indicator';
+      indicator.style.left = (x - 3) + 'px';
+      indicator.style.top = (y - 3) + 'px';
+      
+      document.getElementById('visual-test').appendChild(indicator);
+    }
+    
+    function clearIndicators() {
+      const indicators = document.querySelectorAll('.click-indicator');
+      indicators.forEach(indicator => indicator.remove());
+    }
+    
+    function showToleranceAreas() {
+      testConfig.showTolerance = !testConfig.showTolerance;
+      setupVisualTest();
+    }
+    
+    function updateStatusDisplay(message) {
+      document.getElementById('status-display').textContent = message;
+    }
+    
+    // Initialize
+    window.addEventListener('load', function() {
+      runAutomatedTests();
+      setupVisualTest();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tolerance Parameter Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .visual-test { width: 400px; height: 300px; border: 2px solid #333; position: relative; margin: 10px 0; }
+        .target { position: absolute; background: red; color: white; border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .tolerance-ring { position: absolute; border: 2px dashed #ff6b6b; border-radius: 50%; background: rgba(255, 107, 107, 0.1); pointer-events: none; }
+    </style>
+</head>
+<body>
+    <h1>Tolerance Parameter Test</h1>
+    <p>Testing different tolerance values and object sizes to ensure the parameter works correctly.</p>
+    
+    <div id="test-results"></div>
+    
+    <div class="test-section">
+        <h3>Visual Test with Different Tolerance Values</h3>
+        <div id="visual-tests"></div>
+    </div>
+
+    <script>
+        function calculateExpandedRadius(objectSize, tolerance) {
+            return (objectSize / 2) + (objectSize * tolerance);
+        }
+        
+        function testCollisionDetection(clickX, clickY, targetX, targetY, objectSize, tolerance) {
+            // Standard collision detection
+            const distance = Math.sqrt((clickX - targetX) ** 2 + (clickY - targetY) ** 2);
+            const standardHit = distance <= objectSize / 2;
+            
+            // Expanded collision detection
+            const expandedRadius = calculateExpandedRadius(objectSize, tolerance);
+            const expandedHit = distance <= expandedRadius;
+            
+            return {
+                distance,
+                standardHit,
+                expandedHit,
+                standardRadius: objectSize / 2,
+                expandedRadius
+            };
+        }
+        
+        function runToleranceTests() {
+            const results = [];
+            
+            // Test different tolerance values
+            const toleranceValues = [0, 0.2, 0.5, 0.8, 1.0, 1.5, 2.0];
+            const objectSize = 30;
+            const targetX = 200, targetY = 150;
+            
+            toleranceValues.forEach(tolerance => {
+                const expectedRadius = calculateExpandedRadius(objectSize, tolerance);
+                const testDistance = expectedRadius - 1; // Just inside expanded boundary
+                
+                const testResult = testCollisionDetection(
+                    targetX + testDistance, targetY, 
+                    targetX, targetY, 
+                    objectSize, tolerance
+                );
+                
+                results.push({
+                    name: `Tolerance ${tolerance} - Just inside expanded boundary`,
+                    tolerance,
+                    expectedRadius,
+                    testDistance,
+                    actual: testResult.expandedHit,
+                    expected: true,
+                    pass: testResult.expandedHit === true,
+                    details: `Distance: ${testResult.distance.toFixed(1)}, Expanded radius: ${testResult.expandedRadius.toFixed(1)}`
+                });
+                
+                // Test just outside expanded boundary
+                const outsideDistance = expectedRadius + 1;
+                const outsideResult = testCollisionDetection(
+                    targetX + outsideDistance, targetY,
+                    targetX, targetY,
+                    objectSize, tolerance
+                );
+                
+                results.push({
+                    name: `Tolerance ${tolerance} - Just outside expanded boundary`,
+                    tolerance,
+                    expectedRadius,
+                    testDistance: outsideDistance,
+                    actual: outsideResult.expandedHit,
+                    expected: false,
+                    pass: outsideResult.expandedHit === false,
+                    details: `Distance: ${outsideResult.distance.toFixed(1)}, Expanded radius: ${outsideResult.expandedRadius.toFixed(1)}`
+                });
+            });
+            
+            // Test different object sizes with same tolerance
+            const objectSizes = [20, 30, 40, 50];
+            const fixedTolerance = 0.8;
+            
+            objectSizes.forEach(size => {
+                const expectedRadius = calculateExpandedRadius(size, fixedTolerance);
+                const testDistance = expectedRadius - 1;
+                
+                const testResult = testCollisionDetection(
+                    targetX + testDistance, targetY,
+                    targetX, targetY,
+                    size, fixedTolerance
+                );
+                
+                results.push({
+                    name: `Object size ${size} - Tolerance ${fixedTolerance}`,
+                    objectSize: size,
+                    tolerance: fixedTolerance,
+                    expectedRadius,
+                    actual: testResult.expandedHit,
+                    expected: true,
+                    pass: testResult.expandedHit === true,
+                    details: `Distance: ${testResult.distance.toFixed(1)}, Expanded radius: ${testResult.expandedRadius.toFixed(1)}`
+                });
+            });
+            
+            displayResults(results);
+            createVisualTests();
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('test-results');
+            let html = '<h2>Automated Test Results</h2>';
+            let passCount = 0;
+            
+            results.forEach((result, index) => {
+                const className = result.pass ? 'pass' : 'fail';
+                if (result.pass) passCount++;
+                
+                html += `<div class="test-result ${className}">
+                    <strong>Test ${index + 1}: ${result.name}</strong><br>
+                    Expected: ${result.expected}<br>
+                    Actual: ${result.actual}<br>
+                    Status: ${result.pass ? 'PASS' : 'FAIL'}<br>
+                    ${result.details}
+                </div>`;
+            });
+            
+            html += `<div class="test-result ${passCount === results.length ? 'pass' : 'fail'}">
+                <strong>Overall: ${passCount}/${results.length} tests passed</strong>
+            </div>`;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function createVisualTests() {
+            const visualDiv = document.getElementById('visual-tests');
+            const toleranceValues = [0, 0.5, 1.0, 2.0];
+            const objectSize = 30;
+            
+            toleranceValues.forEach(tolerance => {
+                const expandedRadius = calculateExpandedRadius(objectSize, tolerance);
+                
+                const testHtml = `
+                    <div style="margin: 20px 0;">
+                        <h4>Tolerance: ${tolerance} (Expanded radius: ${expandedRadius.toFixed(1)}px)</h4>
+                        <div class="visual-test" onclick="handleVisualClick(event, ${tolerance})">
+                            <div class="target" style="width: ${objectSize}px; height: ${objectSize}px; left: ${200 - objectSize/2}px; top: ${150 - objectSize/2}px;">T</div>
+                            <div class="tolerance-ring" style="width: ${expandedRadius * 2}px; height: ${expandedRadius * 2}px; left: ${200 - expandedRadius}px; top: ${150 - expandedRadius}px;"></div>
+                        </div>
+                        <div id="status-${tolerance}" class="info">Click in the test area</div>
+                    </div>
+                `;
+                
+                visualDiv.innerHTML += testHtml;
+            });
+        }
+        
+        function handleVisualClick(event, tolerance) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            
+            const result = testCollisionDetection(clickX, clickY, 200, 150, 30, tolerance);
+            const statusDiv = document.getElementById(`status-${tolerance}`);
+            
+            if (result.expandedHit) {
+                statusDiv.innerHTML = `<strong>✓ Hit!</strong> Distance: ${result.distance.toFixed(1)}px (within ${result.expandedRadius.toFixed(1)}px)`;
+                statusDiv.className = 'test-result pass';
+            } else {
+                statusDiv.innerHTML = `<strong>✗ Miss</strong> Distance: ${result.distance.toFixed(1)}px (outside ${result.expandedRadius.toFixed(1)}px)`;
+                statusDiv.className = 'test-result fail';
+            }
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', runToleranceTests);
+    </script>
+</body>
+</html>

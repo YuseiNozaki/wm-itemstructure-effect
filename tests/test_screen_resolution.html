@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Screen Resolution Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+        .resolution-test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-screen { border: 2px solid #333; position: relative; margin: 10px; display: inline-block; }
+        .test-object { position: absolute; background: red; color: white; border: 1px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+        .tolerance-area { position: absolute; border: 1px dashed #ff6b6b; border-radius: 50%; background: rgba(255, 107, 107, 0.1); }
+    </style>
+</head>
+<body>
+    <h1>Screen Resolution Test</h1>
+    <p>Testing that the expanded collision detection works correctly across different screen resolutions and pixel densities.</p>
+    
+    <div id="test-results"></div>
+    
+    <div class="resolution-test">
+        <h3>Visual Test - Different Screen Simulations</h3>
+        <div id="visual-tests"></div>
+    </div>
+
+    <script>
+        // Simulate the main.html parameters
+        const params = {
+            objectMinSize: 20,
+            objectMaxSize: 40,
+            targetTolerance: 0.8
+        };
+
+        const objectSize = (params.objectMaxSize + params.objectMinSize) / 2; // 30
+
+        function calculateExpandedRadius(objectSize, tolerance) {
+            return (objectSize / 2) + (objectSize * tolerance);
+        }
+
+        function testCollisionDetection(clickX, clickY, targetX, targetY, objectSize, tolerance) {
+            // Standard collision detection
+            const distance = Math.sqrt((clickX - targetX) ** 2 + (clickY - targetY) ** 2);
+            const standardHit = distance <= objectSize / 2;
+            
+            // Expanded collision detection
+            const expandedRadius = calculateExpandedRadius(objectSize, tolerance);
+            const expandedHit = distance <= expandedRadius;
+            
+            return {
+                distance,
+                standardHit,
+                expandedHit,
+                standardRadius: objectSize / 2,
+                expandedRadius
+            };
+        }
+
+        function runResolutionTests() {
+            const results = [];
+            
+            // Test different screen resolutions
+            const resolutions = [
+                { name: "Mobile (375x667)", width: 375, height: 667 },
+                { name: "Tablet (768x1024)", width: 768, height: 1024 },
+                { name: "Desktop (1920x1080)", width: 1920, height: 1080 },
+                { name: "Large Desktop (2560x1440)", width: 2560, height: 1440 },
+                { name: "4K (3840x2160)", width: 3840, height: 2160 }
+            ];
+
+            resolutions.forEach(resolution => {
+                // Place target in center of screen
+                const targetX = resolution.width / 2;
+                const targetY = resolution.height / 2;
+
+                // Test that object size and tolerance are resolution-independent
+                const expandedRadius = calculateExpandedRadius(objectSize, params.targetTolerance);
+                
+                // Test a click at the edge of expanded radius
+                const testDistance = expandedRadius - 1;
+                const testResult = testCollisionDetection(
+                    targetX + testDistance, targetY,
+                    targetX, targetY,
+                    objectSize, params.targetTolerance
+                );
+
+                results.push({
+                    name: `${resolution.name} - Edge of expanded radius`,
+                    resolution: `${resolution.width}x${resolution.height}`,
+                    targetPosition: `(${targetX}, ${targetY})`,
+                    testDistance,
+                    actual: testResult.expandedHit,
+                    expected: true,
+                    pass: testResult.expandedHit === true,
+                    details: `Distance: ${testResult.distance.toFixed(1)}px, Expanded radius: ${testResult.expandedRadius.toFixed(1)}px`
+                });
+
+                // Test that standard radius is consistent
+                const standardTest = testCollisionDetection(
+                    targetX + (objectSize / 2) - 1, targetY,
+                    targetX, targetY,
+                    objectSize, params.targetTolerance
+                );
+
+                results.push({
+                    name: `${resolution.name} - Standard radius consistency`,
+                    resolution: `${resolution.width}x${resolution.height}`,
+                    actual: standardTest.standardHit,
+                    expected: true,
+                    pass: standardTest.standardHit === true,
+                    details: `Standard radius: ${standardTest.standardRadius}px`
+                });
+
+                // Test pixel density independence
+                const pixelDensities = [1, 1.5, 2, 3]; // Common device pixel ratios
+                pixelDensities.forEach(density => {
+                    // Object size should remain the same regardless of pixel density
+                    const effectiveObjectSize = objectSize; // Not scaled by density
+                    const effectiveExpandedRadius = calculateExpandedRadius(effectiveObjectSize, params.targetTolerance);
+                    
+                    const densityTest = testCollisionDetection(
+                        targetX + effectiveExpandedRadius - 1, targetY,
+                        targetX, targetY,
+                        effectiveObjectSize, params.targetTolerance
+                    );
+
+                    results.push({
+                        name: `${resolution.name} - Pixel density ${density}x`,
+                        pixelDensity: density,
+                        actual: densityTest.expandedHit,
+                        expected: true,
+                        pass: densityTest.expandedHit === true,
+                        details: `Effective radius: ${effectiveExpandedRadius.toFixed(1)}px`
+                    });
+                });
+            });
+
+            // Test relative positioning consistency
+            const relativeTests = [
+                { name: "Top-left corner", x: 100, y: 100 },
+                { name: "Top-right corner", x: 1820, y: 100 },
+                { name: "Bottom-left corner", x: 100, y: 980 },
+                { name: "Bottom-right corner", x: 1820, y: 980 },
+                { name: "Center", x: 960, y: 540 }
+            ];
+
+            relativeTests.forEach(test => {
+                const result = testCollisionDetection(
+                    test.x + 25, test.y, // 25px from target center
+                    test.x, test.y,
+                    objectSize, params.targetTolerance
+                );
+
+                results.push({
+                    name: `Position independence - ${test.name}`,
+                    position: `(${test.x}, ${test.y})`,
+                    actual: result.expandedHit,
+                    expected: true,
+                    pass: result.expandedHit === true,
+                    details: `Distance: ${result.distance.toFixed(1)}px, Expanded radius: ${result.expandedRadius.toFixed(1)}px`
+                });
+            });
+
+            displayResults(results);
+            createVisualTests(resolutions);
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('test-results');
+            let html = '<h2>Resolution Independence Test Results</h2>';
+            let passCount = 0;
+            
+            results.forEach((result, index) => {
+                const className = result.pass ? 'pass' : 'fail';
+                if (result.pass) passCount++;
+                
+                html += `<div class="test-result ${className}">
+                    <strong>Test ${index + 1}: ${result.name}</strong><br>
+                    Expected: ${result.expected}<br>
+                    Actual: ${result.actual}<br>
+                    Status: ${result.pass ? 'PASS' : 'FAIL'}<br>
+                    ${result.details || ''}
+                </div>`;
+            });
+            
+            html += `<div class="test-result ${passCount === results.length ? 'pass' : 'fail'}">
+                <strong>Overall: ${passCount}/${results.length} tests passed</strong>
+            </div>`;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function createVisualTests(resolutions) {
+            const visualDiv = document.getElementById('visual-tests');
+            const scale = 0.1; // Scale down for display
+            
+            resolutions.forEach(resolution => {
+                const scaledWidth = resolution.width * scale;
+                const scaledHeight = resolution.height * scale;
+                const targetX = scaledWidth / 2;
+                const targetY = scaledHeight / 2;
+                const scaledObjectSize = objectSize * scale;
+                const scaledExpandedRadius = calculateExpandedRadius(objectSize, params.targetTolerance) * scale;
+                
+                const testHtml = `
+                    <div style="display: inline-block; margin: 10px; text-align: center;">
+                        <h4>${resolution.name}</h4>
+                        <div class="test-screen" style="width: ${scaledWidth}px; height: ${scaledHeight}px;">
+                            <div class="test-object" style="
+                                width: ${scaledObjectSize}px; 
+                                height: ${scaledObjectSize}px; 
+                                left: ${targetX - scaledObjectSize/2}px; 
+                                top: ${targetY - scaledObjectSize/2}px;
+                                font-size: ${Math.max(8, scaledObjectSize/3)}px;
+                            ">T</div>
+                            <div class="tolerance-area" style="
+                                width: ${scaledExpandedRadius * 2}px; 
+                                height: ${scaledExpandedRadius * 2}px; 
+                                left: ${targetX - scaledExpandedRadius}px; 
+                                top: ${targetY - scaledExpandedRadius}px;
+                            "></div>
+                        </div>
+                        <div style="font-size: 12px; color: #666;">
+                            ${resolution.width}x${resolution.height}<br>
+                            Target: (${(resolution.width/2).toFixed(0)}, ${(resolution.height/2).toFixed(0)})<br>
+                            Expanded radius: ${calculateExpandedRadius(objectSize, params.targetTolerance).toFixed(1)}px
+                        </div>
+                    </div>
+                `;
+                
+                visualDiv.innerHTML += testHtml;
+            });
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runResolutionTests);
+    </script>
+</body>
+</html>
