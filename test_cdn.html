@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CDN Test</title>
+</head>
+<body>
+  <div id="test-div">Testing CDN resources...</div>
+  <script>
+    // Test jsPsych CDN loading
+    console.log('Testing jsPsych CDN...');
+    
+    // Try to load jsPsych from CDN
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/jspsych@7';
+    script.onload = function() {
+      console.log('jsPsych loaded successfully');
+      document.getElementById('test-div').textContent = 'jsPsych loaded successfully';
+    };
+    script.onerror = function() {
+      console.error('Failed to load jsPsych');
+      document.getElementById('test-div').textContent = 'Failed to load jsPsych - CDN blocked';
+    };
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>
