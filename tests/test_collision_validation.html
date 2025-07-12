@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collision Detection Validation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+    </style>
+</head>
+<body>
+    <h1>Collision Detection Validation</h1>
+    <div id="results"></div>
+
+    <script>
+        // Simulate the parameters from main.html
+        const params = {
+            objectMinSize: 20,
+            objectMaxSize: 40,
+            targetTolerance: 0.8
+        };
+
+        // Create a test scenario
+        const objectSize = (params.objectMaxSize + params.objectMinSize) / 2; // 30
+        const targetObject = {
+            x: 400,
+            y: 300,
+            size: objectSize,
+            isTarget: true
+        };
+
+        const distractorObject = {
+            x: 500,
+            y: 200,
+            size: objectSize,
+            isTarget: false
+        };
+
+        const objects = [targetObject, distractorObject];
+
+        function calculateDistance(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function testCollisionDetection(clickX, clickY) {
+            // Replicate the exact logic from main.html
+            let clickedObject = null;
+            
+            // Standard collision detection first
+            for (let i = 0; i < objects.length; i++) {
+                const obj = objects[i];
+                const dx = clickX - obj.x;
+                const dy = clickY - obj.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= obj.size / 2) {
+                    clickedObject = obj;
+                    break;
+                }
+            }
+            
+            // If no object was clicked using standard detection, check for expanded target detection
+            if (!clickedObject && targetObject) {
+                const targetDx = clickX - targetObject.x;
+                const targetDy = clickY - targetObject.y;
+                const targetDistance = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+                
+                // Calculate expanded hit radius for target
+                const expandedTargetRadius = (targetObject.size / 2) + (targetObject.size * params.targetTolerance);
+                
+                if (targetDistance <= expandedTargetRadius) {
+                    clickedObject = targetObject;
+                }
+            }
+            
+            return {
+                clickedObject: clickedObject,
+                correct: clickedObject === targetObject
+            };
+        }
+
+        function runTests() {
+            const results = [];
+            
+            // Test 1: Click exactly on target center
+            const test1 = testCollisionDetection(400, 300);
+            results.push({
+                name: "Click on target center",
+                expected: true,
+                actual: test1.correct,
+                pass: test1.correct === true,
+                details: `Distance: 0px, Original radius: 15px, Expanded radius: 39px`
+            });
+
+            // Test 2: Click within original target boundary
+            const test2 = testCollisionDetection(410, 300);
+            results.push({
+                name: "Click within original target boundary",
+                expected: true,
+                actual: test2.correct,
+                pass: test2.correct === true,
+                details: `Distance: 10px, Original radius: 15px, Expanded radius: 39px`
+            });
+
+            // Test 3: Click outside original boundary but within expanded boundary
+            const test3 = testCollisionDetection(430, 300);
+            const dist3 = calculateDistance(400, 300, 430, 300);
+            results.push({
+                name: "Click outside original but within expanded boundary",
+                expected: true,
+                actual: test3.correct,
+                pass: test3.correct === true,
+                details: `Distance: ${dist3}px, Original radius: 15px, Expanded radius: 39px`
+            });
+
+            // Test 4: Click outside expanded boundary
+            const test4 = testCollisionDetection(450, 300);
+            const dist4 = calculateDistance(400, 300, 450, 300);
+            results.push({
+                name: "Click outside expanded boundary",
+                expected: false,
+                actual: test4.correct,
+                pass: test4.correct === false,
+                details: `Distance: ${dist4}px, Original radius: 15px, Expanded radius: 39px`
+            });
+
+            // Test 5: Click on distractor (should not get expanded detection)
+            const test5 = testCollisionDetection(500, 200);
+            results.push({
+                name: "Click on distractor center",
+                expected: false,
+                actual: test5.correct,
+                pass: test5.correct === false,
+                details: `Hit distractor object (no expansion applied)`
+            });
+
+            // Test 6: Click in expanded area around distractor (should fail)
+            const test6 = testCollisionDetection(530, 200);
+            const dist6 = calculateDistance(500, 200, 530, 200);
+            results.push({
+                name: "Click in expanded area around distractor",
+                expected: false,
+                actual: test6.correct,
+                pass: test6.correct === false,
+                details: `Distance: ${dist6}px from distractor, no expansion applied`
+            });
+
+            // Test 7: Click in empty space
+            const test7 = testCollisionDetection(100, 100);
+            results.push({
+                name: "Click in empty space",
+                expected: false,
+                actual: test7.correct,
+                pass: test7.correct === false,
+                details: `No objects nearby`
+            });
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            let passCount = 0;
+
+            // Configuration info
+            html += `<div class="info">
+                <h3>Test Configuration:</h3>
+                <p>Object Size: ${objectSize}px</p>
+                <p>Original Hit Radius: ${objectSize/2}px</p>
+                <p>Target Tolerance: ${params.targetTolerance}</p>
+                <p>Expanded Hit Radius: ${(objectSize/2) + (objectSize * params.targetTolerance)}px</p>
+                <p>Target Position: (${targetObject.x}, ${targetObject.y})</p>
+                <p>Distractor Position: (${distractorObject.x}, ${distractorObject.y})</p>
+            </div>`;
+
+            results.forEach((result, index) => {
+                const className = result.pass ? 'pass' : 'fail';
+                if (result.pass) passCount++;
+                
+                html += `<div class="test-result ${className}">
+                    <strong>Test ${index + 1}: ${result.name}</strong><br>
+                    Expected: ${result.expected}<br>
+                    Actual: ${result.actual}<br>
+                    Status: ${result.pass ? 'PASS' : 'FAIL'}<br>
+                    Details: ${result.details}
+                </div>`;
+            });
+
+            html += `<div class="test-result ${passCount === results.length ? 'pass' : 'fail'}">
+                <strong>Overall Result: ${passCount}/${results.length} tests passed</strong>
+            </div>`;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

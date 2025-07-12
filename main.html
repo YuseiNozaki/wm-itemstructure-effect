@@ -303,6 +303,9 @@
       objectMinSize: 20,
       objectMaxSize: 40,
       
+      // Target detection tolerance
+      targetTolerance: 0.8, // Additional tolerance as multiplier of object size (0.8 = 80% of object size)
+      
       // Colors and shapes
       colors: ['red', 'blue', 'green', 'yellow', 'purple'],
       shapes: ['circle', 'triangle', 'square', 'diamond'],
@@ -982,7 +985,7 @@
             }
           }
           
-          // Find clicked object
+          // Find clicked object using standard collision detection
           let clickedObject = null;
           
           for (let i = 0; i < objects.length; i++) {
@@ -994,6 +997,20 @@
             if (distance <= obj.size / 2) {
               clickedObject = obj;
               break;
+            }
+          }
+          
+          // If no object was clicked using standard detection, check for expanded target detection
+          if (!clickedObject && targetObject) {
+            const targetDx = clickX - targetObject.x;
+            const targetDy = clickY - targetObject.y;
+            const targetDistance = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+            
+            // Calculate expanded hit radius for target
+            const expandedTargetRadius = (targetObject.size / 2) + (targetObject.size * params.targetTolerance);
+            
+            if (targetDistance <= expandedTargetRadius) {
+              clickedObject = targetObject;
             }
           }
           
