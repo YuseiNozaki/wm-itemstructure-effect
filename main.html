@@ -821,7 +821,8 @@
         lastMouseY = params.screenHeight / 2;
         
         // Generate objects
-        generateObjects(searchArea, targetColor, targetShape, structure);
+        const isPractice = jsPsych.timelineVariable('isPractice') || false;
+        generateObjects(searchArea, targetColor, targetShape, structure, viewCondition, isPractice);
         
         // Initial draw
         drawSearchDisplay(ctx, viewCondition);
@@ -1074,7 +1075,7 @@
     };
 
     // Generate objects for visual search
-    function generateObjects(area, targetColor, targetShape, structure) {
+    function generateObjects(area, targetColor, targetShape, structure, viewCondition, isPractice) {
       objects = [];
       let positions = [];
       
@@ -1082,6 +1083,33 @@
       const objectSize = (params.objectMaxSize + params.objectMinSize) / 2;
       
       let targetX, targetY;
+      
+      // Calculate initial window bounds for practice trials
+      let initialWindowBounds = null;
+      if (isPractice && (viewCondition === 'window' || viewCondition === 'scroll')) {
+        // Initial window is centered on screen
+        const windowCenterX = params.screenWidth / 2;
+        const windowCenterY = params.screenHeight / 2;
+        initialWindowBounds = {
+          left: windowCenterX - params.windowWidth / 2,
+          right: windowCenterX + params.windowWidth / 2,
+          top: windowCenterY - params.windowHeight / 2,
+          bottom: windowCenterY + params.windowHeight / 2
+        };
+      }
+      
+      // Helper function to check if target overlaps with initial window
+      function isTargetInInitialWindow(x, y) {
+        if (!initialWindowBounds) return false;
+        
+        // Check if target center is within window bounds
+        // Add some padding to account for object size
+        const padding = objectSize / 2;
+        return (x + padding > initialWindowBounds.left && 
+                x - padding < initialWindowBounds.right &&
+                y + padding > initialWindowBounds.top && 
+                y - padding < initialWindowBounds.bottom);
+      }
       
       if (structure === 'structured') {
         // For structured condition, create a grid layout
@@ -1098,17 +1126,38 @@
           }
         }
         
-        // Randomly place target at one of the grid positions
-        const targetPosition = Math.floor(Math.random() * positions.length);
-        targetX = positions[targetPosition].x;
-        targetY = positions[targetPosition].y;
+        // For practice trials, filter out positions that would be in the initial window
+        let availablePositions = positions;
+        if (isPractice && (viewCondition === 'window' || viewCondition === 'scroll')) {
+          availablePositions = positions.filter(pos => !isTargetInInitialWindow(pos.x, pos.y));
+          
+          // If no positions are available outside the window, use all positions as fallback
+          if (availablePositions.length === 0) {
+            availablePositions = positions;
+          }
+        }
         
-        // Remove the target position
-        positions.splice(targetPosition, 1);
+        // Randomly place target at one of the available positions
+        const targetPosition = Math.floor(Math.random() * availablePositions.length);
+        targetX = availablePositions[targetPosition].x;
+        targetY = availablePositions[targetPosition].y;
+        
+        // Remove the target position from the original positions array
+        const originalTargetIndex = positions.findIndex(pos => pos.x === targetX && pos.y === targetY);
+        if (originalTargetIndex >= 0) {
+          positions.splice(originalTargetIndex, 1);
+        }
       } else {
         // Unstructured condition - random positions
-        targetX = Math.random() * (area.width - objectSize * 2) + objectSize;
-        targetY = Math.random() * (area.height - objectSize * 2) + objectSize;
+        let attempts = 0;
+        const maxAttempts = 50; // Prevent infinite loops
+        
+        do {
+          targetX = Math.random() * (area.width - objectSize * 2) + objectSize;
+          targetY = Math.random() * (area.height - objectSize * 2) + objectSize;
+          attempts++;
+        } while (isPractice && (viewCondition === 'window' || viewCondition === 'scroll') && 
+                 isTargetInInitialWindow(targetX, targetY) && attempts < maxAttempts);
         
         // Generate random positions for distractors
         for (let i = 0; i < params.numObjects - 1; i++) {
