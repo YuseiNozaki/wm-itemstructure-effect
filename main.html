@@ -493,7 +493,7 @@
       stimulus: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
           <h1>練習について</h1>
-          <p style="font-size: 18px; margin: 20px 0;">はじめに3回練習を行います</p>
+          <p style="font-size: 18px; margin: 20px 0;">はじめに9回練習を行います</p>
           <p style="font-size: 16px; margin: 20px 0;">
             <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
           </p>
@@ -1356,7 +1356,7 @@
       stimulus: function() {
         let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
         html += '<h1>練習完了</h1>';
-        html += '<p style="font-size: 18px; margin: 20px 0;">3回の練習が完了しました。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0;">9回の練習が完了しました。</p>';
         html += '<p style="font-size: 16px; margin: 20px 0;">以下から選択してください：</p>';
         html += '<div style="margin: 30px 0;">';
         html += '<button id="practice-again-btn" style="padding: 15px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">もう一度練習する</button>';
@@ -1460,8 +1460,17 @@
       }
     };
 
-    // Practice trial variables - fixed order: fullscreen, window, scroll
+    // Practice trial variables - fixed order: fullscreen, window, scroll (repeated 3 times)
     const practiceTrialVariables = [
+      // First set
+      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      // Second set
+      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      // Third set
       { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
       { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
       { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true }
