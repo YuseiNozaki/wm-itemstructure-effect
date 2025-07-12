@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Memory Task Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+    
+    .memory-cell {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .memory-cell.highlighted {
+      background-color: #ffcc00;
+    }
+    
+    .memory-reproduction-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+    
+    .reproduction-cell {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .reproduction-cell:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .reproduction-cell.selected {
+      background-color: #66aaff;
+    }
+    
+    .memory-submit-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    
+    .memory-submit-btn:hover {
+      background-color: #0056b3;
+    }
+    
+    .memory-submit-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .stage {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage1" class="stage">
+    <h1>位置記憶課題 - 記憶段階</h1>
+    <p>以下のグリッド内の色のついたセルの位置を記憶してください。</p>
+    <div id="memory-grid" class="memory-grid">
+      <!-- Grid cells will be populated by JavaScript -->
+    </div>
+    <p>3秒後に次の段階に進みます。</p>
+    <button id="next-btn" onclick="showRecallStage()">次へ (テスト用)</button>
+  </div>
+  
+  <div id="stage2" class="stage hidden">
+    <h1>位置記憶課題 - 回答</h1>
+    <p>記憶した位置をクリックして再現してください。</p>
+    <p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>
+    <div id="memory-reproduction-grid" class="memory-reproduction-grid">
+      <!-- Grid cells will be populated by JavaScript -->
+    </div>
+    <button id="memory-submit-btn" class="memory-submit-btn" disabled>決定</button>
+    <p id="selection-info">2つのセルを選択してください。</p>
+  </div>
+  
+  <div id="stage3" class="stage hidden">
+    <h1>結果</h1>
+    <p id="result-text"></p>
+    <button onclick="resetTest()">もう一度テスト</button>
+  </div>
+
+  <script>
+    const memoryPositions = [];
+    const selectedMemoryPositions = [];
+    const gridSize = 4;
+    const numPositions = 2;
+    
+    function initializeMemoryStage() {
+      // Generate 2 random positions
+      memoryPositions.length = 0;
+      while (memoryPositions.length < numPositions) {
+        const position = Math.floor(Math.random() * (gridSize * gridSize));
+        if (!memoryPositions.includes(position)) {
+          memoryPositions.push(position);
+        }
+      }
+      
+      // Create grid
+      const memoryGrid = document.getElementById('memory-grid');
+      memoryGrid.innerHTML = '';
+      
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'memory-cell';
+        if (memoryPositions.includes(i)) {
+          cell.classList.add('highlighted');
+        }
+        cell.setAttribute('data-index', i);
+        memoryGrid.appendChild(cell);
+      }
+      
+      console.log('Memory positions:', memoryPositions);
+    }
+    
+    function showRecallStage() {
+      document.getElementById('stage1').classList.add('hidden');
+      document.getElementById('stage2').classList.remove('hidden');
+      
+      // Initialize reproduction grid
+      const reproductionGrid = document.getElementById('memory-reproduction-grid');
+      reproductionGrid.innerHTML = '';
+      selectedMemoryPositions.length = 0;
+      
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'reproduction-cell';
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', function() {
+          toggleCell(i);
+        });
+        reproductionGrid.appendChild(cell);
+      }
+      
+      updateSubmitButton();
+    }
+    
+    function toggleCell(index) {
+      const cell = document.querySelector(`[data-index="${index}"]`);
+      const isSelected = selectedMemoryPositions.includes(index);
+      
+      if (isSelected) {
+        // Deselect
+        cell.classList.remove('selected');
+        const idx = selectedMemoryPositions.indexOf(index);
+        selectedMemoryPositions.splice(idx, 1);
+      } else {
+        // Select only if we haven't reached the limit
+        if (selectedMemoryPositions.length < numPositions) {
+          cell.classList.add('selected');
+          selectedMemoryPositions.push(index);
+        }
+      }
+      
+      updateSubmitButton();
+    }
+    
+    function updateSubmitButton() {
+      const submitBtn = document.getElementById('memory-submit-btn');
+      const selectionInfo = document.getElementById('selection-info');
+      const selectedCount = selectedMemoryPositions.length;
+      
+      if (selectedCount === numPositions) {
+        submitBtn.disabled = false;
+        selectionInfo.textContent = `${selectedCount}つのセルが選択されました。決定ボタンを押してください。`;
+      } else {
+        submitBtn.disabled = true;
+        selectionInfo.textContent = `${selectedCount}つのセルが選択されました。あと${numPositions - selectedCount}つ選択してください。`;
+      }
+    }
+    
+    function submitAnswer() {
+      const correctCount = selectedMemoryPositions.filter(pos => memoryPositions.includes(pos)).length;
+      const accuracy = correctCount / numPositions;
+      const isCorrect = accuracy === 1.0;
+      
+      document.getElementById('stage2').classList.add('hidden');
+      document.getElementById('stage3').classList.remove('hidden');
+      
+      const resultText = document.getElementById('result-text');
+      resultText.innerHTML = `
+        <p>記憶した位置: ${memoryPositions.join(', ')}</p>
+        <p>選択した位置: ${selectedMemoryPositions.join(', ')}</p>
+        <p>正解数: ${correctCount} / ${numPositions}</p>
+        <p>正答率: ${Math.round(accuracy * 100)}%</p>
+        <p><strong>${isCorrect ? '正解！' : '不正解'}</strong></p>
+      `;
+      
+      console.log('Memory positions:', memoryPositions);
+      console.log('Selected positions:', selectedMemoryPositions);
+      console.log('Correct count:', correctCount);
+      console.log('Accuracy:', accuracy);
+    }
+    
+    function resetTest() {
+      document.getElementById('stage1').classList.remove('hidden');
+      document.getElementById('stage2').classList.add('hidden');
+      document.getElementById('stage3').classList.add('hidden');
+      initializeMemoryStage();
+    }
+    
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      initializeMemoryStage();
+      
+      // Add submit button event listener
+      document.getElementById('memory-submit-btn').addEventListener('click', submitAnswer);
+      
+      // Auto-advance after 3 seconds (for testing)
+      setTimeout(function() {
+        if (!document.getElementById('stage1').classList.contains('hidden')) {
+          showRecallStage();
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
