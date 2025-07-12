@@ -82,6 +82,47 @@
     .memory-cell.selected {
       background-color: #66aaff;
     }
+    .memory-reproduction-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+    .reproduction-cell {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .reproduction-cell:hover {
+      background-color: #e0e0e0;
+    }
+    .reproduction-cell.selected {
+      background-color: #66aaff;
+    }
+    .memory-submit-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    .memory-submit-btn:hover {
+      background-color: #0056b3;
+    }
+    .memory-submit-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
     .memory-choice-container {
       display: flex;
       justify-content: center;
@@ -271,7 +312,7 @@
       
       // Memory task
       memoryGridSize: 4, // 4x4 grid
-      memoryPositions: 3, // Number of positions to remember
+      memoryPositions: 2, // Number of positions to remember
     };
 
     // Trial factors
@@ -508,90 +549,82 @@
       }
     };
 
-    // Memory grid task - recall (2-choice format)
+    // Memory grid task - recall (reproduction format)
     const memoryGridRecall = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        // Generate incorrect positions (different from the original)
         const gridSize = params.memoryGridSize;
-        let incorrectPositions = [];
         
-        // Generate different positions ensuring they don't match the original
-        while (incorrectPositions.length < params.memoryPositions) {
-          const row = Math.floor(Math.random() * gridSize);
-          const col = Math.floor(Math.random() * gridSize);
-          const position = row * gridSize + col;
-          
-          // Ensure no duplicates and not same as original positions
-          if (!incorrectPositions.includes(position) && !memoryPositions.includes(position)) {
-            incorrectPositions.push(position);
-          }
-          
-          // Safety check to prevent infinite loop (should not happen with 4x4 grid and 3 positions)
-          if (incorrectPositions.length === 0 && (memoryPositions.length + incorrectPositions.length) >= gridSize * gridSize - 3) {
-            // Fallback: just pick different positions even if some overlap (very unlikely scenario)
-            const allPositions = Array.from({length: gridSize * gridSize}, (_, i) => i);
-            const availablePositions = allPositions.filter(pos => !memoryPositions.includes(pos));
-            incorrectPositions = availablePositions.slice(0, params.memoryPositions);
-            break;
-          }
-        }
-        
-        // Randomly decide which grid (left or right) shows the correct positions
-        const correctSide = Math.random() < 0.5 ? 'left' : 'right';
-        const leftPositions = correctSide === 'left' ? memoryPositions : incorrectPositions;
-        const rightPositions = correctSide === 'right' ? memoryPositions : incorrectPositions;
-        
-        // Store the correct answer for later evaluation
-        window.correctChoice = correctSide;
-        
-        // Create the HTML with two grids
+        // Create the HTML with a blank interactive grid
         let gridHTML = '<h1>位置記憶課題 - 回答</h1>';
-        gridHTML += '<p>2つのグリッドのうち、記憶したものと一致するグリッドをクリックしてください。</p>';
-        gridHTML += '<div class="memory-choice-container">';
+        gridHTML += '<p>記憶した位置をクリックして再現してください。</p>';
+        gridHTML += '<p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>';
+        gridHTML += '<div id="memory-reproduction-grid" class="memory-reproduction-grid">';
         
-        // Left grid
-        gridHTML += '<div>';
-        gridHTML += '<p style="text-align: center; margin-bottom: 10px;"><strong>選択肢 A</strong></p>';
-        gridHTML += '<div class="memory-choice-grid" data-choice="left">';
         for (let i = 0; i < gridSize * gridSize; i++) {
-          const isHighlighted = leftPositions.includes(i);
-          gridHTML += `<div class="choice-cell ${isHighlighted ? 'highlighted' : ''}" data-index="${i}"></div>`;
+          gridHTML += `<div class="reproduction-cell" data-index="${i}"></div>`;
         }
-        gridHTML += '</div>';
-        gridHTML += '</div>';
-        
-        // Right grid
-        gridHTML += '<div>';
-        gridHTML += '<p style="text-align: center; margin-bottom: 10px;"><strong>選択肢 B</strong></p>';
-        gridHTML += '<div class="memory-choice-grid" data-choice="right">';
-        for (let i = 0; i < gridSize * gridSize; i++) {
-          const isHighlighted = rightPositions.includes(i);
-          gridHTML += `<div class="choice-cell ${isHighlighted ? 'highlighted' : ''}" data-index="${i}"></div>`;
-        }
-        gridHTML += '</div>';
-        gridHTML += '</div>';
         
         gridHTML += '</div>';
-        gridHTML += '<p>どちらかのグリッドをクリックして選択してください。</p>';
+        gridHTML += '<button id="memory-submit-btn" class="memory-submit-btn" disabled>決定</button>';
+        gridHTML += '<p id="selection-info">2つのセルを選択してください。</p>';
         
         return gridHTML;
       },
       choices: "NO_KEYS",
       on_load: function() {
-        const grids = document.querySelectorAll('.memory-choice-grid');
+        // Initialize selected positions array
+        selectedMemoryPositions = [];
         
-        grids.forEach(grid => {
-          grid.addEventListener('click', function() {
-            const selectedChoice = this.getAttribute('data-choice');
-            const isCorrect = selectedChoice === window.correctChoice;
+        const cells = document.querySelectorAll('.reproduction-cell');
+        const submitBtn = document.getElementById('memory-submit-btn');
+        const selectionInfo = document.getElementById('selection-info');
+        
+        // Add click event listeners to all cells
+        cells.forEach(cell => {
+          cell.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            const isSelected = this.classList.contains('selected');
+            
+            if (isSelected) {
+              // Deselect cell
+              this.classList.remove('selected');
+              selectedMemoryPositions = selectedMemoryPositions.filter(pos => pos !== index);
+            } else {
+              // Select cell only if we haven't reached the limit
+              if (selectedMemoryPositions.length < params.memoryPositions) {
+                this.classList.add('selected');
+                selectedMemoryPositions.push(index);
+              }
+            }
+            
+            // Update UI based on selection count
+            const selectedCount = selectedMemoryPositions.length;
+            if (selectedCount === params.memoryPositions) {
+              submitBtn.disabled = false;
+              selectionInfo.textContent = `${selectedCount}つのセルが選択されました。決定ボタンを押してください。`;
+            } else {
+              submitBtn.disabled = true;
+              selectionInfo.textContent = `${selectedCount}つのセルが選択されました。あと${params.memoryPositions - selectedCount}つ選択してください。`;
+            }
+          });
+        });
+        
+        // Add submit button event listener
+        submitBtn.addEventListener('click', function() {
+          if (selectedMemoryPositions.length === params.memoryPositions) {
+            // Calculate accuracy
+            const correctCount = selectedMemoryPositions.filter(pos => memoryPositions.includes(pos)).length;
+            const accuracy = correctCount / params.memoryPositions;
+            const isCorrect = accuracy === 1.0; // Perfect match required
             
             jsPsych.finishTrial({
-              memory_selected_choice: selectedChoice,
-              memory_correct_choice: window.correctChoice,
+              memory_selected_positions: selectedMemoryPositions,
+              memory_correct_positions: memoryPositions,
+              memory_accuracy: accuracy,
               memory_correct: isCorrect ? 1 : 0
             });
-          });
+          }
         });
       }
     };
@@ -1307,8 +1340,10 @@
       stimulus: `
         <h1>位置記憶課題の説明</h1>
         <p>これからは追加で、位置記憶課題も行います。</p>
-        <p>各試行の開始時に4×4のグリッド上で、3つの色のついたセルが表示されます。</p>
-        <p>それらの位置を記憶し、探索のあとに、2つのグリッドから記憶したものと一致するものを選択してください。</p>
+        <p>各試行の開始時に4×4のグリッド上で、2つの色のついたセルが表示されます。</p>
+        <p>それらの位置を記憶し、探索のあとに、ブランクのグリッドで記憶した位置を再現してください。</p>
+        <p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>
+        <p>2つのセルを選択すると決定ボタンがアクティブになります。</p>
         <p><strong>エンターキーを押すと次に進みます。</strong></p>
       `,
       choices: ['Enter']
