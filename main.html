@@ -351,11 +351,20 @@
     const welcome = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
-                '<p>エンターキーを押すと実験が開始されます。</p>',
-      choices: ['Enter'],
+                '<p>下の「次へ」ボタンをクリックして実験を開始してください。</p>' +
+                '<div style="margin: 20px 0;">' +
+                '<button id="welcome-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>' +
+                '</div>',
+      choices: "NO_KEYS",
       on_load: function() {
         // Ensure no fullscreen listeners are active during welcome
         removeFullscreenListeners();
+        
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('welcome-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
       }
     };
 
@@ -483,11 +492,21 @@
           <h1>練習について</h1>
           <p style="font-size: 18px; margin: 20px 0;">はじめに3回練習を行います</p>
           <p style="font-size: 16px; margin: 20px 0;">
-            <strong>エンターキーを押して練習を開始してください。</strong>
+            <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
           </p>
+          <div style="margin: 20px 0;">
+            <button id="practice-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          </div>
         </div>
       `,
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('practice-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
 
     // Instructions for visual search task
@@ -515,10 +534,20 @@
             viewCondition === 'scroll' ? 
             '次は背景をスクロールして探索します。' : 
             '次は全画面で探索をします'}</p>
-          <p><strong>エンターキーを押すと開始します。</strong></p>
+          <p><strong>下の「次へ」ボタンをクリックして開始します。</strong></p>
+          <div style="margin: 20px 0;">
+            <button id="visual-search-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          </div>
         `;
       },
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('visual-search-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
 
     // Memory grid task - display
@@ -1241,13 +1270,23 @@
         
         return `
           <h1>${correct ? '正解!' : '不正解'}</h1>
-          <p>エンターキーを押すと次に進みます。</p>
+          <p>下の「次へ」ボタンをクリックして次に進みます。</p>
+          <div style="margin: 20px 0;">
+            <button id="memory-feedback-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          </div>
         `;
       },
       data: {
         task: 'memory_feedback'
       },
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('memory-feedback-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
 
     // End screen with overall score
@@ -1278,10 +1317,20 @@
           <p>実験にご参加いただき、ありがとうございました。</p>
           <p>実験の正答率: ${searchAccuracy}%</p>
           ${memoryAccuracyText}
-          <p><strong>エンターキーを押すと終了します。</strong></p>
+          <p><strong>下の「終了」ボタンをクリックして終了します。</strong></p>
+          <div style="margin: 20px 0;">
+            <button id="end-screen-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">終了</button>
+          </div>
         `;
       },
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the End button
+        const nextBtn = document.getElementById('end-screen-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
 
     // Practice completion choice screen
@@ -1330,11 +1379,21 @@
             集中して取り組んでください。
           </p>
           <p style="font-size: 16px; margin: 20px 0;">
-            <strong>エンターキーを押して本番を開始してください。</strong>
+            <strong>下の「次へ」ボタンをクリックして本番を開始してください。</strong>
           </p>
+          <div style="margin: 20px 0;">
+            <button id="main-experiment-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          </div>
         </div>
       `,
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('main-experiment-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
     
     // Midpoint message
@@ -1344,9 +1403,19 @@
         <h1>半分終了</h1>
         <p>お疲れさまでした。ここで半分終了です。</p>
         <p>ここからは記憶についての課題を追加します。</p>
-        <p><strong>エンターキーを押すと次に進みます。</strong></p>
+        <p><strong>下の「次へ」ボタンをクリックして次に進みます。</strong></p>
+        <div style="margin: 20px 0;">
+          <button id="midpoint-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        </div>
       `,
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('midpoint-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
     
     // WM task explanation
@@ -1359,9 +1428,19 @@
         <p>それらの位置を記憶し、探索のあとに、ブランクのグリッドで記憶した位置を再現してください。</p>
         <p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>
         <p>2つのセルを選択すると決定ボタンがアクティブになります。</p>
-        <p><strong>エンターキーを押すと次に進みます。</strong></p>
+        <p><strong>下の「次へ」ボタンをクリックして次に進みます。</strong></p>
+        <div style="margin: 20px 0;">
+          <button id="wm-task-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        </div>
       `,
-      choices: ['Enter']
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Add click event listener to the Next button
+        const nextBtn = document.getElementById('wm-task-next-btn');
+        nextBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
     };
 
     // Practice trial variables - fixed order: fullscreen, window, scroll
