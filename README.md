@@ -4,4 +4,4 @@ This is a psychological experiment program for analyzing the effects of working 
 Compatible with various operating systems such as Windows, Mac, and Linux.
 
 # Usage
-Please run main.html in your PC browser.
+Please run index.html in your PC browser.
