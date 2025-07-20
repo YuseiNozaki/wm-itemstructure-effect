@@ -492,7 +492,6 @@
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-          <h1>練習について</h1>
           <p style="font-size: 18px; margin: 20px 0;">はじめに9回練習を行います</p>
           <p style="font-size: 16px; margin: 20px 0;">
             <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
@@ -524,19 +523,18 @@
         if (!isPractice) {
           // Increment trial counter for main trials
           currentMainTrialNumber++;
-          progressDisplay = `<p style="font-size: 16px; margin: 10px 0; font-weight: bold; color: #007bff;">進捗: ${currentMainTrialNumber}回/${totalMainTrials}回</p>`;
+          progressDisplay = `<p style="font-size: 16px; margin: 10px 0; font-weight: bold; color: #007bff;">${currentMainTrialNumber}回/${totalMainTrials}回</p>`;
         }
         
         return `
-          <h1>実験の説明</h1>
           ${progressDisplay}
-          <p>現在の条件: <strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
+          <p>次は<strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
             viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
           <p>${viewCondition === 'window' ? 
-            '次はウィンドウを動かして探索します。' : 
+            'ウィンドウを動かして探索します。' : 
             viewCondition === 'scroll' ? 
-            '次は背景をスクロールして探索します。' : 
-            '次は全画面で探索をします'}</p>
+            '背景をスクロールして探索します。' : 
+            '全画面で探索をします'}</p>
           <p><strong>下の「次へ」ボタンをクリックして開始します。</strong></p>
           <div style="margin: 20px 0;">
             <button id="visual-search-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
@@ -574,7 +572,7 @@
         }
         
         // Create the grid HTML
-        let gridHTML = '<h1>位置記憶課題</h1>';
+        let gridHTML = '<h1>記憶課題</h1>';
         gridHTML += '<p>以下のグリッド内の色のついたセルの位置を記憶してください。</p>';
         gridHTML += '<div id="memory-grid">';
         
@@ -603,9 +601,8 @@
         const gridSize = params.memoryGridSize;
         
         // Create the HTML with a blank interactive grid
-        let gridHTML = '<h1>位置記憶課題 - 回答</h1>';
+        let gridHTML = '<h1>記憶課題 - 回答</h1>';
         gridHTML += '<p>記憶した位置をクリックして再現してください。</p>';
-        gridHTML += '<p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>';
         gridHTML += '<div id="memory-reproduction-grid" class="memory-reproduction-grid">';
         
         for (let i = 0; i < gridSize * gridSize; i++) {
@@ -1488,12 +1485,9 @@
     const wmTaskExplanation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <h1>位置記憶課題の説明</h1>
-        <p>これからは追加で、位置記憶課題も行います。</p>
-        <p>各試行の開始時に4×4のグリッド上で、2つの色のついたセルが表示されます。</p>
-        <p>それらの位置を記憶し、探索のあとに、ブランクのグリッドで記憶した位置を再現してください。</p>
-        <p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>
-        <p>2つのセルを選択すると決定ボタンがアクティブになります。</p>
+        <h1>記憶課題の説明</h1>
+        <p>これからは追加で、記憶課題も行います。</p>
+        <p>2つの色のついたセルの位置を記憶してください。</p>
         <p><strong>下の「次へ」ボタンをクリックして次に進みます。</strong></p>
         <div style="margin: 20px 0;">
           <button id="wm-task-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
