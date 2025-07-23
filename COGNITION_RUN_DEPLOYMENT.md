@@ -43,7 +43,6 @@ This project has been restructured for deployment on cognition.run. The program 
 
 1. **HTML Elements:** All HTML elements (`div`, `canvas`) are now created dynamically via JavaScript
 2. **CSS Separation:** All styles moved to external `styles.css` file
-3. **Standalone JavaScript:** Complete experiment logic in a single JavaScript file
 
 ## Verification
 
