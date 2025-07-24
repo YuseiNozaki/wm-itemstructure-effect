@@ -1,33 +1,34 @@
 # Cognition.run Deployment Instructions
 
-This project has been restructured for deployment on cognition.run. The program functionality remains identical to the original.
+This project is designed for deployment on cognition.run platform. The experiment implements a working memory and visual search task using jsPsych v7.
 
 ## Files for Deployment
 
 ### 1. JavaScript Code
-**File:** `cognition-run-script.js`
-- Contains the complete experiment logic
-- Includes DOM element creation at the beginning
-- Ready to copy-paste into cognition.run JavaScript section
+**File:** `index.html` (JavaScript section)
+- Contains the complete experiment logic within `<script>` tags
+- Includes dynamic DOM element creation for cognition.run compatibility
+- Ready to extract and paste into cognition.run JavaScript section
 
-### 2. CSS Styles
+### 2. CSS Styles  
 **File:** `styles.css`
-- Contains all the styling required for the experiment
+- Contains all styling required for the experiment
 - Should be uploaded as a separate CSS file in cognition.run
+- Includes styles for memory grid, search window, and visual elements
 
 ## Deployment Steps
 
 1. **Upload CSS File:**
    - Upload `styles.css` to cognition.run as a separate CSS file
-   - The CSS will be automatically linked
+   - The CSS will be automatically linked to your experiment
 
-2. **Copy JavaScript Code:**
-   - Open `cognition-run-script.js`
-   - Copy the entire contents
+2. **Extract and Copy JavaScript Code:**
+   - Open `index.html` in a text editor
+   - Copy the entire contents between the `<script>` tags (excluding the script tags themselves)
    - Paste into the JavaScript section of cognition.run
 
 3. **Required External Libraries:**
-   The experiment requires these external libraries (include as script tags in cognition.run):
+   Add these external libraries in cognition.run's library settings:
    ```html
    <script src="https://unpkg.com/jspsych@7"></script>
    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
@@ -39,24 +40,85 @@ This project has been restructured for deployment on cognition.run. The program 
    <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
    ```
 
-## Key Changes Made
+4. **Experiment Configuration:**
+   - Set experiment to run in fullscreen mode
+   - Ensure participant consent and data collection settings are configured
+   - Test all three viewing conditions (fullscreen, window, scroll) before deployment
 
-1. **HTML Elements:** All HTML elements (`div`, `canvas`) are now created dynamically via JavaScript
-2. **CSS Separation:** All styles moved to external `styles.css` file
+## Key Features for Cognition.run Deployment
 
-## Verification
+1. **Dynamic DOM Creation:** All required HTML elements (`div`, `canvas`) are created dynamically via JavaScript
+2. **CSS Separation:** All styles are contained in external `styles.css` file
+3. **jsPsych v7 Compatibility:** Updated to use modern jsPsych v7 API
+4. **Responsive Design:** Adapts to different screen sizes and resolutions
+5. **Data Collection:** Comprehensive data output in JSON format at experiment completion
 
-The modified version maintains 100% identical functionality to the original:
-- All visual search conditions work the same way
-- Memory tasks function identically  
-- User interface and interactions are unchanged
-- Data collection and experiment flow remain the same
+## Experiment Specifications
 
-## Local Testing
+### Technical Requirements
+- **Duration:** Approximately 15-20 minutes
+- **Screen Resolution:** Minimum 1024x768, fullscreen recommended  
+- **Browser Compatibility:** Modern browsers (Chrome, Firefox, Safari, Edge)
+- **Participant Input:** Mouse/trackpad for object selection and window manipulation
 
-To test locally:
+### Experimental Conditions
+- **Viewing Conditions:** 3 types (fullscreen, window drag, scroll drag)
+- **Object Layout:** 2 types (structured grid, unstructured random)
+- **Memory Load:** 2 conditions (with/without working memory task)
+- **Total Trials:** 120 main trials + practice trials
+
+### Data Output
+The experiment collects:
+- Reaction times and accuracy for visual search tasks
+- Mouse movement trajectories and total movement distance
+- Working memory task performance (when applicable)
+- Demographic information (age, gender)
+- Trial-by-trial condition information
+
+## Verification and Testing
+
+### Pre-deployment Checklist
+- [ ] All jsPsych v7 plugins load correctly
+- [ ] CSS file uploads and applies properly
+- [ ] Fullscreen functionality works on target devices
+- [ ] All three viewing conditions (fullscreen, window, scroll) function correctly
+- [ ] Memory task displays and records responses accurately
+- [ ] Data collection outputs complete JSON at experiment end
+- [ ] Practice trials allow repetition before main experiment
+- [ ] Demographic survey collects required information
+
+### Local Testing Before Deployment
 1. Open `index.html` in a browser
-2. The experiment should run exactly as before
-3. All DOM elements are created and styled correctly
+2. Complete the full experiment workflow:
+   - Welcome screen and demographics
+   - Practice trials (test all viewing conditions)
+   - Main experiment blocks (with and without memory)
+   - Data output verification
+3. Test on multiple browsers and screen sizes
+4. Verify all interactions work correctly (clicking, dragging, scrolling)
 
-The restructured files ensure compatibility with cognition.run's deployment requirements while preserving all original functionality.
+### Common Deployment Issues
+- **Fullscreen Problems:** Ensure cognition.run allows fullscreen API access
+- **Library Loading:** Verify all jsPsych plugins load in correct order
+- **CSS Conflicts:** Check that custom styles don't conflict with cognition.run defaults
+- **Data Saving:** Confirm cognition.run data collection integration works properly
+
+### Troubleshooting
+- If objects don't display: Check canvas creation and drawing functions
+- If clicking doesn't work: Verify event listeners and collision detection
+- If memory task fails: Check grid creation and selection tracking
+- If drag operations fail: Ensure mouse event handling is properly configured
+
+## Platform-Specific Notes
+
+### Cognition.run Configuration
+- Set experiment type to "Custom JavaScript"
+- Enable fullscreen mode in experiment settings
+- Configure data export to include all trial data
+- Set appropriate time limits for experiment completion
+- Consider adding progress indicators for participant experience
+
+### Performance Optimization
+- The experiment is optimized for smooth performance with 30 objects per trial
+- Canvas operations are efficient for real-time mouse tracking
+- Memory usage is minimal with dynamic element creation/destruction
