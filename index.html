@@ -908,12 +908,15 @@
           searchWindow.style.display = 'none';
           
           // Finish trial
+          const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
           const trialData = {
             reaction_time: rt,
             correct: correct,
             view_condition: viewCondition,
             structure: structure,
-            memory_load: jsPsych.timelineVariable('memoryLoad'),
+            memory_load: memoryLoadCondition,
+            wm_load: memoryLoadCondition === 'with-memory', // Boolean indicator for WM load presence
+            wm_load_label: memoryLoadCondition === 'with-memory' ? 'WM負荷あり' : 'WM負荷なし', // Japanese label for WM load
             target_color: targetColor,
             target_shape: targetShape,
             total_movement: totalMovement,
