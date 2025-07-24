@@ -6,7 +6,9 @@ This project is designed for deployment on cognition.run platform. The experimen
 
 ### 1. JavaScript Code
 **File:** `index.html` (JavaScript section)
-- Contains the complete experiment logic within `<script>` tags
+- Contains the complete experiment logic within a specific `<script>` tag
+- Look for the `<script>` tag with the comment `<!-- Experiment Logic -->` above it
+- Copy only the JavaScript code within this `<script>` tag (excluding the script tags themselves)
 - Includes dynamic DOM element creation for cognition.run compatibility
 - Ready to extract and paste into cognition.run JavaScript section
 
