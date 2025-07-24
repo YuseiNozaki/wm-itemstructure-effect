@@ -909,6 +909,7 @@
           
           // Finish trial
           const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
+          const isPracticeCondition = jsPsych.timelineVariable('isPractice') || false;
           const trialData = {
             reaction_time: rt,
             correct: correct,
@@ -916,6 +917,7 @@
             structure: structure,
             memory_load: memoryLoadCondition,
             wm_load: memoryLoadCondition === 'with-memory', // Boolean indicator for WM load presence
+            practice_trial: isPracticeCondition, // Boolean indicator for practice trial
             target_color: targetColor,
             target_shape: targetShape,
             total_movement: totalMovement,
