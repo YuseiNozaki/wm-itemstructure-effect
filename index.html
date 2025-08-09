@@ -1414,7 +1414,6 @@
             return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
           }
         },
-        fixationPoint,
         showTarget,
         visualSearch,
         // Search feedback for 'with-memory' condition comes immediately after visual search
@@ -1455,7 +1454,6 @@
     const practiceTrialProcedure = {
       timeline: [
         visualSearchInstructions,
-        fixationPoint,
         showTarget,
         visualSearch,
         // Always show search feedback for practice (no memory component)
