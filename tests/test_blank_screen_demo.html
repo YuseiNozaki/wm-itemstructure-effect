@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blank Screen Implementation Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    .screen.active {
+      opacity: 1;
+    }
+    .blank-screen {
+      background-color: white;
+    }
+    .instruction-screen {
+      background-color: #f0f8ff;
+      flex-direction: column;
+      text-align: center;
+    }
+    .target-screen {
+      background-color: #f5f5f5;
+    }
+    .target-circle {
+      width: 100px;
+      height: 100px;
+      background-color: red;
+      border-radius: 50%;
+      border: 2px solid black;
+    }
+    .timing-info {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="timing-info" id="timing-info">
+    Ready to start...
+  </div>
+
+  <div class="screen instruction-screen active" id="instruction">
+    <h2>Blank Screen Implementation Demo</h2>
+    <p>This simulates the new trial flow:</p>
+    <ol>
+      <li>Instructions (current screen)</li>
+      <li><strong>Blank Screen (500ms)</strong> - NEW</li>
+      <li>Target Display (1000ms)</li>
+      <li><strong>Blank Screen (500ms)</strong> - NEW</li>
+      <li>End message</li>
+    </ol>
+    <button onclick="startDemo()">Start Demo</button>
+  </div>
+
+  <div class="screen blank-screen" id="blank1">
+    <!-- Intentionally empty for blank screen -->
+  </div>
+
+  <div class="screen target-screen" id="target">
+    <div class="target-circle"></div>
+  </div>
+
+  <div class="screen blank-screen" id="blank2">
+    <!-- Intentionally empty for blank screen -->
+  </div>
+
+  <div class="screen instruction-screen" id="end">
+    <h2>Demo Complete</h2>
+    <p>The timing sequence shows how blank screens are inserted:</p>
+    <ul>
+      <li>Before target: 500ms blank</li>
+      <li>Target display: 1000ms</li>
+      <li>After target: 500ms blank</li>
+    </ul>
+    <p>This matches the issue requirements (500ms blank screen before and after target presentation).</p>
+    <button onclick="restartDemo()">Restart Demo</button>
+  </div>
+
+  <script>
+    let currentStep = 0;
+    const screens = ['instruction', 'blank1', 'target', 'blank2', 'end'];
+    const timings = [0, 500, 1000, 500, 0]; // durations in ms
+    let startTime;
+
+    function showScreen(screenId) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      // Show target screen
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function updateTimingInfo(step, elapsed = 0) {
+      const info = document.getElementById('timing-info');
+      const stepNames = ['Instructions', 'Blank Screen 1', 'Target Display', 'Blank Screen 2', 'Complete'];
+      const duration = timings[step];
+      
+      if (step < stepNames.length) {
+        info.innerHTML = `
+          Step ${step + 1}: ${stepNames[step]}<br>
+          Duration: ${duration}ms<br>
+          Elapsed: ${elapsed}ms
+        `;
+      }
+    }
+
+    function startDemo() {
+      currentStep = 1;
+      startTime = Date.now();
+      runStep();
+    }
+
+    function runStep() {
+      if (currentStep >= screens.length) {
+        return;
+      }
+
+      showScreen(screens[currentStep]);
+      updateTimingInfo(currentStep, 0);
+
+      const duration = timings[currentStep];
+      if (duration > 0) {
+        // Show progress for timed steps
+        const startStepTime = Date.now();
+        const progressInterval = setInterval(() => {
+          const elapsed = Date.now() - startStepTime;
+          updateTimingInfo(currentStep, elapsed);
+          
+          if (elapsed >= duration) {
+            clearInterval(progressInterval);
+            currentStep++;
+            runStep();
+          }
+        }, 50);
+      }
+    }
+
+    function restartDemo() {
+      currentStep = 0;
+      showScreen('instruction');
+      updateTimingInfo(-1);
+      document.getElementById('timing-info').textContent = 'Ready to restart...';
+    }
+
+    // Initialize
+    updateTimingInfo(-1);
+  </script>
+</body>
+</html>

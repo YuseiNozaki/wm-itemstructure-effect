@@ -561,6 +561,20 @@
       }
     };
 
+    // Blank screen display (500ms white screen)
+    const blankScreen = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background-color: white;">
+        </div>
+      `,
+      choices: "NO_KEYS",
+      trial_duration: 500,
+      data: {
+        task: 'blank_screen'
+      }
+    };
+
     // Display target object
     const showTarget = {
       type: jsPsychHtmlKeyboardResponse,
@@ -1414,7 +1428,9 @@
             return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
           }
         },
+        blankScreen,
         showTarget,
+        blankScreen,
         visualSearch,
         // Search feedback for 'with-memory' condition comes immediately after visual search
         {
@@ -1454,7 +1470,9 @@
     const practiceTrialProcedure = {
       timeline: [
         visualSearchInstructions,
+        blankScreen,
         showTarget,
+        blankScreen,
         visualSearch,
         // Always show search feedback for practice (no memory component)
         searchFeedback
