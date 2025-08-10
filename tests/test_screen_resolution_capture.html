@@ -41,7 +41,9 @@
 
         function displayTestResults() {
             const allData = jsPsych.data.get();
-            const globalData = allData.values()[0]; // First trial contains global properties
+            // Find the first trial with task === 'resolution_test'
+            const filtered = allData.filter({task: 'resolution_test'}).values();
+            const globalData = filtered.length > 0 ? filtered[0] : {};
             
             let html = '<div class="data-preview"><h2>Screen Resolution Capture Test Results</h2>';
             
