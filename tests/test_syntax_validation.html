@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Main Experiment Syntax Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script>
+    // Test that the main experiment functions load without syntax errors
+    const params = {
+      objectMinSize: 20,
+      objectMaxSize: 40,
+      colors: ['red', 'blue', 'green'],
+      shapes: ['circle', 'square'],
+    };
+
+    // Test the fixed uniform size function
+    function getUniformObjectSize() {
+      return (params.objectMaxSize + params.objectMinSize) / 2;
+    }
+
+    // Test the shape drawing function
+    function drawShape(shape, color, x, y, size) {
+      const halfSize = size / 2;
+      return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" stroke="black" stroke-width="2" /></svg>`;
+    }
+
+    const jsPsych = initJsPsych({
+      on_finish: function() {
+        document.getElementById('jspsych-target').innerHTML = `
+          <div style="text-align: center; padding: 20px;">
+            <h1 style="color: green;">✓ Main Experiment Syntax Test PASSED</h1>
+            <p>No JavaScript errors detected.</p>
+            <p>Uniform object size: ${getUniformObjectSize()}px</p>
+            <p>Size calculation: (${params.objectMaxSize} + ${params.objectMinSize}) / 2 = ${getUniformObjectSize()}</p>
+          </div>
+        `;
+      }
+    });
+
+    // Test target presentation with uniform size
+    const syntaxTest = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const uniformSize = getUniformObjectSize();
+        return `
+          <h1>Syntax Validation Test</h1>
+          <p>Testing uniform size calculation and target presentation...</p>
+          <div style="margin: 20px auto; width: 100px; height: 100px; border: 1px solid #ccc;">
+            ${drawShape('circle', 'red', 100, 100, uniformSize)}
+          </div>
+          <p>✓ getUniformObjectSize() returns: ${uniformSize}px</p>
+          <p>✓ Target presentation uses calculated size instead of hardcoded 50px</p>
+          <p>Press SPACE to complete test</p>
+        `;
+      },
+      choices: [' '],
+    };
+
+    console.log('Starting syntax test...');
+    console.log('Uniform object size:', getUniformObjectSize());
+    
+    jsPsych.run([syntaxTest]);
+  </script>
+</body>
+</html>

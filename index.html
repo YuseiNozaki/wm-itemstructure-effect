@@ -180,6 +180,11 @@
       memoryPositions: 3, // Number of positions to remember
     };
 
+    // Calculate uniform object size for consistency between target presentation and search
+    function getUniformObjectSize() {
+      return (params.objectMaxSize + params.objectMinSize) / 2;
+    }
+
     // Trial factors
     const factors = {
       viewCondition: ['window', 'scroll', 'fullscreen'],
@@ -901,7 +906,7 @@
         
         return `
           <div style="margin: 20px auto; width: 100px; height: 100px;">
-            ${drawShape(targetShape, targetColor, 100, 100, 50)}
+            ${drawShape(targetShape, targetColor, 100, 100, getUniformObjectSize())}
           </div>
         `;
       },
@@ -1267,7 +1272,7 @@
       let positions = [];
       
       // Use uniform object size
-      const objectSize = (params.objectMaxSize + params.objectMinSize) / 2;
+      const objectSize = getUniformObjectSize();
       
       let targetX, targetY;
       

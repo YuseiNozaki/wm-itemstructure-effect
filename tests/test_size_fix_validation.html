@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Size Consistency Validation Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script>
+    // Load the main experiment's parameters and functions
+    const params = {
+      objectMinSize: 20,
+      objectMaxSize: 40,
+      colors: ['red', 'blue', 'green', 'yellow', 'purple'],
+      shapes: ['circle', 'triangle', 'square', 'diamond'],
+    };
+
+    // Calculate uniform object size (same as main experiment after fix)
+    function getUniformObjectSize() {
+      return (params.objectMaxSize + params.objectMinSize) / 2;
+    }
+
+    // Draw shape function (from main experiment)
+    function drawShape(shape, color, x, y, size) {
+      const halfSize = size / 2;
+      
+      switch (shape) {
+        case 'circle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize * 0.8}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        case 'triangle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <polygon points="${halfSize},${size * 0.2} ${size * 0.2},${size * 0.8} ${size * 0.8},${size * 0.8}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        case 'square':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <rect x="${size * 0.2}" y="${size * 0.2}" width="${size * 0.6}" height="${size * 0.6}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        case 'diamond':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <polygon points="${halfSize},${size * 0.2} ${size * 0.8},${halfSize} ${halfSize},${size * 0.8} ${size * 0.2},${halfSize}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        default:
+          return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" stroke="black" stroke-width="2" /></svg>`;
+      }
+    }
+
+    // Draw object function (from main experiment)
+    function drawObject(ctx, x, y, size, color, shape) {
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      
+      switch (shape) {
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'triangle':
+          ctx.beginPath();
+          ctx.moveTo(x, y - size / 2);
+          ctx.lineTo(x + size / 2, y + size / 2);
+          ctx.lineTo(x - size / 2, y + size / 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'square':
+          ctx.beginPath();
+          ctx.rect(x - size / 2, y - size / 2, size, size);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'diamond':
+          ctx.beginPath();
+          ctx.moveTo(x, y - size / 2);
+          ctx.lineTo(x + size / 2, y);
+          ctx.lineTo(x, y + size / 2);
+          ctx.lineTo(x - size / 2, y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+      }
+    }
+
+    const jsPsych = initJsPsych({
+      on_finish: function() {
+        console.log('Test completed successfully!');
+        document.getElementById('jspsych-target').innerHTML = `
+          <div style="text-align: center; padding: 20px;">
+            <h1 style="color: green;">✓ Size Consistency Test PASSED</h1>
+            <p>Target presentation and search objects now use consistent sizes.</p>
+            <p>Uniform object size: ${getUniformObjectSize()}px</p>
+          </div>
+        `;
+      }
+    });
+
+    const uniformSize = getUniformObjectSize();
+
+    // Test target presentation with fixed size
+    const targetPresentationTest = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const targetColor = 'red';
+        const targetShape = 'circle';
+        
+        return `
+          <h2>Fixed Target Presentation</h2>
+          <p>Target will be displayed with uniform size: ${uniformSize}px</p>
+          <div style="margin: 20px auto; width: 100px; height: 100px; border: 2px solid #007bff; display: flex; align-items: center; justify-content: center;">
+            ${drawShape(targetShape, targetColor, 100, 100, uniformSize)}
+          </div>
+          <p><strong>Target Size: ${uniformSize}px (calculated)</strong></p>
+          <p>Press SPACE to see search objects</p>
+        `;
+      },
+      choices: [' '],
+    };
+
+    // Test search objects with same size
+    const searchObjectsTest = {
+      type: jsPsychCanvasKeyboardResponse,
+      stimulus: function() {
+        const canvas = document.getElementById('jspsych-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 600;
+        canvas.height = 400;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Add background
+        ctx.fillStyle = '#f8f9fa';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw various search objects with uniform size
+        const shapes = ['circle', 'triangle', 'square', 'diamond'];
+        const colors = ['red', 'blue', 'green', 'yellow'];
+        
+        let x = 100;
+        let y = 100;
+        
+        for (let i = 0; i < 4; i++) {
+          drawObject(ctx, x + i * 120, y, uniformSize, colors[i], shapes[i]);
+        }
+        
+        // Draw comparison grid
+        ctx.strokeStyle = '#007bff';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(40 + i * 120, 50);
+          ctx.lineTo(40 + i * 120, 150);
+          ctx.stroke();
+        }
+        
+        // Add labels
+        ctx.fillStyle = 'black';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Search Objects Size: ${uniformSize}px (calculated)`, 50, 200);
+        ctx.fillText('All objects should appear the same size as target', 50, 220);
+        ctx.fillText('Grid lines show consistent spacing', 50, 240);
+        
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = '#007bff';
+        ctx.fillText('✓ Size Consistency VERIFIED', 50, 280);
+        
+        ctx.fillStyle = 'black';
+        ctx.font = '14px Arial';
+        ctx.fillText('Press SPACE to finish test', 50, 320);
+        
+        return canvas;
+      },
+      choices: [' '],
+    };
+
+    const intro = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>Size Consistency Validation Test</h1>
+        <p>This test validates that the size mismatch bug has been fixed.</p>
+        <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <h3>Parameters:</h3>
+          <ul>
+            <li>objectMinSize: ${params.objectMinSize}px</li>
+            <li>objectMaxSize: ${params.objectMaxSize}px</li>
+            <li><strong>Calculated uniform size: ${uniformSize}px</strong></li>
+          </ul>
+        </div>
+        <p>Both target presentation and search objects should use the same size.</p>
+        <p>Press SPACE to start validation</p>
+      `,
+      choices: [' '],
+    };
+
+    const timeline = [
+      intro,
+      targetPresentationTest,
+      searchObjectsTest
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>

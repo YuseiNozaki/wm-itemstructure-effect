@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Size Consistency Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script>
+    // Test parameters matching main experiment
+    const params = {
+      objectMinSize: 20,
+      objectMaxSize: 40,
+    };
+
+    // Calculate object size like in main experiment
+    const objectSize = (params.objectMaxSize + params.objectMinSize) / 2;
+
+    // Test target presentation function (current implementation)
+    function drawShape(shape, color, x, y, size) {
+      const halfSize = size / 2;
+      
+      switch (shape) {
+        case 'circle':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize * 0.8}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        case 'square':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <rect x="${size * 0.2}" y="${size * 0.2}" width="${size * 0.6}" height="${size * 0.6}" fill="${color}" stroke="black" stroke-width="2" />
+                  </svg>`;
+        default:
+          return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" stroke="black" stroke-width="2" /></svg>`;
+      }
+    }
+
+    // Test search object drawing function
+    function drawObject(ctx, x, y, size, color, shape) {
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      
+      switch (shape) {
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'square':
+          ctx.beginPath();
+          ctx.rect(x - size / 2, y - size / 2, size, size);
+          ctx.fill();
+          ctx.stroke();
+          break;
+      }
+    }
+
+    const jsPsych = initJsPsych({
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test current behavior (with bug)
+    const currentTargetPresentation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `
+          <h2>Current Target Presentation (Size: 50px)</h2>
+          <div style="margin: 20px auto; width: 100px; height: 100px; border: 1px solid #ccc;">
+            ${drawShape('circle', 'red', 100, 100, 50)}
+          </div>
+          <p>Target size: 50px (hardcoded)</p>
+          <p>Press SPACE to continue</p>
+        `;
+      },
+      choices: [' '],
+    };
+
+    // Test search objects (current implementation)
+    const currentSearchObjects = {
+      type: jsPsychCanvasKeyboardResponse,
+      stimulus: function() {
+        const canvas = document.getElementById('jspsych-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 300;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw search objects with calculated size
+        drawObject(ctx, 100, 100, objectSize, 'red', 'circle');
+        drawObject(ctx, 200, 100, objectSize, 'blue', 'square');
+        drawObject(ctx, 300, 100, objectSize, 'green', 'circle');
+        
+        // Add text labels
+        ctx.fillStyle = 'black';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Search objects size: ${objectSize}px (calculated)`, 50, 200);
+        ctx.fillText('Press SPACE to continue', 50, 250);
+        
+        return canvas;
+      },
+      choices: [' '],
+    };
+
+    // Test fixed behavior (without bug)
+    const fixedTargetPresentation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `
+          <h2>Fixed Target Presentation (Size: ${objectSize}px)</h2>
+          <div style="margin: 20px auto; width: 100px; height: 100px; border: 1px solid #ccc;">
+            ${drawShape('circle', 'red', 100, 100, objectSize)}
+          </div>
+          <p>Target size: ${objectSize}px (calculated, matching search objects)</p>
+          <p>Press SPACE to finish</p>
+        `;
+      },
+      choices: [' '],
+    };
+
+    const intro = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>Size Consistency Test</h1>
+        <p>This test demonstrates the size mismatch bug and the fix.</p>
+        <p>objectMinSize: ${params.objectMinSize}px</p>
+        <p>objectMaxSize: ${params.objectMaxSize}px</p>
+        <p>Calculated object size: ${objectSize}px</p>
+        <p>Press SPACE to start</p>
+      `,
+      choices: [' '],
+    };
+
+    const timeline = [
+      intro,
+      currentTargetPresentation,
+      currentSearchObjects,
+      fixedTargetPresentation
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
