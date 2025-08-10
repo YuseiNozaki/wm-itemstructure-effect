@@ -66,7 +66,19 @@
                 
                 html += `<div class="test-result ${heightValid ? 'pass' : 'fail'}">
                     <strong>Test 5: Height Value Validation</strong><br>
-                    Expected: Positive number between 1 and 10000<br>
+                const widthValid = typeof width === 'number' && width > 0 && width < MAX_REASONABLE_SCREEN_DIMENSION;
+                const heightValid = typeof height === 'number' && height > 0 && height < MAX_REASONABLE_SCREEN_DIMENSION;
+                
+                html += `<div class="test-result ${widthValid ? 'pass' : 'fail'}">
+                    <strong>Test 4: Width Value Validation</strong><br>
+                    Expected: Positive number between 1 and ${MAX_REASONABLE_SCREEN_DIMENSION}<br>
+                    Actual: ${typeof width} (${width})<br>
+                    Result: ${widthValid ? 'PASS' : 'FAIL'}
+                </div>`;
+                
+                html += `<div class="test-result ${heightValid ? 'pass' : 'fail'}">
+                    <strong>Test 5: Height Value Validation</strong><br>
+                    Expected: Positive number between 1 and ${MAX_REASONABLE_SCREEN_DIMENSION}<br>
                     Actual: ${typeof height} (${height})<br>
                     Result: ${heightValid ? 'PASS' : 'FAIL'}
                 </div>`;
