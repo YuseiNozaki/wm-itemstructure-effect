@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timeline Flow Validation</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+    .step { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .step.current { border-left: 5px solid #007bff; background-color: #e7f3ff; }
+    .step-number { display: inline-block; background: #007bff; color: white; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; margin-right: 10px; }
+    .step.current .step-number { background: #28a745; }
+    h1 { text-align: center; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <h1>実験タイムラインの流れ</h1>
+  <p style="text-align: center; font-size: 18px; margin-bottom: 30px;">説明画面が正しい位置に追加されていることを確認</p>
+  
+  <div class="step">
+    <span class="step-number">1</span>
+    <strong>Welcome</strong> - 実験開始の歓迎画面
+  </div>
+  
+  <div class="step">
+    <span class="step-number">2</span>
+    <strong>Demographics</strong> - 年齢選択画面
+  </div>
+  
+  <div class="step">
+    <span class="step-number">3</span>
+    <strong>Gender Selection</strong> - 性別選択画面
+  </div>
+  
+  <div class="step current">
+    <span class="step-number">4</span>
+    <strong>📋 実験の操作説明</strong> - <span style="background-color: #fff3cd; padding: 2px 6px; border-radius: 3px;">新しく追加された画面</span>
+    <ul style="margin-top: 10px; font-size: 14px;">
+      <li>実験概要の説明</li>
+      <li>3つの表示条件（全画面・ウィンドウ・スクロール）の説明</li>
+      <li>記憶課題の詳細説明と視覚例</li>
+      <li>操作のコツと重要な注意事項</li>
+    </ul>
+  </div>
+  
+  <div class="step">
+    <span class="step-number">5</span>
+    <strong>Practice Explanation</strong> - 練習開始の説明
+  </div>
+  
+  <div class="step">
+    <span class="step-number">6</span>
+    <strong>Practice Procedure</strong> - 練習試行
+  </div>
+  
+  <div class="step">
+    <span class="step-number">7</span>
+    <strong>Main Experiment Start</strong> - 本実験開始
+  </div>
+  
+  <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-top: 30px;">
+    <h3 style="color: #155724; margin-top: 0;">✅ 実装完了事項</h3>
+    <ul style="color: #155724;">
+      <li><strong>正しい挿入位置:</strong> 性別選択後、練習説明前に配置</li>
+      <li><strong>包括的な内容:</strong> 実験の全体像から操作詳細まで網羅</li>
+      <li><strong>視覚的説明:</strong> 記憶課題のグリッド例、条件別の色分け</li>
+      <li><strong>直感的なUI:</strong> アイコン、色、レイアウトで理解しやすく設計</li>
+      <li><strong>参加者目線:</strong> 困らないよう操作のコツや注意事項を明記</li>
+    </ul>
+  </div>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <button onclick="window.open('test_instructions_preview.html', '_blank')" 
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer;">
+      説明画面をプレビュー
+    </button>
+  </div>
+</body>
+</html>

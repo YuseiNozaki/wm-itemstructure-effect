@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Instructions Integration Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="../styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script>
+    // Test if jsPsych is loaded
+    if (typeof initJsPsych === 'undefined') {
+      document.body.innerHTML = '<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;"><h1 style="color: red;">Failed to load jsPsych - CDN blocked</h1><p>This test validates the instruction screen integration into the main experiment flow.</p><p>The test shows the expected flow: Welcome → Demographics → Gender → <strong>Instructions</strong> → Practice</p></div>';
+    } else {
+      // Initialize jsPsych
+      const jsPsych = initJsPsych({
+        on_finish: function() {
+          jsPsych.data.displayData();
+        }
+      });
+
+      // Mock welcome screen
+      const welcome = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>Welcome</h1><p>Press any key to continue</p>',
+        choices: "ALL_KEYS"
+      };
+
+      // Mock demographics (simplified)
+      const demographics = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>Demographics</h1><p>Age: 25</p><p>Press any key to continue</p>',
+        choices: "ALL_KEYS"
+      };
+
+      // Mock gender selection (simplified)  
+      const genderSelection = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>Gender Selection</h1><p>Gender: Male</p><p>Press any key to continue</p>',
+        choices: "ALL_KEYS"
+      };
+
+      // Comprehensive experiment instruction screen (from main experiment)
+      const experimentInstructions = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function() {
+          let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.6;">';
+          
+          // Main title
+          html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px; font-size: 28px;">実験の操作説明</h1>';
+          
+          // Experiment overview section
+          html += '<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #007bff;">';
+          html += '<h2 style="color: #007bff; margin-top: 0; font-size: 20px;">🔍 実験の概要</h2>';
+          html += '<p style="font-size: 16px; margin: 10px 0;">この実験では、画面上に散らばった図形の中から<strong>指定された色と形の組み合わせ</strong>を見つけてクリックする課題を行います。</p>';
+          html += '<p style="font-size: 16px; margin: 10px 0;">実験は<strong>2つのブロック</strong>に分かれており、後半では記憶課題も同時に行います。</p>';
+          html += '</div>';
+          
+          // Simplified for integration test - show key sections
+          html += '<div style="background-color: #d1ecf1; border: 2px solid #bee5eb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">';
+          html += '<h2 style="color: #0c5460; margin-top: 0; font-size: 20px;">📋 統合テスト</h2>';
+          html += '<p style="font-size: 16px;">このテストでは、説明画面が正しいタイミングで表示されることを確認します。</p>';
+          html += '<p style="font-size: 16px;"><strong>タイムライン位置:</strong> Welcome → Demographics → Gender → <span style="background-color: yellow; padding: 2px 6px;">Instructions</span> → Practice</p>';
+          html += '</div>';
+          
+          // Continue button
+          html += '<div style="text-align: center; margin-top: 30px;">';
+          html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; font-size: 18px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">練習を開始する</button>';
+          html += '</div>';
+          
+          html += '</div>';
+          
+          return html;
+        },
+        choices: "NO_KEYS",
+        on_load: function() {
+          // Add click event listener to continue button
+          const continueBtn = document.getElementById('instructions-continue-btn');
+          continueBtn.addEventListener('click', function() {
+            jsPsych.finishTrial({
+              user_action: 'continue_to_practice'
+            });
+          });
+        }
+      };
+
+      // Mock practice explanation 
+      const practiceExplanation = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h1>Practice Explanation</h1><p>You successfully reached the practice section!</p><p>Press any key to complete test</p>',
+        choices: "ALL_KEYS"
+      };
+
+      // Test timeline showing the instruction screen integration
+      const timeline = [
+        welcome,
+        demographics, 
+        genderSelection,
+        experimentInstructions,  // The new instructions screen is inserted here
+        practiceExplanation
+      ];
+
+      // Run the integration test
+      jsPsych.run(timeline);
+    }
+  </script>
+</body>
+</html>
