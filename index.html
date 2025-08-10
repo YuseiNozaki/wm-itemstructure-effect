@@ -1857,6 +1857,15 @@
       firstBlockProcedureData = withoutMemoryDesign;
       secondBlockProcedureData = withMemoryDesign;
     }
+
+    // Record counterbalancing assignment in experimental data
+    jsPsych.data.addProperties({
+      counterbalancing_condition: typeof CONDITION !== 'undefined' ? CONDITION : 'local_random',
+      memory_first_block: memoryFirstCondition,
+      block1_memory_load: memoryFirstCondition ? 'with-memory' : 'without-memory',
+      block2_memory_load: memoryFirstCondition ? 'without-memory' : 'with-memory',
+      assignment_source: typeof CONDITION !== 'undefined' ? 'cognition_run' : 'local_testing'
+    });
     
     // Build timeline procedure for a single trial
     const trialProcedure = {
