@@ -121,6 +121,6 @@ The experiment collects:
 - Consider adding progress indicators for participant experience
 
 ### Performance Optimization
-- The experiment is optimized for smooth performance with 30 objects per trial
+- The experiment is optimized for smooth performance with 25 objects per trial
 - Canvas operations are efficient for real-time mouse tracking
 - Memory usage is minimal with dynamic element creation/destruction
