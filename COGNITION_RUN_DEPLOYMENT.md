@@ -69,6 +69,14 @@ This project is designed for deployment on cognition.run platform. The experimen
 - **Memory Load:** 2 conditions (with/without working memory task)
 - **Total Trials:** 120 main trials + practice trials
 
+### Memory Load Counterbalancing
+The experiment implements automatic counterbalancing for memory load conditions using cognition.run's CONDITION variable:
+- **CONDITION = 0, 2, 4... (even values):** Without memory → With memory
+- **CONDITION = 1, 3, 5... (odd values):** With memory → Without memory
+- **Local testing:** Random assignment when CONDITION variable is unavailable
+
+This ensures balanced assignment across participants while maintaining local testing capability.
+
 ### Data Output
 The experiment collects:
 - Reaction times and accuracy for visual search tasks
@@ -76,6 +84,7 @@ The experiment collects:
 - Working memory task performance (when applicable)
 - Demographic information (age, gender)
 - Trial-by-trial condition information
+- Counterbalancing assignment data (CONDITION value, block order, assignment source)
 
 ## Verification and Testing
 
@@ -118,6 +127,7 @@ The experiment collects:
 - Enable fullscreen mode in experiment settings
 - Configure data export to include all trial data
 - Set appropriate time limits for experiment completion
+- **Configure CONDITION variable for counterbalancing:** Assign sequential values (0,1,2,3...) to ensure balanced memory load assignment across participants
 - Consider adding progress indicators for participant experience
 
 ### Performance Optimization
