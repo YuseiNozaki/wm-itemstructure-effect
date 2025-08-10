@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blank Screen Timing Test</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="../styles.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Create required DOM elements
+    const targetDiv = document.createElement('div');
+    targetDiv.id = 'jspsych-target';
+    document.body.appendChild(targetDiv);
+
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Blank screen display (500ms white screen)
+    const blankScreen = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background-color: white;">
+        </div>
+      `,
+      choices: "NO_KEYS",
+      trial_duration: 500,
+      data: {
+        task: 'blank_screen'
+      }
+    };
+
+    // Simple target display for testing
+    const showTarget = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background-color: lightgray;">
+          <div style="margin: 20px auto; width: 100px; height: 100px; background-color: red; border-radius: 50%;"></div>
+        </div>
+      `,
+      choices: "NO_KEYS",
+      trial_duration: 1000,
+      data: {
+        task: 'show_target'
+      }
+    };
+
+    // Instruction screen
+    const instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+          <div style="text-align: center;">
+            <h2>Blank Screen Timing Test</h2>
+            <p>You will see:</p>
+            <ol style="text-align: left;">
+              <li>This instruction screen</li>
+              <li>Blank screen (500ms)</li>
+              <li>Target display (1000ms)</li>
+              <li>Blank screen (500ms)</li>
+              <li>End screen</li>
+            </ol>
+            <p>Press SPACE to start</p>
+          </div>
+        </div>
+      `,
+      choices: [' '],
+      data: {
+        task: 'instructions'
+      }
+    };
+
+    const endScreen = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+          <div style="text-align: center;">
+            <h2>Test Complete</h2>
+            <p>Timing sequence completed.</p>
+            <p>Check the console for timing data.</p>
+            <p>Press SPACE to view data</p>
+          </div>
+        </div>
+      `,
+      choices: [' '],
+      data: {
+        task: 'end'
+      }
+    };
+
+    // Test timeline: instructions -> blank -> target -> blank -> end
+    const timeline = [
+      instructions,
+      blankScreen,
+      showTarget,
+      blankScreen,
+      endScreen
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
