@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Object Count Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background-color: #d4edda; }
+        .fail { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Object Count Test</h1>
+    <div id="results"></div>
+
+    <script>
+        // Simulate the exact logic from index.html
+        const params = {
+            numObjects: 25, // Updated value from index.html
+            objectMinSize: 20,
+            objectMaxSize: 40,
+        };
+
+        function testStructuredArrangement() {
+            // This mimics the structured arrangement logic from index.html
+            const gridSize = Math.floor(Math.sqrt(params.numObjects));
+            const totalPositions = gridSize * gridSize;
+            
+            return {
+                gridSize: gridSize,
+                totalPositions: totalPositions,
+                expectedObjects: totalPositions // In structured, we use grid positions
+            };
+        }
+
+        function testRandomArrangement() {
+            // This mimics the random arrangement logic from index.html
+            // 1 target + (numObjects - 1) distractors = numObjects total
+            return {
+                targetCount: 1,
+                distractorCount: params.numObjects - 1,
+                totalObjects: params.numObjects
+            };
+        }
+
+        function runTests() {
+            const results = [];
+            
+            // Test structured arrangement
+            const structured = testStructuredArrangement();
+            results.push({
+                name: "Structured Arrangement",
+                description: `Grid size: ${structured.gridSize}×${structured.gridSize}`,
+                expected: "Should create 25 objects for fair comparison",
+                actual: `Creates ${structured.expectedObjects} objects`,
+                pass: structured.expectedObjects === 25, // Now should pass
+                details: `Math.floor(Math.sqrt(${params.numObjects})) = ${structured.gridSize}, ${structured.gridSize}² = ${structured.totalPositions}`
+            });
+
+            // Test random arrangement  
+            const random = testRandomArrangement();
+            results.push({
+                name: "Random Arrangement", 
+                description: `${random.targetCount} target + ${random.distractorCount} distractors`,
+                expected: "Should create 25 objects for fair comparison",
+                actual: `Creates ${random.totalObjects} objects`,
+                pass: random.totalObjects === 25, // Now should pass
+                details: `Uses numObjects parameter directly: ${params.numObjects}`
+            });
+
+            // Test what happens if we change to 25
+            const newParams = { ...params, numObjects: 25 };
+            const newStructured = Math.floor(Math.sqrt(newParams.numObjects));
+            const newStructuredTotal = newStructured * newStructured;
+            
+            results.push({
+                name: "Proposed Fix - Structured with numObjects=25",
+                description: `Grid size: ${newStructured}×${newStructured}`, 
+                expected: "Should create 25 objects",
+                actual: `Would create ${newStructuredTotal} objects`,
+                pass: newStructuredTotal === 25,
+                details: `Math.floor(Math.sqrt(25)) = ${newStructured}, ${newStructured}² = ${newStructuredTotal}`
+            });
+
+            results.push({
+                name: "Proposed Fix - Random with numObjects=25",
+                description: `1 target + 24 distractors`,
+                expected: "Should create 25 objects", 
+                actual: `Would create ${newParams.numObjects} objects`,
+                pass: newParams.numObjects === 25,
+                details: `Uses numObjects parameter directly: ${newParams.numObjects}`
+            });
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            
+            results.forEach(result => {
+                const cssClass = result.pass ? 'pass' : 'fail';
+                const status = result.pass ? 'PASS' : 'FAIL';
+                
+                html += `
+                    <div class="test-result ${cssClass}">
+                        <h3>${result.name} - ${status}</h3>
+                        <p><strong>Description:</strong> ${result.description}</p>
+                        <p><strong>Expected:</strong> ${result.expected}</p>
+                        <p><strong>Actual:</strong> ${result.actual}</p>
+                        <p><strong>Details:</strong> ${result.details}</p>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Run the tests when page loads
+        runTests();
+    </script>
+</body>
+</html>

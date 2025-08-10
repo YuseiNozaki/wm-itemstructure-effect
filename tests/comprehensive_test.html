@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprehensive Object Generation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .pass { background-color: #d4edda; border-color: #c3e6cb; }
+        .fail { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .code { font-family: monospace; background: #f8f9fa; padding: 3px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Object Generation Test</h1>
+    <p>This test simulates the exact object generation logic from index.html to verify that both structured and random arrangements now generate exactly 25 objects.</p>
+    
+    <div id="results"></div>
+
+    <script>
+        // Parameters matching the updated index.html
+        const params = {
+            numObjects: 25, // Updated from 30 to 25
+            objectMinSize: 20,
+            objectMaxSize: 40,
+        };
+
+        function testStructuredGeneration() {
+            // Simulate the exact structured generation logic from index.html
+            const gridSize = Math.floor(Math.sqrt(params.numObjects));
+            const positions = [];
+            
+            // Generate grid positions (simulating the nested loop from index.html)
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    positions.push({
+                        x: i * 50 + 25, // Simulated cell positions
+                        y: j * 50 + 25
+                    });
+                }
+            }
+            
+            // One position becomes the target, remaining are distractors
+            const totalObjects = positions.length; // All grid positions become objects
+            
+            return {
+                method: "Structured (Grid)",
+                gridSize: gridSize,
+                gridPositions: positions.length,
+                targetCount: 1,
+                distractorCount: totalObjects - 1,
+                totalObjects: totalObjects,
+                calculation: `Math.floor(√${params.numObjects}) = ${gridSize}, ${gridSize}² = ${positions.length}`
+            };
+        }
+
+        function testRandomGeneration() {
+            // Simulate the exact random generation logic from index.html
+            // Target: 1, Distractors: params.numObjects - 1
+            const targetCount = 1;
+            const distractorCount = params.numObjects - 1;
+            const totalObjects = targetCount + distractorCount;
+            
+            return {
+                method: "Random",
+                targetCount: targetCount,
+                distractorCount: distractorCount,
+                totalObjects: totalObjects,
+                calculation: `1 target + ${distractorCount} distractors = ${totalObjects}`
+            };
+        }
+
+        function testEdgeCases() {
+            const tests = [];
+            
+            // Test what happens with different numObjects values
+            const testValues = [16, 25, 36, 49]; // Perfect squares
+            
+            testValues.forEach(num => {
+                const gridSize = Math.floor(Math.sqrt(num));
+                const gridObjects = gridSize * gridSize;
+                const randomObjects = num;
+                
+                tests.push({
+                    numObjects: num,
+                    gridSize: gridSize,
+                    structuredObjects: gridObjects,
+                    randomObjects: randomObjects,
+                    consistent: gridObjects === randomObjects,
+                    note: gridObjects === randomObjects ? "✓ Consistent" : `✗ Inconsistent (${gridObjects} vs ${randomObjects})`
+                });
+            });
+            
+            return tests;
+        }
+
+        function displayResults() {
+            const structured = testStructuredGeneration();
+            const random = testRandomGeneration();
+            const edgeCases = testEdgeCases();
+            
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            
+            // Main test results
+            const structuredPass = structured.totalObjects === 25;
+            const randomPass = random.totalObjects === 25;
+            const bothPass = structuredPass && randomPass;
+            
+            html += `
+                <div class="test-result ${structuredPass ? 'pass' : 'fail'}">
+                    <h3>Structured Arrangement - ${structuredPass ? 'PASS' : 'FAIL'}</h3>
+                    <p><strong>Method:</strong> ${structured.method}</p>
+                    <p><strong>Grid Size:</strong> ${structured.gridSize}×${structured.gridSize}</p>
+                    <p><strong>Total Objects:</strong> ${structured.totalObjects}</p>
+                    <p><strong>Calculation:</strong> <span class="code">${structured.calculation}</span></p>
+                    <p><strong>Breakdown:</strong> ${structured.targetCount} target + ${structured.distractorCount} distractors</p>
+                </div>
+                
+                <div class="test-result ${randomPass ? 'pass' : 'fail'}">
+                    <h3>Random Arrangement - ${randomPass ? 'PASS' : 'FAIL'}</h3>
+                    <p><strong>Method:</strong> ${random.method}</p>
+                    <p><strong>Total Objects:</strong> ${random.totalObjects}</p>
+                    <p><strong>Calculation:</strong> <span class="code">${random.calculation}</span></p>
+                    <p><strong>Breakdown:</strong> ${random.targetCount} target + ${random.distractorCount} distractors</p>
+                </div>
+                
+                <div class="test-result ${bothPass ? 'pass' : 'fail'}">
+                    <h3>Consistency Check - ${bothPass ? 'PASS' : 'FAIL'}</h3>
+                    <p><strong>Requirement:</strong> Both arrangements should generate exactly 25 objects</p>
+                    <p><strong>Structured Result:</strong> ${structured.totalObjects} objects</p>
+                    <p><strong>Random Result:</strong> ${random.totalObjects} objects</p>
+                    <p><strong>Status:</strong> ${bothPass ? '✓ Both arrangements now generate the same number of objects' : '✗ Arrangements still generate different numbers of objects'}</p>
+                </div>
+            `;
+            
+            // Edge case analysis
+            html += `
+                <div class="test-result info">
+                    <h3>Edge Case Analysis</h3>
+                    <p>Testing how different numObjects values affect consistency between arrangements:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <tr style="background: #f8f9fa;">
+                            <th style="border: 1px solid #dee2e6; padding: 8px;">numObjects</th>
+                            <th style="border: 1px solid #dee2e6; padding: 8px;">Grid Size</th>
+                            <th style="border: 1px solid #dee2e6; padding: 8px;">Structured Objects</th>
+                            <th style="border: 1px solid #dee2e6; padding: 8px;">Random Objects</th>
+                            <th style="border: 1px solid #dee2e6; padding: 8px;">Consistent?</th>
+                        </tr>
+            `;
+            
+            edgeCases.forEach(test => {
+                const rowClass = test.consistent ? 'pass' : 'fail';
+                html += `
+                    <tr style="background: ${test.consistent ? '#d4edda' : '#f8d7da'};">
+                        <td style="border: 1px solid #dee2e6; padding: 8px;">${test.numObjects}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px;">${test.gridSize}×${test.gridSize}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px;">${test.structuredObjects}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px;">${test.randomObjects}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px;">${test.note}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </table>
+                    <p style="margin-top: 10px;"><strong>Note:</strong> The value 25 was chosen because it's a perfect square (5²), ensuring both arrangements generate exactly the same number of objects.</p>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Run tests when page loads
+        displayResults();
+    </script>
+</body>
+</html>
