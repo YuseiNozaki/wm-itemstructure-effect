@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Short Content Layout Test</title>
+  <link href="../styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="jspsych-target">
+    <div class="jspsych-content">
+      <div style="text-align: center;">
+        <h1>短いコンテンツのテスト</h1>
+        <p>これは短いコンテンツです。</p>
+        <p>画面中央に表示されるはずです。</p>
+        <button style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">続行</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const target = document.getElementById('jspsych-target');
+      const content = target.querySelector('.jspsych-content');
+      
+      console.log('Short content height:', content.offsetHeight);
+      console.log('Viewport height:', window.innerHeight);
+      console.log('Content is properly centered:', content.offsetHeight < window.innerHeight);
+    });
+  </script>
+</body>
+</html>
