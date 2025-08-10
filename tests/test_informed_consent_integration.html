@@ -83,9 +83,7 @@
     <div class="arrow">→</div>
     <div class="timeline-step highlight">Informed Consent</div>
     <div class="arrow">→</div>
-    <div class="timeline-step">Demographics</div>
-    <div class="arrow">→</div>
-    <div class="timeline-step">Gender</div>
+    <div class="timeline-step">Combined Demographics</div>
     <div class="arrow">→</div>
     <div class="timeline-step">Instructions</div>
     <div class="arrow">→</div>
@@ -144,17 +142,20 @@
             results.push({ status: 'fail', message: '✗ Informed consent is not in timeline' });
           }
           
-          // Test 6: Check timeline order (welcome -> informedConsent -> demographics)
+          // Test 6: Check timeline order (welcome -> informedConsent -> demographics) and that genderSelection is removed
           const timelineMatch = html.match(/const timeline = \[([\s\S]*?)\];/);
           if (timelineMatch) {
             const timelineContent = timelineMatch[1];
             const welcomeIndex = timelineContent.indexOf('welcome');
             const consentIndex = timelineContent.indexOf('informedConsent');
             const demographicsIndex = timelineContent.indexOf('demographics');
+            const genderSelectionExists = timelineContent.includes('genderSelection');
             
-            if (welcomeIndex < consentIndex && consentIndex < demographicsIndex) {
-              results.push({ status: 'pass', message: '✓ Timeline order is correct: welcome → informedConsent → demographics' });
+            if (welcomeIndex < consentIndex && consentIndex < demographicsIndex && !genderSelectionExists) {
+              results.push({ status: 'pass', message: '✓ Timeline order is correct: welcome → informedConsent → demographics (genderSelection removed)' });
               passCount++;
+            } else if (genderSelectionExists) {
+              results.push({ status: 'fail', message: '✗ genderSelection still exists in timeline (should be combined with demographics)' });
             } else {
               results.push({ status: 'fail', message: '✗ Timeline order is incorrect' });
             }
