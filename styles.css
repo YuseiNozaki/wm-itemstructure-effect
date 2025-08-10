@@ -57,78 +57,111 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 100px);
   grid-template-rows: repeat(4, 100px);
-  gap: 5px;
+  gap: 8px;
   margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 .memory-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.memory-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 .memory-cell.highlighted {
-  background-color: #ffcc00;
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
+  box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
 }
 .memory-cell.selected {
-  background-color: #66aaff;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
 }
 .memory-reproduction-grid {
   display: grid;
   grid-template-columns: repeat(4, 100px);
   grid-template-rows: repeat(4, 100px);
-  gap: 5px;
+  gap: 8px;
   margin: 20px auto;
+  padding: 20px;
+  background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 .reproduction-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .reproduction-cell:hover {
-  background-color: #e0e0e0;
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 .reproduction-cell.selected {
-  background-color: #66aaff;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
 }
 .memory-submit-btn {
   padding: 12px 24px;
   font-size: 16px;
-  background-color: #007bff;
+  background: linear-gradient(145deg, #10b981, #059669);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   margin: 20px auto;
   display: block;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
 }
 .memory-submit-btn:hover {
-  background-color: #0056b3;
+  background: linear-gradient(145deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(16, 185, 129, 0.3);
 }
 .memory-submit-btn:disabled {
-  background-color: #ccc;
+  background: linear-gradient(145deg, #d1d5db, #9ca3af);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 .memory-reset-btn {
   padding: 8px 16px;
   font-size: 14px;
-  background-color: #6c757d;
+  background: linear-gradient(145deg, #6b7280, #4b5563);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   margin: 10px auto;
   display: block;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 .memory-reset-btn:hover {
-  background-color: #545b62;
+  background: linear-gradient(145deg, #4b5563, #374151);
+  transform: translateY(-1px);
 }
 .memory-choice-container {
   display: flex;
@@ -140,29 +173,38 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 80px);
   grid-template-rows: repeat(4, 80px);
-  gap: 3px;
+  gap: 4px;
   margin: 0 auto;
-  border: 3px solid transparent;
-  padding: 10px;
+  border: 3px solid #e5e7eb;
+  padding: 12px;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffffff, #f9fafb);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .memory-choice-grid:hover {
-  border-color: #ccc;
+  border-color: #9ca3af;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 .memory-choice-grid.selected {
-  border-color: #007bff;
-  background-color: #f8f9fa;
+  border-color: #3b82f6;
+  background: linear-gradient(145deg, #eff6ff, #dbeafe);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
 }
 .choice-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
 .choice-cell.highlighted {
-  background-color: #ffcc00;
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
 }
 .hidden {
   display: none !important;

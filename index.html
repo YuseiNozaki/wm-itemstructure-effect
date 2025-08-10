@@ -9,6 +9,7 @@
   <script src="https://unpkg.com/@jspsych/plugin-instructions@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
   <link href="styles.css" rel="stylesheet" type="text/css" />
 </head>
@@ -232,11 +233,39 @@
     // Welcome screen
     const welcome = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
-                '<p>下の「次へ」ボタンをクリックして実験を開始してください。</p>' +
-                '<div style="margin: 20px 0;">' +
-                '<button id="welcome-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>' +
-                '</div>',
+      stimulus: `
+        <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
+          <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full text-center">
+            <div class="mb-8">
+              <svg class="w-16 h-16 mx-auto mb-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">視覚探索実験へようこそ</h1>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+              この度は実験にご参加いただき、誠にありがとうございます。<br>
+              約30分の心理学実験にお付き合いください。
+            </p>
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 text-left">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-blue-700">
+                    実験は集中できる静かな環境で行ってください。途中での中断も可能です。
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button id="welcome-next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              実験を開始する
+            </button>
+          </div>
+        </div>
+      `,
       choices: "NO_KEYS",
       on_load: function() {
         // Ensure no fullscreen listeners are active during welcome
@@ -254,78 +283,155 @@
     const informedConsent = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; font-size: 14px;">';
-        html += '<h1 style="text-align: center; color: #333; margin-bottom: 30px;">研究に関する同意事項</h1>';
+        let html = `
+          <div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+              <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-slate-100 rounded-lg mb-4">
+                  <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">研究に関する同意事項</h1>
+                <p class="text-gray-600">実験参加前に必ずお読みください</p>
+              </div>
+              
+              <div id="consent-content" class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-6 mb-8 bg-gray-50 text-left space-y-6">`;
         
-        // Scrollable content area
-        html += '<div id="consent-content" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; background-color: #f9f9f9; text-align: left;">';
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">1</span>
+                    研究の目的
+                  </h3>
+                  <p class="text-gray-700 leading-relaxed">本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>
+                </div>`;
         
-        html += '<h3>1. 研究の目的</h3>';
-        html += '<p>本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>';
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
+                    実験内容
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-green-500 mr-2">•</span>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>
+                    <li class="flex items-start"><span class="text-green-500 mr-2">•</span>所要時間：約 30 分（説明等を含む）</li>
+                    <li class="flex items-start"><span class="text-green-500 mr-2">•</span>課題内容：ご自身の PC からアクセスしていただき、画面上に表示される特定の図形の場所を探す課題に、繰り返し取り組んでいただきます。</li>
+                    <li class="flex items-start"><span class="text-green-500 mr-2">•</span>収集するデータ：氏名、メールアドレス（謝礼支払い目的のみ）、性別、年齢、反応時間、課題の成績、カーソルの移動履歴</li>
+                  </ul>
+                </div>`;
         
-        html += '<h3>2. 実験内容</h3>';
-        html += '<ul>';
-        html += '<li>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>';
-        html += '<li>所要時間：約 30 分（説明等を含む）</li>';
-        html += '<li>課題内容：ご自身の PC からアクセスしていただき、画面上に表示される特定の図形の場所を探す課題に、繰り返し取り組んでいただきます。</li>';
-        html += '<li>収集するデータ：氏名、メールアドレス（謝礼支払い目的のみ）、性別、年齢、反応時間、課題の成績、カーソルの移動履歴</li>';
-        html += '</ul>';
-        
-        html += '<h3>3. 参加条件</h3>';
-        html += '<ul>';
-        html += '<li>18 歳以上の方。</li>';
-        html += '<li>正常または矯正視力を有し、課題の理解に支障がない方。</li>';
-        html += '<li>静かで落ち着いた場所から自身のパソコンを使って、オンラインで実験に参加できる方。</li>';
-        html += '</ul>';
-        
-        html += '<h3>4. 予想される不利益・リスクと対処</h3>';
-        html += '<ul>';
-        html += '<li>画面注視による目の疲れ、ストレス等が生じる可能性があります。</li>';
-        html += '<li>不快・体調不良時はいつでも中断・中止できます。</li>';
-        html += '</ul>';
-        
-        html += '<h3>5. 研究成果の公開</h3>';
-        html += '<p>この研究の成果は、博士論文および心理系の学会で発表を行う予定です。その際に収集したデータを公開することがありますが、情報から個人が特定されない形式での公開を行います。</p>';
-        
-        html += '<h3>6. 謝礼・費用</h3>';
-        html += '<ul>';
-        html += '<li>謝礼として、PayPayなどに交換可能なデジタルギフト「デジコ」を 300 円分お支払いいたします。</li>';
-        html += '<li>「デジコ」のお支払いに必要なため、氏名とメールアドレスをご回答いただきます。</li>';
-        html += '<li>参加に費用はかかりません（通信費等は参加者負担となります）。</li>';
-        html += '</ul>';
-        
-        html += '<h3>7. 任意参加・撤回の自由</h3>';
-        html += '<ul>';
-        html += '<li>参加は完全に任意です。また理由を問わず、途中で撤回できます。</li>';
-        html += '<li>参加を撤回した場合や途中で中止とした場合にも、不利益は一切ありません。</li>';
-        html += '</ul>';
-        
-        html += '<h3>8. 個人情報とデータの取扱い</h3>';
-        html += '<ul>';
-        html += '<li>データは ID で管理し、氏名等の識別情報と分離して保管します。</li>';
-        html += '<li>データは研究実施者および指導教員のみが閲覧可能な状態で保存します。</li>';
-        html += '<li>データの第三者提供は原則行いません。学会・論文等では統計的に集計した形で公表します。</li>';
-        html += '<li>実験実施上で得られた個人情報等は、すべて守秘をお約束し、外部から閲覧不可の状態で厳重に管理いたします。</li>';
-        html += '</ul>';
-        
-        html += '<h3>9. お問い合わせ先</h3>';
-        html += '<p><strong>研究実施者：</strong>野﨑 優晴（東京学芸大学大学院 連合学校教育学研究科 博士課程）<br>';
-        html += 'E-mail：r241004y@st.u-gakugei.ac.jp</p>';
-        html += '<p><strong>指導教員：</strong>関口 貴裕（東京学芸大学 教育心理学講座 教授）<br>';
-        html += 'E-mail：sekiguti@u-gakugei.ac.jp</p>';
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-orange-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">3</span>
+                    参加条件
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-orange-500 mr-2">•</span>18 歳以上の方。</li>
+                    <li class="flex items-start"><span class="text-orange-500 mr-2">•</span>正常または矯正視力を有し、課題の理解に支障がない方。</li>
+                    <li class="flex items-start"><span class="text-orange-500 mr-2">•</span>静かで落ち着いた場所から自身のパソコンを使って、オンラインで実験に参加できる方。</li>
+                  </ul>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-red-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">4</span>
+                    予想される不利益・リスクと対処
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-red-500 mr-2">•</span>画面注視による目の疲れ、ストレス等が生じる可能性があります。</li>
+                    <li class="flex items-start"><span class="text-red-500 mr-2">•</span>不快・体調不良時はいつでも中断・中止できます。</li>
+                  </ul>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">5</span>
+                    研究成果の公開
+                  </h3>
+                  <p class="text-gray-700 leading-relaxed">この研究の成果は、博士論文および心理系の学会で発表を行う予定です。その際に収集したデータを公開することがありますが、情報から個人が特定されない形式での公開を行います。</p>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">6</span>
+                    謝礼・費用
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-indigo-500 mr-2">•</span>謝礼として、PayPayなどに交換可能なデジタルギフト「デジコ」を 300 円分お支払いいたします。</li>
+                    <li class="flex items-start"><span class="text-indigo-500 mr-2">•</span>「デジコ」のお支払いに必要なため、氏名とメールアドレスをご回答いただきます。</li>
+                    <li class="flex items-start"><span class="text-indigo-500 mr-2">•</span>参加に費用はかかりません（通信費等は参加者負担となります）。</li>
+                  </ul>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-teal-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">7</span>
+                    任意参加・撤回の自由
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-teal-500 mr-2">•</span>参加は完全に任意です。また理由を問わず、途中で撤回できます。</li>
+                    <li class="flex items-start"><span class="text-teal-500 mr-2">•</span>参加を撤回した場合や途中で中止とした場合にも、不利益は一切ありません。</li>
+                  </ul>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-cyan-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-cyan-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">8</span>
+                    個人情報とデータの取扱い
+                  </h3>
+                  <ul class="text-gray-700 leading-relaxed space-y-2">
+                    <li class="flex items-start"><span class="text-cyan-500 mr-2">•</span>データは ID で管理し、氏名等の識別情報と分離して保管します。</li>
+                    <li class="flex items-start"><span class="text-cyan-500 mr-2">•</span>データは研究実施者および指導教員のみが閲覧可能な状態で保存します。</li>
+                    <li class="flex items-start"><span class="text-cyan-500 mr-2">•</span>データの第三者提供は原則行いません。学会・論文等では統計的に集計した形で公表します。</li>
+                    <li class="flex items-start"><span class="text-cyan-500 mr-2">•</span>実験実施上で得られた個人情報等は、すべて守秘をお約束し、外部から閲覧不可の状態で厳重に管理いたします。</li>
+                  </ul>
+                </div>`;
+
+        html += `
+                <div class="bg-white p-4 rounded-lg border-l-4 border-slate-500">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <span class="bg-slate-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">9</span>
+                    お問い合わせ先
+                  </h3>
+                  <div class="text-gray-700 leading-relaxed space-y-3">
+                    <div class="bg-gray-50 p-3 rounded">
+                      <p class="font-semibold">研究実施者：</p>
+                      <p>野﨑 優晴（東京学芸大学大学院 連合学校教育学研究科 博士課程）</p>
+                      <p class="text-blue-600">E-mail：r241004y@st.u-gakugei.ac.jp</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded">
+                      <p class="font-semibold">指導教員：</p>
+                      <p>関口 貴裕（東京学芸大学 教育心理学講座 教授）</p>
+                      <p class="text-blue-600">E-mail：sekiguti@u-gakugei.ac.jp</p>
+                    </div>
+                  </div>
+                </div>`;
         
         html += '</div>'; // End of scrollable content
         
         // Consent checkbox and button
-        html += '<div style="text-align: center; margin: 20px 0;">';
-        html += '<label style="display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 20px;">';
-        html += '<input type="checkbox" id="consent-checkbox" style="margin-right: 10px; transform: scale(1.2);"> ';
-        html += '上記の内容を確認し、研究参加に同意します';
-        html += '</label>';
-        html += '<button id="consent-next-btn" disabled style="padding: 12px 24px; font-size: 16px; background-color: #ccc; color: #666; border: none; border-radius: 5px; cursor: not-allowed; transition: all 0.3s;">次へ進む</button>';
-        html += '</div>';
-        
-        html += '</div>';
+        html += `
+              <div class="text-center border-t pt-6">
+                <label class="inline-flex items-center mb-6 cursor-pointer">
+                  <input type="checkbox" id="consent-checkbox" class="w-5 h-5 text-slate-600 border-gray-300 rounded focus:ring-slate-500 focus:ring-2">
+                  <span class="ml-3 text-lg text-gray-700 font-medium">上記の内容を確認し、研究参加に同意します</span>
+                </label>
+                <div>
+                  <button id="consent-next-btn" disabled class="bg-gray-300 text-gray-500 font-semibold py-3 px-8 rounded-lg cursor-not-allowed transition duration-200 disabled:transform-none">
+                    次へ進む
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
         
         return html;
       },
@@ -341,14 +447,10 @@
         checkbox.addEventListener('change', function() {
           if (checkbox.checked) {
             nextBtn.disabled = false;
-            nextBtn.style.backgroundColor = '#007bff';
-            nextBtn.style.color = 'white';
-            nextBtn.style.cursor = 'pointer';
+            nextBtn.className = 'bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-lg cursor-pointer transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2';
           } else {
             nextBtn.disabled = true;
-            nextBtn.style.backgroundColor = '#ccc';
-            nextBtn.style.color = '#666';
-            nextBtn.style.cursor = 'not-allowed';
+            nextBtn.className = 'bg-gray-300 text-gray-500 font-semibold py-3 px-8 rounded-lg cursor-not-allowed transition duration-200 disabled:transform-none';
           }
         });
         
@@ -370,63 +472,118 @@
     const demographics = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 700px; margin: 0 auto; padding: 20px; text-align: center; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif;">';
-        html += '<h2 style="margin-bottom: 30px; color: #333;">基本情報の入力</h2>';
-        
-        // Information about data usage
-        html += '<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left; line-height: 1.6;">';
-        html += '<h4 style="color: #495057; margin-top: 0; margin-bottom: 15px;">個人情報の取り扱いについて</h4>';
-        html += '<ul style="margin: 0; padding-left: 20px; color: #6c757d;">';
-        html += '<li style="margin-bottom: 8px;"><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</li>';
-        html += '<li style="margin-bottom: 0;">謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</li>';
-        html += '</ul>';
-        html += '</div>';
-        
-        html += '<form id="demographics-form" style="margin: 20px 0;">';
-        
-        // Name field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="name-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">氏名 <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="text" id="name-input" name="name" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="お名前を入力してください">';
-        html += '</div>';
-        
-        // Email field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="email-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">メールアドレス <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="email" id="email-input" name="email" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="example@example.com">';
-        html += '<small style="color: #6c757d; font-size: 14px; display: block; margin-top: 5px;">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>';
-        html += '</div>';
-        
-        // Age field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">年齢 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="age-select" name="age" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
-        html += '<option value="">選択してください</option>';
+        let html = `
+          <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
+              <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-lg mb-4">
+                  <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">基本情報の入力</h2>
+                <p class="text-gray-600">実験参加に必要な情報をご入力ください</p>
+              </div>
+              
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h4 class="text-sm font-medium text-amber-800 mb-1">個人情報の取り扱いについて</h4>
+                    <div class="text-sm text-amber-700 space-y-1">
+                      <p><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</p>
+                      <p>謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <form id="demographics-form" class="space-y-6">
+                <div>
+                  <label for="name-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                    氏名 <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    id="name-input" 
+                    name="name" 
+                    required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200" 
+                    placeholder="お名前を入力してください"
+                  >
+                </div>
+                
+                <div>
+                  <label for="email-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                    メールアドレス <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    id="email-input" 
+                    name="email" 
+                    required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200" 
+                    placeholder="example@example.com"
+                  >
+                  <p class="mt-1 text-sm text-gray-500">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="age-select" class="block text-sm font-semibold text-gray-700 mb-2">
+                      年齢 <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                      id="age-select" 
+                      name="age" 
+                      required 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
+                    >
+                      <option value="">選択してください</option>`;
 
         // Generate age options from 18 to 100
         for (let i = 18; i <= 100; i++) {
-          html += `<option value="${i}">${i}</option>`;
+          html += `<option value="${i}">${i}歳</option>`;
         }
         
-        html += '</select>';
-        html += '</div>';
-        
-        // Gender field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">性別 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="gender-select" name="gender" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
-        html += '<option value="">選択してください</option>';
-        html += '<option value="男性">男性</option>';
-        html += '<option value="女性">女性</option>';
-        html += '<option value="その他">その他</option>';
-        html += '</select>';
-        html += '</div>';
-        
-        html += '<div style="margin: 30px 0; text-align: center;">';
-        html += '<button type="submit" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">次へ進む</button>';
-        html += '</div>';
-        html += '</form>';
-        html += '</div>';
+        html += `
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label for="gender-select" class="block text-sm font-semibold text-gray-700 mb-2">
+                      性別 <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                      id="gender-select" 
+                      name="gender" 
+                      required 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
+                    >
+                      <option value="">選択してください</option>
+                      <option value="男性">男性</option>
+                      <option value="女性">女性</option>
+                      <option value="その他">その他</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="pt-6 text-center">
+                  <button 
+                    type="submit" 
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  >
+                    次へ進む
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
         
         return html;
       },
@@ -498,6 +655,10 @@
             gender: gender
           });
         });
+      }
+    };
+          });
+        });
       },
       on_finish: function() {
         // After demographics are complete, activate fullscreen
@@ -512,45 +673,69 @@
     const experimentInstructions = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        let html = `
+          <div class="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-6">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+              <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-lg mb-4">
+                  <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                  </svg>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">実験の操作説明</h1>
+                <p class="text-lg text-gray-600">実験の流れと操作方法について説明します</p>
+              </div>
+              
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <div class="flex items-center mb-4">
+                  <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <h2 class="text-xl font-semibold text-blue-800">実験全体の流れ</h2>
+                </div>
+                <div class="space-y-3 text-blue-700">
+                  <p class="text-lg">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>
+                  <p class="text-lg">できるだけ<span class="font-bold text-red-600">早く</span>、<span class="font-bold text-red-600">正確に</span>探してください。</p>
+                  <p class="text-lg">全部終了すると、あなたのスコアが表示されます。</p>
+                </div>
+              </div>
+              
+              <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span class="w-6 h-6 bg-green-500 rounded-full text-white flex items-center justify-center text-sm mr-3">✓</span>
+                  実験の構成
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
         
-        // Main title
-        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">実験の操作説明</h1>';
-        
-        // Experiment overview section
-        html += '<div style="background-color: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">';
-        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">実験全体の流れ</h2>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">できるだけ<strong style="color: #e74c3c;">早く</strong>、<strong style="color: #e74c3c;">正確に</strong>探してください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">全部終了すると、あなたのスコアが表示されます。</p>';
-        html += '</div>';
-        
-        // Experiment flow section  
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">実験の構成</h2>';
-        html += '<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">';
-        
-        // Step boxes
         const steps = [
-          { num: '1', title: '練習', desc: '9回', detail: 'まずは操作に慣れましょう' },
-          { num: '2', title: '前半', desc: '60回', detail: '集中してがんばりましょう' },
-          { num: '3', title: '後半', desc: '60回', detail: '記憶課題も追加されます' }
+          { num: '1', title: '練習', desc: '9回', detail: 'まずは操作に慣れましょう', color: 'from-blue-500 to-blue-600' },
+          { num: '2', title: '前半', desc: '60回', detail: '集中してがんばりましょう', color: 'from-purple-500 to-purple-600' },
+          { num: '3', title: '後半', desc: '60回', detail: '記憶課題も追加されます', color: 'from-indigo-500 to-indigo-600' }
         ];
         
         steps.forEach(step => {
-          html += `<div style="flex: 1; min-width: 220px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">`;
-          html += `<div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">${step.num}</div>`;
-          html += `<div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">${step.title}</div>`;
-          html += `<div style="font-size: 16px; margin-bottom: 8px;">${step.desc}</div>`;
-          html += `<div style="font-size: 14px; opacity: 0.9;">${step.detail}</div>`;
-          html += '</div>';
+          html += `
+            <div class="bg-gradient-to-r ${step.color} text-white p-6 rounded-lg text-center transform hover:scale-105 transition duration-200">
+              <div class="text-3xl font-bold mb-2">${step.num}</div>
+              <div class="text-xl font-semibold mb-2">${step.title}</div>
+              <div class="text-lg mb-2">${step.desc}</div>
+              <div class="text-sm opacity-90">${step.detail}</div>
+            </div>
+          `;
         });
         
-        html += '</div></div>';
-        
-        // Task overview section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">操作の説明</h2>';
+        html += `
+                </div>
+              </div>
+              
+              <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span class="w-6 h-6 bg-red-500 rounded-full text-white flex items-center justify-center text-sm mr-3">!</span>
+                  操作の説明
+                </h2>
+                <div class="space-y-4">`;
         
         const taskSteps = [
           { step: '1', text: '条件の説明が表示されます' },
@@ -560,57 +745,86 @@
         ];
         
         taskSteps.forEach(task => {
-          html += `<div style="background-color: #ffffff; border: 2px solid #dee2e6; border-radius: 8px; padding: 18px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
-          html += `<div style="background-color: #dc3545; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">${task.step}</div>`;
-          html += `<div style="font-size: 16px; color: #333; flex: 1;">${task.text}</div>`;
-          html += '</div>';
+          html += `
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 flex items-start space-x-4 hover:border-red-300 transition duration-200">
+              <div class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">${task.step}</div>
+              <div class="text-gray-700 flex-1">${task.text}</div>
+            </div>
+          `;
         });
         
-        html += '</div>';
-        
-        // Viewing conditions section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">3つの表示パターン</h2>';
+        html += `
+                </div>
+              </div>
+              
+              <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span class="w-6 h-6 bg-purple-500 rounded-full text-white flex items-center justify-center text-sm mr-3">3</span>
+                  3つの表示パターン
+                </h2>
+                <div class="space-y-4">`;
         
         const conditions = [
           {
             name: '全画面',
-            color: '#17a2b8',
+            color: 'blue',
+            bgColor: 'bg-blue-50',
+            borderColor: 'border-blue-300',
+            textColor: 'text-blue-800',
             description: '覚えた図形を探してクリックしてください。'
           },
           {
             name: 'ウィンドウ', 
-            color: '#fd7e14',
+            color: 'orange',
+            bgColor: 'bg-orange-50',
+            borderColor: 'border-orange-300',
+            textColor: 'text-orange-800',
             description: 'ウィンドウが表示されます。ウィンドウをドラッグすることで、隠れている範囲も見ることができます。覚えた図形を見つけたらクリックしてください。'
           },
           {
             name: 'スクロール',
-            color: '#28a745',
+            color: 'green',
+            bgColor: 'bg-green-50',
+            borderColor: 'border-green-300',
+            textColor: 'text-green-800',
             description: 'ウィンドウが中央に固定されています。ドラッグすると背景がスクロールされるので、覚えた図形を探し、見つけたらクリックしてください。'
           }
         ];
         
         conditions.forEach((condition, index) => {
-          html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 10px; padding: 20px; margin-bottom: 20px;">`;
-          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${index + 1}. ${condition.name}</h3>`;
-          html += `<p style="margin: 0; font-size: 16px; color: #333; line-height: 1.6;">${condition.description}</p>`;
-          html += '</div>';
+          html += `
+            <div class="${condition.bgColor} ${condition.borderColor} border-2 rounded-lg p-6">
+              <h3 class="${condition.textColor} text-xl font-semibold mb-3 flex items-center">
+                <span class="w-7 h-7 bg-${condition.color}-500 text-white rounded-full flex items-center justify-center text-sm mr-3">${index + 1}</span>
+                ${condition.name}
+              </h3>
+              <p class="text-gray-700 leading-relaxed">${condition.description}</p>
+            </div>
+          `;
         });
         
-        html += '</div>';
-        
-        // Important message
-        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center;">';
-        html += '<h3 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">⚡ 重要なポイント</h3>';
-        html += '<p style="margin: 0; font-size: 18px; color: #856404; font-weight: bold;">できるだけ早く、正確に図形を見つけてクリックしてください</p>';
-        html += '</div>';
-        
-        // Continue button
-        html += '<div style="text-align: center; margin-top: 40px;">';
-        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">練習を開始する</button>';
-        html += '</div>';
-        
-        html += '</div>';
+        html += `
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-amber-300 rounded-lg p-6 mb-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                  <div class="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center">
+                    <span class="text-xl">⚡</span>
+                  </div>
+                </div>
+                <h3 class="text-xl font-bold text-amber-800 mb-3">重要なポイント</h3>
+                <p class="text-lg font-semibold text-amber-700">できるだけ早く、正確に図形を見つけてクリックしてください</p>
+              </div>
+              
+              <div class="text-center pt-6">
+                <button id="instructions-continue-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-lg">
+                  練習を開始する
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
         
         return html;
       },
@@ -626,15 +840,6 @@
             user_action: 'continue_to_practice'
           });
         });
-        
-        // Add hover effect to button
-        continueBtn.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-2px)';
-        });
-        
-        continueBtn.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0)';
-        });
       }
     };
 
@@ -642,13 +847,56 @@
     const practiceExplanation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-          <p style="font-size: 18px; margin: 20px 0;">はじめに9回練習を行います</p>
-          <p style="font-size: 16px; margin: 20px 0;">
-            <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
-          </p>
-          <div style="margin: 20px 0;">
-            <button id="practice-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        <div class="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 flex items-center justify-center p-6">
+          <div class="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
+            <div class="mb-8">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-cyan-100 rounded-lg mb-4">
+                <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+              </div>
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">練習セッション</h2>
+              <p class="text-lg text-gray-600">本番前に操作に慣れていただきます</p>
+            </div>
+            
+            <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-6 mb-8">
+              <div class="flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-cyan-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">9</div>
+              </div>
+              <p class="text-cyan-800 text-lg font-medium">はじめに9回練習を行います</p>
+              <p class="text-cyan-700 mt-2">操作方法を覚えて、本番に備えましょう</p>
+            </div>
+            
+            <div class="space-y-4 mb-8 text-left">
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="text-gray-700">練習では正解・不正解のフィードバックがあります</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="text-gray-700">リラックスして操作に慣れてください</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="text-gray-700">準備ができたら下のボタンをクリック</span>
+              </div>
+            </div>
+            
+            <button id="practice-next-btn" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2">
+              練習を開始する
+            </button>
           </div>
         </div>
       `,
@@ -669,26 +917,91 @@
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         const isPractice = jsPsych.timelineVariable('isPractice') || false;
         
+        // Define colors for each condition
+        const conditionStyles = {
+          fullscreen: {
+            gradient: 'from-blue-50 to-blue-100',
+            bg: 'bg-blue-50',
+            border: 'border-blue-300',
+            text: 'text-blue-800',
+            button: 'bg-blue-600 hover:bg-blue-700',
+            icon: 'text-blue-600',
+            name: '全画面条件',
+            description: '全画面で探索をします'
+          },
+          window: {
+            gradient: 'from-orange-50 to-orange-100',
+            bg: 'bg-orange-50',
+            border: 'border-orange-300',
+            text: 'text-orange-800',
+            button: 'bg-orange-600 hover:bg-orange-700',
+            icon: 'text-orange-600',
+            name: 'ウィンドウ条件',
+            description: 'ウィンドウを動かして探索します。'
+          },
+          scroll: {
+            gradient: 'from-green-50 to-green-100',
+            bg: 'bg-green-50',
+            border: 'border-green-300',
+            text: 'text-green-800',
+            button: 'bg-green-600 hover:bg-green-700',
+            icon: 'text-green-600',
+            name: 'スクロール条件',
+            description: '背景をスクロールして探索します。'
+          }
+        };
+        
+        const style = conditionStyles[viewCondition];
+        
         // Generate progress display for main trials only
         let progressDisplay = '';
         if (!isPractice) {
           // Increment trial counter for main trials
           currentMainTrialNumber++;
-          progressDisplay = `<p style="font-size: 16px; margin: 10px 0; font-weight: bold; color: #007bff;">${currentMainTrialNumber}回/${totalMainTrials}回</p>`;
+          progressDisplay = `
+            <div class="mb-4 text-center">
+              <div class="inline-flex items-center px-4 py-2 bg-gray-100 rounded-full">
+                <span class="text-sm font-medium text-gray-600">進捗：</span>
+                <span class="ml-2 text-lg font-bold text-gray-800">${currentMainTrialNumber}</span>
+                <span class="text-sm text-gray-600">/</span>
+                <span class="text-sm text-gray-600">${totalMainTrials}回</span>
+              </div>
+            </div>
+          `;
         }
         
+        const conditionIcon = viewCondition === 'fullscreen' ? 
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>' :
+          viewCondition === 'window' ? 
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0v10a2 2 0 01-2 2H9V7z"></path>' :
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>';
+        
         return `
-          ${progressDisplay}
-          <p>次は<strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
-            viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
-          <p>${viewCondition === 'window' ? 
-            'ウィンドウを動かして探索します。' : 
-            viewCondition === 'scroll' ? 
-            '背景をスクロールして探索します。' : 
-            '全画面で探索をします'}</p>
-          <p><strong>下の「次へ」ボタンをクリックして開始します。</strong></p>
-          <div style="margin: 20px 0;">
-            <button id="visual-search-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          <div class="min-h-screen bg-gradient-to-br ${style.gradient} flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-lg w-full text-center">
+              ${progressDisplay}
+              <div class="mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 ${style.bg} rounded-lg mb-4">
+                  <svg class="w-8 h-8 ${style.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${conditionIcon}
+                  </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">次の条件</h2>
+              </div>
+              
+              <div class="${style.bg} ${style.border} border-2 rounded-lg p-6 mb-6">
+                <h3 class="${style.text} text-xl font-bold mb-2">${style.name}</h3>
+                <p class="${style.text}">${style.description}</p>
+              </div>
+              
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+                <p class="text-gray-700 font-medium">準備ができたら下のボタンをクリックして開始してください</p>
+              </div>
+              
+              <button id="visual-search-next-btn" class="${style.button} text-white font-semibold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2">
+                開始する
+              </button>
+            </div>
           </div>
         `;
       },
@@ -1506,8 +1819,26 @@
         const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
         const correct = searchData.correct;
         
+        const feedbackColor = correct ? 'text-green-600' : 'text-red-600';
+        const feedbackBg = correct ? 'bg-green-50' : 'bg-red-50';
+        const feedbackBorder = correct ? 'border-green-200' : 'border-red-200';
+        const feedbackIcon = correct ? 
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>' :
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        
         return `
-          <h1>${correct ? '正解!' : '不正解'}</h1>
+          <div class="min-h-screen flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 text-center max-w-md w-full">
+              <div class="${feedbackBg} ${feedbackBorder} border-2 rounded-lg p-8">
+                <div class="flex justify-center mb-4">
+                  <svg class="w-16 h-16 ${feedbackColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${feedbackIcon}
+                  </svg>
+                </div>
+                <h1 class="text-3xl font-bold ${feedbackColor}">${correct ? '正解!' : '不正解'}</h1>
+              </div>
+            </div>
+          </div>
         `;
       },
       data: {
@@ -1525,11 +1856,30 @@
         const memoryData = jsPsych.data.get().filter({task: 'memory_recall'}).last(1).values()[0];
         const correct = memoryData.memory_correct === 1;
         
+        const feedbackColor = correct ? 'text-green-600' : 'text-red-600';
+        const feedbackBg = correct ? 'bg-green-50' : 'bg-red-50';
+        const feedbackBorder = correct ? 'border-green-200' : 'border-red-200';
+        const buttonColor = correct ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700';
+        const feedbackIcon = correct ? 
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>' :
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        
         return `
-          <h1>${correct ? '正解!' : '不正解'}</h1>
-          <p>下の「次へ」ボタンをクリックして次に進みます。</p>
-          <div style="margin: 20px 0;">
-            <button id="memory-feedback-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          <div class="min-h-screen flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 text-center max-w-md w-full">
+              <div class="${feedbackBg} ${feedbackBorder} border-2 rounded-lg p-6 mb-6">
+                <div class="flex justify-center mb-4">
+                  <svg class="w-16 h-16 ${feedbackColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${feedbackIcon}
+                  </svg>
+                </div>
+                <h1 class="text-3xl font-bold ${feedbackColor} mb-4">${correct ? '正解!' : '不正解'}</h1>
+                <p class="text-gray-600">下のボタンをクリックして次に進みます</p>
+              </div>
+              <button id="memory-feedback-next-btn" class="${buttonColor} text-white font-semibold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2">
+                次へ
+              </button>
+            </div>
           </div>
         `;
       },
@@ -1570,13 +1920,64 @@
         }
         
         return `
-          <h1>実験終了</h1>
-          <p>実験にご参加いただき、ありがとうございました。</p>
-          <p>探索課題の正答率: ${searchAccuracy}%</p>
-          ${memoryAccuracyText}
-          <p><strong>下の「終了」ボタンをクリックして終了します。</strong></p>
-          <div style="margin: 20px 0;">
-            <button id="end-screen-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">終了</button>
+          <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full text-center">
+              <div class="mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-6">
+                  <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">実験終了</h1>
+                <p class="text-lg text-gray-600 mb-8">実験にご参加いただき、誠にありがとうございました。</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
+                  <div class="flex items-center justify-center mb-3">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 class="text-lg font-semibold text-blue-800 mb-2">探索課題</h3>
+                  <p class="text-2xl font-bold text-blue-600">${searchAccuracy}%</p>
+                  <p class="text-sm text-blue-700">正答率</p>
+                </div>
+                
+                ${memoryScores && memoryScores.length > 0 ? `
+                <div class="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6">
+                  <div class="flex items-center justify-center mb-3">
+                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 class="text-lg font-semibold text-purple-800 mb-2">記憶課題</h3>
+                  <p class="text-2xl font-bold text-purple-600">${Math.round((memoryScores.filter(score => score !== undefined).reduce((a, b) => a + b, 0) / memoryScores.filter(score => score !== undefined).length) * 100)}%</p>
+                  <p class="text-sm text-purple-700">正答率</p>
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
+                <div class="flex items-center justify-center mb-4">
+                  <div class="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center">
+                    <span class="text-xl">🎉</span>
+                  </div>
+                </div>
+                <p class="text-amber-800 font-medium">
+                  お疲れさまでした！<br>
+                  ご協力いただいたデータは研究に活用させていただきます。
+                </p>
+              </div>
+              
+              <button id="end-screen-next-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-lg">
+                実験を終了する
+              </button>
+            </div>
           </div>
         `;
       },
@@ -1594,15 +1995,47 @@
     const practiceCompletionChoice = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
-        html += '<h1>練習完了</h1>';
-        html += '<p style="font-size: 18px; margin: 20px 0;">9回の練習が完了しました。</p>';
-        html += '<p style="font-size: 16px; margin: 20px 0;">以下から選択してください：</p>';
-        html += '<div style="margin: 30px 0;">';
-        html += '<button id="practice-again-btn" style="padding: 15px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">もう一度練習する</button>';
-        html += '<button id="proceed-main-btn" style="padding: 15px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">本番へ進む</button>';
-        html += '</div>';
-        html += '</div>';
+        let html = `
+          <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full text-center">
+              <div class="mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-lg mb-4">
+                  <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">練習完了</h1>
+                <p class="text-lg text-gray-600 mb-6">9回の練習が完了しました。お疲れさまでした！</p>
+              </div>
+              
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
+                <p class="text-gray-700 text-lg font-medium">操作に慣れましたか？以下から選択してください：</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="practice-again-btn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center space-x-3">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span>もう一度練習する</span>
+                </button>
+                
+                <button id="proceed-main-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center space-x-3">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                  <span>本番へ進む</span>
+                </button>
+              </div>
+              
+              <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-blue-700 text-sm">
+                  <strong>ヒント：</strong> 操作に不安がある場合は、もう一度練習することをお勧めします。
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
         return html;
       },
       choices: "NO_KEYS",
