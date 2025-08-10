@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Informed Consent Integration Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .pass {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .fail {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .info {
+      background-color: #e2e3e5;
+      color: #383d41;
+    }
+    
+    .timeline-flow {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 20px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    
+    .timeline-step {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      min-width: 120px;
+      text-align: center;
+    }
+    
+    .timeline-step.highlight {
+      background: #28a745;
+      font-weight: bold;
+    }
+    
+    .arrow {
+      font-size: 20px;
+      color: #6c757d;
+    }
+    
+    .code-snippet {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 15px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Informed Consent Integration Test</h1>
+  <p>This test validates that the informed consent screen has been properly integrated into the main experiment timeline.</p>
+  
+  <div id="results"></div>
+  
+  <div class="timeline-flow">
+    <div class="timeline-step">Welcome</div>
+    <div class="arrow">→</div>
+    <div class="timeline-step highlight">Informed Consent</div>
+    <div class="arrow">→</div>
+    <div class="timeline-step">Demographics</div>
+    <div class="arrow">→</div>
+    <div class="timeline-step">Gender</div>
+    <div class="arrow">→</div>
+    <div class="timeline-step">Instructions</div>
+    <div class="arrow">→</div>
+    <div class="timeline-step">...</div>
+  </div>
+
+  <script>
+    function runTests() {
+      const resultsDiv = document.getElementById('results');
+      const results = [];
+      
+      // Test 1: Check if main index.html contains informed consent component
+      fetch('../index.html')
+        .then(response => response.text())
+        .then(html => {
+          let passCount = 0;
+          let totalTests = 6;
+          
+          // Test 1: Check if informed consent variable is defined
+          if (html.includes('const informedConsent = {')) {
+            results.push({ status: 'pass', message: '✓ Informed consent component is defined' });
+            passCount++;
+          } else {
+            results.push({ status: 'fail', message: '✗ Informed consent component is missing' });
+          }
+          
+          // Test 2: Check if it contains the consent text
+          if (html.includes('研究に関する同意事項')) {
+            results.push({ status: 'pass', message: '✓ Consent title text is present' });
+            passCount++;
+          } else {
+            results.push({ status: 'fail', message: '✗ Consent title text is missing' });
+          }
+          
+          // Test 3: Check if it contains the checkbox functionality
+          if (html.includes('consent-checkbox') && html.includes('checkbox.checked')) {
+            results.push({ status: 'pass', message: '✓ Checkbox functionality is implemented' });
+            passCount++;
+          } else {
+            results.push({ status: 'fail', message: '✗ Checkbox functionality is missing' });
+          }
+          
+          // Test 4: Check if it records consent data
+          if (html.includes('informed_consent: true') && html.includes('consent_timestamp')) {
+            results.push({ status: 'pass', message: '✓ Consent data recording is implemented' });
+            passCount++;
+          } else {
+            results.push({ status: 'fail', message: '✗ Consent data recording is missing' });
+          }
+          
+          // Test 5: Check if timeline includes informed consent
+          if (html.includes('informedConsent,') && html.includes('welcome,')) {
+            results.push({ status: 'pass', message: '✓ Informed consent is added to timeline' });
+            passCount++;
+          } else {
+            results.push({ status: 'fail', message: '✗ Informed consent is not in timeline' });
+          }
+          
+          // Test 6: Check timeline order (welcome -> informedConsent -> demographics)
+          const timelineMatch = html.match(/const timeline = \[([\s\S]*?)\];/);
+          if (timelineMatch) {
+            const timelineContent = timelineMatch[1];
+            const welcomeIndex = timelineContent.indexOf('welcome');
+            const consentIndex = timelineContent.indexOf('informedConsent');
+            const demographicsIndex = timelineContent.indexOf('demographics');
+            
+            if (welcomeIndex < consentIndex && consentIndex < demographicsIndex) {
+              results.push({ status: 'pass', message: '✓ Timeline order is correct: welcome → informedConsent → demographics' });
+              passCount++;
+            } else {
+              results.push({ status: 'fail', message: '✗ Timeline order is incorrect' });
+            }
+          } else {
+            results.push({ status: 'fail', message: '✗ Could not find timeline definition' });
+          }
+          
+          // Display results
+          displayResults(results, passCount, totalTests);
+          
+          // Show relevant code snippets
+          showCodeSnippets(html);
+        })
+        .catch(error => {
+          results.push({ status: 'fail', message: '✗ Failed to load index.html: ' + error.message });
+          displayResults(results, 0, 1);
+        });
+    }
+    
+    function displayResults(results, passCount, totalTests) {
+      const resultsDiv = document.getElementById('results');
+      
+      // Summary
+      const summary = document.createElement('div');
+      summary.className = passCount === totalTests ? 'test-result pass' : 'test-result fail';
+      summary.innerHTML = `<h3>Test Summary: ${passCount}/${totalTests} tests passed</h3>`;
+      resultsDiv.appendChild(summary);
+      
+      // Individual results
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = `test-result ${result.status}`;
+        div.textContent = result.message;
+        resultsDiv.appendChild(div);
+      });
+    }
+    
+    function showCodeSnippets(html) {
+      const resultsDiv = document.getElementById('results');
+      
+      // Show timeline snippet
+      const timelineMatch = html.match(/const timeline = \[([\s\S]*?)\];/);
+      if (timelineMatch) {
+        const timelineDiv = document.createElement('div');
+        timelineDiv.innerHTML = `
+          <h3>Timeline Configuration:</h3>
+          <div class="code-snippet">const timeline = [${timelineMatch[1]}];</div>
+        `;
+        resultsDiv.appendChild(timelineDiv);
+      }
+      
+      // Show informed consent component snippet (first 200 chars)
+      const consentMatch = html.match(/const informedConsent = \{([\s\S]{0,400})/);
+      if (consentMatch) {
+        const consentDiv = document.createElement('div');
+        consentDiv.innerHTML = `
+          <h3>Informed Consent Component (first 400 chars):</h3>
+          <div class="code-snippet">const informedConsent = {${consentMatch[1]}...</div>
+        `;
+        resultsDiv.appendChild(consentDiv);
+      }
+    }
+    
+    // Run tests when page loads
+    document.addEventListener('DOMContentLoaded', runTests);
+  </script>
+</body>
+</html>
