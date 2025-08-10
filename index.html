@@ -29,9 +29,58 @@
     searchWindowDiv.classList.add('hidden');
     document.body.appendChild(searchWindowDiv);
 
-    // Initialize jsPsych v7 instance (upgraded from v6.3.1)
-    // Note: Targeting v7.x as the latest stable version (v8.x may not be available yet)
-    const jsPsych = initJsPsych({
+    // Check if jsPsych CDN resources have loaded successfully
+    if (typeof initJsPsych === 'undefined') {
+      // Display error message when CDN resources are blocked
+      const errorDiv = document.createElement('div');
+      errorDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid #dc3545;
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 600px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 9999;
+      `;
+      errorDiv.innerHTML = `
+        <h2 style="color: #dc3545; margin-top: 0;">実験を開始できません</h2>
+        <p style="font-size: 16px; line-height: 1.5; margin: 20px 0;">
+          必要なライブラリ（jsPsych）の読み込みに失敗しました。<br>
+          これは通常、ネットワークの問題やブラウザの設定が原因です。
+        </p>
+        <div style="background: #f8f9fa; border-radius: 5px; padding: 15px; margin: 20px 0; text-align: left;">
+          <strong>解決方法：</strong>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>インターネット接続を確認してください</li>
+            <li>広告ブロッカーを一時的に無効にしてください</li>
+            <li>ブラウザを更新してください（F5キー）</li>
+            <li>別のブラウザ（Chrome、Firefox等）をお試しください</li>
+          </ul>
+        </div>
+        <button onclick="location.reload()" style="
+          padding: 12px 24px;
+          font-size: 16px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        ">ページを再読み込み</button>
+      `;
+      targetDiv.appendChild(errorDiv);
+      
+      // Log error for debugging
+      console.error('jsPsych CDN loading failed. Please check network connectivity and ad blockers.');
+    } else {
+      // Initialize jsPsych v7 instance (upgraded from v6.3.1)
+      // Note: Targeting v7.x as the latest stable version (v8.x may not be available yet)
+      const jsPsych = initJsPsych({
       display_element: 'jspsych-target',
       on_finish: function() {
         jsPsych.data.displayData();
@@ -1918,6 +1967,7 @@
 
     // Run the experiment using jsPsych v7 API (upgraded from v6.3.1)
     jsPsych.run(timeline);
+    } // End of else block for jsPsych initialization
   </script>
 </body>
 </html>

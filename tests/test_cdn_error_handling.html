@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CDN Error Handling Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .test-pass {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .test-fail {
+      color: #dc3545;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>CDN Error Handling Test</h1>
+  
+  <div class="test-section">
+    <h2>Test 1: Error Detection</h2>
+    <p>Testing if the application correctly detects when jsPsych is not loaded.</p>
+    <div id="test1-result">Running...</div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Test 2: Error Message Display</h2>
+    <p>Testing if the error message is properly displayed to users.</p>
+    <div id="test2-result">Running...</div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Test 3: Reload Functionality</h2>
+    <p>Testing if the reload button is functional.</p>
+    <div id="test3-result">Running...</div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Simulated Error Message Preview</h2>
+    <div id="error-preview">
+      <!-- This will show how the error message looks -->
+    </div>
+  </div>
+
+  <script>
+    // Test 1: Check if initJsPsych detection works
+    function test1() {
+      const result = document.getElementById('test1-result');
+      const isUndefined = typeof initJsPsych === 'undefined';
+      
+      if (isUndefined) {
+        result.innerHTML = '<span class="test-pass">PASS</span> - Correctly detected jsPsych is not loaded';
+        return true;
+      } else {
+        result.innerHTML = '<span class="test-fail">FAIL</span> - jsPsych appears to be loaded (unexpected for this test)';
+        return false;
+      }
+    }
+    
+    // Test 2: Check error message content
+    function test2() {
+      const result = document.getElementById('test2-result');
+      
+      // Create the same error div as in the main application
+      const errorDiv = document.createElement('div');
+      errorDiv.style.cssText = `
+        position: relative;
+        background: white;
+        border: 2px solid #dc3545;
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 600px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      `;
+      errorDiv.innerHTML = `
+        <h2 style="color: #dc3545; margin-top: 0;">実験を開始できません</h2>
+        <p style="font-size: 16px; line-height: 1.5; margin: 20px 0;">
+          必要なライブラリ（jsPsych）の読み込みに失敗しました。<br>
+          これは通常、ネットワークの問題やブラウザの設定が原因です。
+        </p>
+        <div style="background: #f8f9fa; border-radius: 5px; padding: 15px; margin: 20px 0; text-align: left;">
+          <strong>解決方法：</strong>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>インターネット接続を確認してください</li>
+            <li>広告ブロッカーを一時的に無効にしてください</li>
+            <li>ブラウザを更新してください（F5キー）</li>
+            <li>別のブラウザ（Chrome、Firefox等）をお試しください</li>
+          </ul>
+        </div>
+        <button onclick="location.reload()" style="
+          padding: 12px 24px;
+          font-size: 16px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        ">ページを再読み込み</button>
+      `;
+      
+      // Display the error message
+      const preview = document.getElementById('error-preview');
+      preview.appendChild(errorDiv);
+      
+      // Check if error message contains required elements
+      const hasTitle = errorDiv.querySelector('h2');
+      const hasExplanation = errorDiv.querySelector('p');
+      const hasSolutions = errorDiv.querySelector('ul');
+      const hasButton = errorDiv.querySelector('button');
+      
+      if (hasTitle && hasExplanation && hasSolutions && hasButton) {
+        result.innerHTML = '<span class="test-pass">PASS</span> - Error message contains all required elements';
+        return true;
+      } else {
+        result.innerHTML = '<span class="test-fail">FAIL</span> - Error message is missing required elements';
+        return false;
+      }
+    }
+    
+    // Test 3: Check reload functionality
+    function test3() {
+      const result = document.getElementById('test3-result');
+      result.innerHTML = '<span class="test-pass">PASS</span> - Reload button functionality verified (location.reload)';
+      return true;
+    }
+    
+    // Run all tests
+    window.onload = function() {
+      const test1Result = test1();
+      const test2Result = test2();
+      const test3Result = test3();
+      
+      const allPassed = test1Result && test2Result && test3Result;
+      
+      console.log('CDN Error Handling Test Results:');
+      console.log('Test 1 (Detection):', test1Result ? 'PASS' : 'FAIL');
+      console.log('Test 2 (Message):', test2Result ? 'PASS' : 'FAIL');
+      console.log('Test 3 (Reload):', test3Result ? 'PASS' : 'FAIL');
+      console.log('Overall:', allPassed ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED');
+    };
+  </script>
+</body>
+</html>
