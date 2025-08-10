@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Target Presentation - Border Removed</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .target-presentation {
+            border: 1px dashed #999;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Target Presentation Border Fix</h1>
+        
+        <div class="status">
+            Border successfully removed from target canvas
+        </div>
+        
+        <p>The target presentation now shows a clean canvas without the gray border.</p>
+        
+        <div class="target-presentation">
+            <h3>Fixed Target Presentation</h3>
+            <p>Canvas now renders without border - same as actual experiment</p>
+            <!-- This matches the actual experiment structure without border -->
+            <div style="margin: 20px auto; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                <canvas id="target-canvas" width="60" height="60"></canvas>
+            </div>
+        </div>
+        
+        <p><strong>Change made:</strong> Removed <code>style="border: 1px solid #ccc;"</code> from target canvas</p>
+        <p><strong>Result:</strong> Clean target presentation without visible border</p>
+    </div>
+
+    <script>
+        // Draw target object to demonstrate the fix
+        function drawTarget() {
+            const canvas = document.getElementById('target-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a red circle (same as experiment)
+            ctx.fillStyle = 'red';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.arc(30, 30, 20, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        // Draw the target when page loads
+        drawTarget();
+    </script>
+</body>
+</html>

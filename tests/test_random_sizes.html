@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Object Sizes Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .size-display {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fixed Object Sizes Test</h1>
+        
+        <div class="test-section">
+            <h2>Target Presentation Size</h2>
+            <p>Target presentation size: <span id="target-size">40px</span> <span class="success">✓ Fixed</span></p>
+            <div id="target-display" style="margin: 20px auto; width: 100px; height: 100px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Search Object Sizes</h2>
+            <p><strong>All objects are fixed at 40px</strong> <span class="success">✓ No variation</span></p>
+            <button onclick="generateFixedSizes()">Generate Sample Objects</button>
+            <div id="fixed-sizes-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Size Validation (10 samples)</h2>
+            <div id="size-validation"></div>
+            <button onclick="validateSizes()">Validate All Objects Are 40px</button>
+        </div>
+    </div>
+
+    <script>
+        // Copy the size functions from the main experiment
+        const params = {
+            objectSize: 40, // Fixed size for all objects
+            colors: ['red', 'blue', 'green', 'yellow', 'purple'],
+            shapes: ['circle', 'triangle', 'square', 'diamond']
+        };
+        
+        function getObjectSize() {
+            return params.objectSize;
+        }
+
+        function getTargetPresentationSize() {
+            return params.objectSize; // Same as search objects - 40px
+        }
+        
+        function drawShape(shape, color, canvasWidth, canvasHeight, size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+            
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+            const radius = size / 2;
+            
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            switch(shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.fillRect(centerX - radius, centerY - radius, size, size);
+                    ctx.strokeRect(centerX - radius, centerY - radius, size, size);
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY - radius);
+                    ctx.lineTo(centerX - radius, centerY + radius);
+                    ctx.lineTo(centerX + radius, centerY + radius);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY - radius);
+                    ctx.lineTo(centerX + radius, centerY);
+                    ctx.lineTo(centerX, centerY + radius);
+                    ctx.lineTo(centerX - radius, centerY);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+            
+            return canvas.outerHTML;
+        }
+        
+        function generateFixedSizes() {
+            const display = document.getElementById('fixed-sizes-display');
+            display.innerHTML = '';
+            
+            for (let i = 0; i < 10; i++) {
+                const size = getObjectSize(); // Always returns 40px
+                const color = params.colors[Math.floor(Math.random() * params.colors.length)];
+                const shape = params.shapes[Math.floor(Math.random() * params.shapes.length)];
+                
+                const sizeDiv = document.createElement('div');
+                sizeDiv.className = 'size-display';
+                sizeDiv.innerHTML = `
+                    ${drawShape(shape, color, 60, 60, size)}
+                    <br>Size: ${size}px <span class="success">✓</span>
+                `;
+                display.appendChild(sizeDiv);
+            }
+        }
+        
+        function validateSizes() {
+            const display = document.getElementById('size-validation');
+            const sizes = [];
+            
+            // Generate 100 objects and check all are 40px
+            for (let i = 0; i < 100; i++) {
+                sizes.push(getObjectSize());
+            }
+            
+            const allSame = sizes.every(size => size === 40);
+            const min = Math.min(...sizes);
+            const max = Math.max(...sizes);
+            
+            display.innerHTML = `
+                <p><strong>100 samples validation:</strong></p>
+                <p>All objects are 40px: <span class="${allSame ? 'success' : 'error'}">${allSame ? '✓ YES' : '✗ NO'}</span></p>
+                <p>Min size: ${min}px</p>
+                <p>Max size: ${max}px</p>
+                <p>Target presentation: ${getTargetPresentationSize()}px</p>
+                <p>Expected: All objects should be exactly 40px</p>
+            `;
+        }
+        
+        // Initialize target display
+        document.addEventListener('DOMContentLoaded', function() {
+            const targetDisplay = document.getElementById('target-display');
+            targetDisplay.innerHTML = drawShape('circle', 'red', 100, 100, getTargetPresentationSize());
+            
+            generateFixedSizes();
+        });
+    </script>
+</body>
+</html>

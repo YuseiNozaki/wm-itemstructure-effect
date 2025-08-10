@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Presentation Visual Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+            text-align: center;
+        }
+        .test-area {
+            background: white;
+            padding: 40px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+        }
+        .phase {
+            margin: 40px 0;
+            padding: 20px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+        .phase h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        canvas {
+            background: white;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Target Presentation Visual Size Test</h1>
+    <p>This test simulates the actual experiment flow to verify target presentation size matches search objects.</p>
+    
+    <div class="test-area">
+        <div class="phase">
+            <h3>Phase 1: Target Presentation</h3>
+            <p>This is what participants see when the target is shown (1 second display)</p>
+            <div id="targetPresentation" style="margin: 20px auto; width: 40px; height: 40px;">
+                <!-- Target will be inserted here -->
+            </div>
+            <button onclick="showTarget()">Show Target</button>
+        </div>
+        
+        <div class="phase">
+            <h3>Phase 2: Visual Search</h3>
+            <p>This is the search display where participants look for the target</p>
+            <canvas id="searchCanvas" width="400" height="300"></canvas>
+            <br>
+            <button onclick="generateSearch()">Generate Search Display</button>
+        </div>
+        
+        <div class="phase">
+            <h3>Size Comparison</h3>
+            <p>Direct side-by-side comparison of sizes</p>
+            <div style="display: flex; justify-content: center; gap: 40px; align-items: center;">
+                <div>
+                    <p><strong>Target Presentation</strong></p>
+                    <div id="targetComparison" style="width: 40px; height: 40px; margin: 0 auto; border: 1px solid #ccc;">
+                        <!-- Comparison target -->
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Search Object</strong></p>
+                    <canvas id="comparisonCanvas" width="40" height="40" style="border: 1px solid #ccc;"></canvas>
+                </div>
+            </div>
+            <button onclick="showComparison()">Show Size Comparison</button>
+        </div>
+    </div>
+    
+    <script>
+        // Fixed object size (same as experiment)
+        const objectSize = 40;
+        
+        // Copy of the drawShape function from the experiment
+        function drawShape(shape, color, x, y, size) {
+            const halfSize = size / 2;
+            
+            switch (shape) {
+                case 'circle':
+                    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                              <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize * 0.8}" fill="${color}" stroke="black" stroke-width="2" />
+                            </svg>`;
+                case 'triangle':
+                    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                              <polygon points="${halfSize},${size * 0.2} ${size * 0.2},${size * 0.8} ${size * 0.8},${size * 0.8}" fill="${color}" stroke="black" stroke-width="2" />
+                            </svg>`;
+                case 'square':
+                    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                              <rect x="${size * 0.2}" y="${size * 0.2}" width="${size * 0.6}" height="${size * 0.6}" fill="${color}" stroke="black" stroke-width="2" />
+                            </svg>`;
+                case 'diamond':
+                    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                              <polygon points="${halfSize},${size * 0.2} ${size * 0.8},${halfSize} ${halfSize},${size * 0.8} ${size * 0.2},${halfSize}" fill="${color}" stroke="black" stroke-width="2" />
+                            </svg>`;
+                default:
+                    return `<svg width="${size}" height="${size}"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" stroke="black" stroke-width="2" /></svg>`;
+            }
+        }
+        
+        // Copy of the drawObject function from the experiment
+        function drawObject(ctx, x, y, size, color, shape) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            switch (shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(x, y - size / 2);
+                    ctx.lineTo(x + size / 2, y + size / 2);
+                    ctx.lineTo(x - size / 2, y + size / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.beginPath();
+                    ctx.rect(x - size / 2, y - size / 2, size, size);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    ctx.moveTo(x, y - size / 2);
+                    ctx.lineTo(x + size / 2, y);
+                    ctx.lineTo(x, y + size / 2);
+                    ctx.lineTo(x - size / 2, y);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+        }
+        
+        function showTarget() {
+            const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+            const shapes = ['circle', 'triangle', 'square', 'diamond'];
+            
+            const targetColor = colors[Math.floor(Math.random() * colors.length)];
+            const targetShape = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            // This matches the fixed implementation in index.html
+            document.getElementById('targetPresentation').innerHTML = drawShape(targetShape, targetColor, 20, 20, objectSize);
+            
+            // Flash effect to simulate the 1-second display
+            const container = document.getElementById('targetPresentation');
+            container.style.background = 'lightyellow';
+            setTimeout(() => {
+                container.style.background = '';
+            }, 1000);
+        }
+        
+        function generateSearch() {
+            const canvas = document.getElementById('searchCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+            const shapes = ['circle', 'triangle', 'square', 'diamond'];
+            
+            // Generate random objects
+            for (let i = 0; i < 15; i++) {
+                const x = Math.random() * (canvas.width - objectSize) + objectSize/2;
+                const y = Math.random() * (canvas.height - objectSize) + objectSize/2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                
+                drawObject(ctx, x, y, objectSize, color, shape);
+            }
+        }
+        
+        function showComparison() {
+            // Show target
+            document.getElementById('targetComparison').innerHTML = drawShape('circle', 'red', 20, 20, objectSize);
+            
+            // Show search object
+            const canvas = document.getElementById('comparisonCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawObject(ctx, 20, 20, objectSize, 'red', 'circle');
+        }
+        
+        // Initialize comparison on load
+        window.onload = function() {
+            showComparison();
+        };
+    </script>
+</body>
+</html>

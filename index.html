@@ -162,8 +162,7 @@
       
       // Objects
       numObjects: 25, // Total number of objects per trial
-      objectMinSize: 20,
-      objectMaxSize: 40,
+      objectSize: 40, // Fixed size for all objects
       
       // Target detection tolerance
       targetTolerance: 0.8, // Additional tolerance as multiplier of object size (0.8 = 80% of object size)
@@ -179,6 +178,18 @@
       memoryGridSize: 4, // 4x4 grid
       memoryPositions: 3, // Number of positions to remember
     };
+
+    // Generate random object size within the specified range
+    // Get fixed object size (all objects use the same size defined in params.objectSize)
+    // All objects are consistently 40px in size
+    function getObjectSize() {
+      return params.objectSize;
+    }
+
+    // Get a representative size for target presentation (same as search objects)
+    function getTargetPresentationSize() {
+      return params.objectSize; // Same as search objects - 40px
+    }
 
     // Trial factors
     const factors = {
@@ -900,8 +911,8 @@
         });
         
         return `
-          <div style="margin: 20px auto; width: 100px; height: 100px;">
-            ${drawShape(targetShape, targetColor, 100, 100, 50)}
+          <div style="margin: 20px auto; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="target-canvas" width="60" height="60"></canvas>
           </div>
         `;
       },
@@ -909,6 +920,22 @@
       trial_duration: 1000,
       data: {
         task: 'show_target'
+      },
+      on_load: function() {
+        // Get target information from data
+        const data = jsPsych.data.get().last(1).values()[0];
+        const targetColor = data.target_color;
+        const targetShape = data.target_shape;
+        
+        // Draw target on canvas using the same method as search objects
+        const canvas = document.getElementById('target-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw target object at center of canvas using same drawObject function
+        drawObject(ctx, 30, 30, getTargetPresentationSize(), targetColor, targetShape);
       }
     };
 
@@ -1266,8 +1293,8 @@
       objects = [];
       let positions = [];
       
-      // Use uniform object size
-      const objectSize = (params.objectMaxSize + params.objectMinSize) / 2;
+      // Use fixed object size for positioning calculations (to avoid overlaps)
+      const avgObjectSize = params.objectSize;
       
       let targetX, targetY;
       
@@ -1291,7 +1318,7 @@
         
         // Check if target center is within window bounds
         // Add some padding to account for object size
-        const padding = objectSize / 2;
+        const padding = avgObjectSize / 2;
         return (x + padding > initialWindowBounds.left && 
                 x - padding < initialWindowBounds.right &&
                 y + padding > initialWindowBounds.top && 
@@ -1340,8 +1367,8 @@
         const maxAttempts = 50; // Prevent infinite loops
         
         do {
-          targetX = Math.random() * (area.width - objectSize * 2) + objectSize;
-          targetY = Math.random() * (area.height - objectSize * 2) + objectSize;
+          targetX = Math.random() * (area.width - avgObjectSize * 2) + avgObjectSize;
+          targetY = Math.random() * (area.height - avgObjectSize * 2) + avgObjectSize;
           attempts++;
         } while (isPractice && (viewCondition === 'window' || viewCondition === 'scroll') && 
                  isTargetInInitialWindow(targetX, targetY) && attempts < maxAttempts);
@@ -1351,15 +1378,15 @@
           let x, y, overlapping;
           
           do {
-            x = Math.random() * (area.width - objectSize * 2) + objectSize;
-            y = Math.random() * (area.height - objectSize * 2) + objectSize;
+            x = Math.random() * (area.width - avgObjectSize * 2) + avgObjectSize;
+            y = Math.random() * (area.height - avgObjectSize * 2) + avgObjectSize;
             
             // Check if too close to target
             const dx = x - targetX;
             const dy = y - targetY;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            overlapping = distance < objectSize;
+            overlapping = distance < avgObjectSize;
             
             // Check if too close to other positions
             for (let j = 0; j < positions.length && !overlapping; j++) {
@@ -1367,7 +1394,7 @@
               const dy = y - positions[j].y;
               const distance = Math.sqrt(dx * dx + dy * dy);
               
-              if (distance < objectSize) {
+              if (distance < avgObjectSize) {
                 overlapping = true;
               }
             }
@@ -1381,7 +1408,7 @@
       targetObject = {
         x: targetX,
         y: targetY,
-        size: objectSize,
+        size: getObjectSize(),
         color: targetColor,
         shape: targetShape,
         isTarget: true
@@ -1419,7 +1446,7 @@
         objects.push({
           x: positions[i].x,
           y: positions[i].y,
-          size: objectSize,
+          size: getObjectSize(),
           color: distractorColor,
           shape: distractorShape,
           isTarget: false

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Comparison Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .comparison {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin: 20px 0;
+        }
+        .target-presentation {
+            text-align: center;
+        }
+        .search-objects {
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Target Presentation vs Search Objects Size Comparison</h1>
+    
+    <div class="test-section">
+        <h2>Current Implementation Issue</h2>
+        <div class="comparison">
+            <div class="target-presentation">
+                <h3>Target Presentation (Current)</h3>
+                <p>40px object in 100px container</p>
+                <div style="margin: 20px auto; width: 100px; height: 100px; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="16" fill="red" stroke="black" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="search-objects">
+                <h3>Search Objects (Canvas)</h3>
+                <p>40px objects drawn directly</p>
+                <canvas id="searchCanvas" width="120" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Fixed Implementation</h2>
+        <div class="comparison">
+            <div class="target-presentation">
+                <h3>Target Presentation (Fixed)</h3>
+                <p>40px object in 40px container</p>
+                <div style="margin: 20px auto; width: 40px; height: 40px; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="16" fill="red" stroke="black" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="search-objects">
+                <h3>Search Objects (Canvas)</h3>
+                <p>40px objects drawn directly</p>
+                <canvas id="searchCanvas2" width="120" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Draw search objects on canvas to match the actual experiment
+        function drawObject(ctx, x, y, size, color, shape) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            switch (shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.beginPath();
+                    ctx.rect(x - size / 2, y - size / 2, size, size);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+        }
+        
+        // Draw on first canvas
+        const canvas1 = document.getElementById('searchCanvas');
+        const ctx1 = canvas1.getContext('2d');
+        drawObject(ctx1, 60, 60, 40, 'red', 'circle');
+        
+        // Draw on second canvas 
+        const canvas2 = document.getElementById('searchCanvas2');
+        const ctx2 = canvas2.getContext('2d');
+        drawObject(ctx2, 60, 60, 40, 'red', 'circle');
+    </script>
+</body>
+</html>
