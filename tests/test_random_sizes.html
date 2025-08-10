@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Object Sizes Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .size-display {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Random Object Sizes Test</h1>
+        
+        <div class="test-section">
+            <h2>Target Presentation Size</h2>
+            <p>Target presentation size: <span id="target-size">45px</span></p>
+            <div id="target-display" style="margin: 20px auto; width: 100px; height: 100px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Random Search Object Sizes</h2>
+            <p>Range: 20px - 40px</p>
+            <button onclick="generateRandomSizes()">Generate New Random Sizes</button>
+            <div id="random-sizes-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Size Distribution (10 samples)</h2>
+            <div id="size-distribution"></div>
+            <button onclick="showDistribution()">Show Size Distribution</button>
+        </div>
+    </div>
+
+    <script>
+        // Copy the size functions from the main experiment
+        const params = {
+            objectMinSize: 20,
+            objectMaxSize: 40,
+            colors: ['red', 'blue', 'green', 'yellow', 'purple'],
+            shapes: ['circle', 'triangle', 'square', 'diamond']
+        };
+        
+        function getRandomObjectSize() {
+            return Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize;
+        }
+
+        function getTargetPresentationSize() {
+            return 45;
+        }
+        
+        function drawShape(shape, color, canvasWidth, canvasHeight, size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+            
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+            const radius = size / 2;
+            
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            switch(shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.fillRect(centerX - radius, centerY - radius, size, size);
+                    ctx.strokeRect(centerX - radius, centerY - radius, size, size);
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY - radius);
+                    ctx.lineTo(centerX - radius, centerY + radius);
+                    ctx.lineTo(centerX + radius, centerY + radius);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY - radius);
+                    ctx.lineTo(centerX + radius, centerY);
+                    ctx.lineTo(centerX, centerY + radius);
+                    ctx.lineTo(centerX - radius, centerY);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+            
+            return canvas.outerHTML;
+        }
+        
+        function generateRandomSizes() {
+            const display = document.getElementById('random-sizes-display');
+            display.innerHTML = '';
+            
+            for (let i = 0; i < 10; i++) {
+                const size = getRandomObjectSize();
+                const color = params.colors[Math.floor(Math.random() * params.colors.length)];
+                const shape = params.shapes[Math.floor(Math.random() * params.shapes.length)];
+                
+                const sizeDiv = document.createElement('div');
+                sizeDiv.className = 'size-display';
+                sizeDiv.innerHTML = `
+                    ${drawShape(shape, color, 60, 60, size)}
+                    <br>Size: ${size.toFixed(1)}px
+                `;
+                display.appendChild(sizeDiv);
+            }
+        }
+        
+        function showDistribution() {
+            const display = document.getElementById('size-distribution');
+            const sizes = [];
+            
+            for (let i = 0; i < 100; i++) {
+                sizes.push(getRandomObjectSize());
+            }
+            
+            const min = Math.min(...sizes);
+            const max = Math.max(...sizes);
+            const avg = sizes.reduce((a, b) => a + b) / sizes.length;
+            
+            display.innerHTML = `
+                <p><strong>100 samples:</strong></p>
+                <p>Min: ${min.toFixed(1)}px</p>
+                <p>Max: ${max.toFixed(1)}px</p>
+                <p>Average: ${avg.toFixed(1)}px</p>
+                <p>Expected range: 20px - 40px</p>
+                <p>Expected average: 30px</p>
+            `;
+        }
+        
+        // Initialize target display
+        document.addEventListener('DOMContentLoaded', function() {
+            const targetDisplay = document.getElementById('target-display');
+            targetDisplay.innerHTML = drawShape('circle', 'red', 100, 100, getTargetPresentationSize());
+            
+            generateRandomSizes();
+        });
+    </script>
+</body>
+</html>

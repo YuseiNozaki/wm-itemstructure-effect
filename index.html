@@ -180,9 +180,14 @@
       memoryPositions: 3, // Number of positions to remember
     };
 
-    // Calculate uniform object size for consistency between target presentation and search
-    function getUniformObjectSize() {
-      return (params.objectMaxSize + params.objectMinSize) / 2;
+    // Generate random object size within the specified range
+    function getRandomObjectSize() {
+      return Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize;
+    }
+
+    // Get a representative size for target presentation (larger for visibility)
+    function getTargetPresentationSize() {
+      return 45; // Slightly smaller than original 50px but larger than random sizes
     }
 
     // Trial factors
@@ -906,7 +911,7 @@
         
         return `
           <div style="margin: 20px auto; width: 100px; height: 100px;">
-            ${drawShape(targetShape, targetColor, 100, 100, getUniformObjectSize())}
+            ${drawShape(targetShape, targetColor, 100, 100, getTargetPresentationSize())}
           </div>
         `;
       },
@@ -1271,8 +1276,8 @@
       objects = [];
       let positions = [];
       
-      // Use uniform object size
-      const objectSize = getUniformObjectSize();
+      // Use average object size for positioning calculations (to avoid overlaps)
+      const avgObjectSize = (params.objectMaxSize + params.objectMinSize) / 2;
       
       let targetX, targetY;
       
@@ -1296,7 +1301,7 @@
         
         // Check if target center is within window bounds
         // Add some padding to account for object size
-        const padding = objectSize / 2;
+        const padding = avgObjectSize / 2;
         return (x + padding > initialWindowBounds.left && 
                 x - padding < initialWindowBounds.right &&
                 y + padding > initialWindowBounds.top && 
@@ -1345,8 +1350,8 @@
         const maxAttempts = 50; // Prevent infinite loops
         
         do {
-          targetX = Math.random() * (area.width - objectSize * 2) + objectSize;
-          targetY = Math.random() * (area.height - objectSize * 2) + objectSize;
+          targetX = Math.random() * (area.width - avgObjectSize * 2) + avgObjectSize;
+          targetY = Math.random() * (area.height - avgObjectSize * 2) + avgObjectSize;
           attempts++;
         } while (isPractice && (viewCondition === 'window' || viewCondition === 'scroll') && 
                  isTargetInInitialWindow(targetX, targetY) && attempts < maxAttempts);
@@ -1356,15 +1361,15 @@
           let x, y, overlapping;
           
           do {
-            x = Math.random() * (area.width - objectSize * 2) + objectSize;
-            y = Math.random() * (area.height - objectSize * 2) + objectSize;
+            x = Math.random() * (area.width - avgObjectSize * 2) + avgObjectSize;
+            y = Math.random() * (area.height - avgObjectSize * 2) + avgObjectSize;
             
             // Check if too close to target
             const dx = x - targetX;
             const dy = y - targetY;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            overlapping = distance < objectSize;
+            overlapping = distance < avgObjectSize;
             
             // Check if too close to other positions
             for (let j = 0; j < positions.length && !overlapping; j++) {
@@ -1372,7 +1377,7 @@
               const dy = y - positions[j].y;
               const distance = Math.sqrt(dx * dx + dy * dy);
               
-              if (distance < objectSize) {
+              if (distance < avgObjectSize) {
                 overlapping = true;
               }
             }
@@ -1386,7 +1391,7 @@
       targetObject = {
         x: targetX,
         y: targetY,
-        size: objectSize,
+        size: getRandomObjectSize(),
         color: targetColor,
         shape: targetShape,
         isTarget: true
@@ -1424,7 +1429,7 @@
         objects.push({
           x: positions[i].x,
           y: positions[i].y,
-          size: objectSize,
+          size: getRandomObjectSize(),
           color: distractorColor,
           shape: distractorShape,
           isTarget: false
