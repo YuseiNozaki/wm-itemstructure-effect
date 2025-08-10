@@ -79,6 +79,23 @@
       cursor: not-allowed;
     }
     
+    .memory-reset-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px auto;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    
+    .memory-reset-btn:hover {
+      background-color: #545b62;
+    }
+    
     .stage {
       max-width: 800px;
       margin: 0 auto;
@@ -105,12 +122,13 @@
   <div id="stage2" class="stage hidden">
     <h1>位置記憶課題 - 回答</h1>
     <p>記憶した位置をクリックして再現してください。</p>
-    <p>セルをクリックするとハイライトされ、再度クリックすると解除されます。</p>
+    <p>セルをクリックして選択してください。リセットボタンで全選択を解除できます。</p>
     <div id="memory-reproduction-grid" class="memory-reproduction-grid">
       <!-- Grid cells will be populated by JavaScript -->
     </div>
+    <button id="memory-reset-btn" class="memory-reset-btn">リセット</button>
     <button id="memory-submit-btn" class="memory-submit-btn" disabled>決定</button>
-    <p id="selection-info">2つのセルを選択してください。</p>
+    <p id="selection-info">3つのセルを選択してください。</p>
   </div>
   
   <div id="stage3" class="stage hidden">
@@ -123,7 +141,7 @@
     const memoryPositions = [];
     const selectedMemoryPositions = [];
     const gridSize = 4;
-    const numPositions = 2;
+    const numPositions = 3;
     
     function initializeMemoryStage() {
       // Generate 2 random positions
@@ -178,17 +196,10 @@
       const cell = document.querySelector(`[data-index="${index}"]`);
       const isSelected = selectedMemoryPositions.includes(index);
       
-      if (isSelected) {
-        // Deselect
-        cell.classList.remove('selected');
-        const idx = selectedMemoryPositions.indexOf(index);
-        selectedMemoryPositions.splice(idx, 1);
-      } else {
-        // Select only if we haven't reached the limit
-        if (selectedMemoryPositions.length < numPositions) {
-          cell.classList.add('selected');
-          selectedMemoryPositions.push(index);
-        }
+      // Only allow selection if cell is not already selected and limit not reached
+      if (!isSelected && selectedMemoryPositions.length < numPositions) {
+        cell.classList.add('selected');
+        selectedMemoryPositions.push(index);
       }
       
       updateSubmitButton();
@@ -206,6 +217,15 @@
         submitBtn.disabled = true;
         selectionInfo.textContent = `${selectedCount}つのセルが選択されました。あと${numPositions - selectedCount}つ選択してください。`;
       }
+    }
+    
+    function resetSelection() {
+      selectedMemoryPositions.length = 0;
+      const cells = document.querySelectorAll('.reproduction-cell');
+      cells.forEach(cell => {
+        cell.classList.remove('selected');
+      });
+      updateSubmitButton();
     }
     
     function submitAnswer() {
@@ -244,6 +264,9 @@
       
       // Add submit button event listener
       document.getElementById('memory-submit-btn').addEventListener('click', submitAnswer);
+      
+      // Add reset button event listener
+      document.getElementById('memory-reset-btn').addEventListener('click', resetSelection);
       
       // Auto-advance after 3 seconds (for testing)
       setTimeout(function() {
