@@ -545,23 +545,29 @@
     const experimentInstructions = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        let html = '<div class="container mt-4">';
+        html += '<div class="row justify-content-center">';
+        html += '<div class="col-lg-10">';
         
         // Main title
-        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">実験の操作説明</h1>';
+        html += '<h1 class="text-center text-dark mb-5 display-4 fw-bold">実験の操作説明</h1>';
         
         // Experiment overview section
-        html += '<div style="background-color: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">';
-        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">実験全体の流れ</h2>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">できるだけ<strong style="color: #e74c3c;">早く</strong>、<strong style="color: #e74c3c;">正確に</strong>探してください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">全部終了すると、あなたのスコアが表示されます。</p>';
+        html += '<div class="card mb-4 border-primary">';
+        html += '<div class="card-header bg-primary text-white">';
+        html += '<h2 class="mb-0 h4">実験全体の流れ</h2>';
+        html += '</div>';
+        html += '<div class="card-body">';
+        html += '<p class="fs-5 mb-3">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
+        html += '<p class="fs-5 mb-3">できるだけ<strong class="text-danger">早く</strong>、<strong class="text-danger">正確に</strong>探してください。</p>';
+        html += '<p class="fs-5 mb-0">全部終了すると、あなたのスコアが表示されます。</p>';
+        html += '</div>';
         html += '</div>';
         
         // Experiment flow section  
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">実験の構成</h2>';
-        html += '<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">';
+        html += '<div class="mb-4">';
+        html += '<h2 class="text-success mb-3 h4">実験の構成</h2>';
+        html += '<div class="row g-3">';
         
         // Step boxes
         const steps = [
@@ -571,19 +577,21 @@
         ];
         
         steps.forEach(step => {
-          html += `<div style="flex: 1; min-width: 220px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">`;
-          html += `<div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">${step.num}</div>`;
-          html += `<div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">${step.title}</div>`;
-          html += `<div style="font-size: 16px; margin-bottom: 8px;">${step.desc}</div>`;
-          html += `<div style="font-size: 14px; opacity: 0.9;">${step.detail}</div>`;
-          html += '</div>';
+          html += `<div class="col-md-4">`;
+          html += `<div class="card text-white bg-gradient border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">`;
+          html += `<div class="card-body text-center">`;
+          html += `<div class="display-4 fw-bold mb-2">${step.num}</div>`;
+          html += `<h5 class="card-title mb-2">${step.title}</h5>`;
+          html += `<p class="card-text mb-2">${step.desc}</p>`;
+          html += `<small class="text-white-50">${step.detail}</small>`;
+          html += `</div></div></div>`;
         });
         
         html += '</div></div>';
         
         // Task overview section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">操作の説明</h2>';
+        html += '<div class="mb-4">';
+        html += '<h2 class="text-danger mb-3 h4">操作の説明</h2>';
         
         const taskSteps = [
           { step: '1', text: '条件の説明が表示されます' },
@@ -593,57 +601,66 @@
         ];
         
         taskSteps.forEach(task => {
-          html += `<div style="background-color: #ffffff; border: 2px solid #dee2e6; border-radius: 8px; padding: 18px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
-          html += `<div style="background-color: #dc3545; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">${task.step}</div>`;
-          html += `<div style="font-size: 16px; color: #333; flex: 1;">${task.text}</div>`;
-          html += '</div>';
+          html += `<div class="card border-secondary mb-3">`;
+          html += `<div class="card-body d-flex align-items-start">`;
+          html += `<span class="badge bg-danger rounded-circle me-3 p-2" style="width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">${task.step}</span>`;
+          html += `<div class="flex-grow-1">${task.text}</div>`;
+          html += `</div></div>`;
         });
         
         html += '</div>';
         
         // Viewing conditions section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">3つの表示パターン</h2>';
+        html += '<div class="mb-4">';
+        html += '<h2 class="text-purple mb-3 h4" style="color: #6f42c1;">3つの表示パターン</h2>';
         
         const conditions = [
           {
             name: '全画面',
             color: '#17a2b8',
+            bgClass: 'border-info',
             description: '覚えた図形を探してクリックしてください。'
           },
           {
             name: 'ウィンドウ', 
             color: '#fd7e14',
+            bgClass: 'border-warning',
             description: 'ウィンドウが表示されます。ウィンドウをドラッグすることで、隠れている範囲も見ることができます。覚えた図形を見つけたらクリックしてください。'
           },
           {
             name: 'スクロール',
             color: '#28a745',
+            bgClass: 'border-success',
             description: 'ウィンドウが中央に固定されています。ドラッグすると背景がスクロールされるので、覚えた図形を探し、見つけたらクリックしてください。'
           }
         ];
         
         conditions.forEach((condition, index) => {
-          html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 10px; padding: 20px; margin-bottom: 20px;">`;
-          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${index + 1}. ${condition.name}</h3>`;
-          html += `<p style="margin: 0; font-size: 16px; color: #333; line-height: 1.6;">${condition.description}</p>`;
-          html += '</div>';
+          html += `<div class="card ${condition.bgClass} mb-3">`;
+          html += `<div class="card-header d-flex align-items-center" style="background-color: ${condition.color}15; border-color: ${condition.color};">`;
+          html += `<h5 class="mb-0" style="color: ${condition.color};">${index + 1}. ${condition.name}</h5>`;
+          html += `</div>`;
+          html += `<div class="card-body">`;
+          html += `<p class="mb-0">${condition.description}</p>`;
+          html += `</div></div>`;
         });
         
         html += '</div>';
         
         // Important message
-        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center;">';
-        html += '<h3 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">⚡ 重要なポイント</h3>';
-        html += '<p style="margin: 0; font-size: 18px; color: #856404; font-weight: bold;">できるだけ早く、正確に図形を見つけてクリックしてください</p>';
+        html += '<div class="alert alert-warning text-center mb-4" role="alert">';
+        html += '<h4 class="alert-heading">⚡ 重要なポイント</h4>';
+        html += '<p class="mb-0 fs-5 fw-bold">できるだけ早く、正確に図形を見つけてクリックしてください</p>';
         html += '</div>';
         
         // Continue button
-        html += '<div style="text-align: center; margin-top: 40px;">';
-        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">練習を開始する</button>';
+        html += '<div class="text-center mt-4">';
+        html += '<button id="instructions-continue-btn" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 1.25rem; transition: transform 0.2s;">練習を開始する</button>';
         html += '</div>';
         
-        html += '</div>';
+        html += '</div>'; // End col
+        html += '</div>'; // End row  
+        html += '</div>'; // End container
         
         return html;
       },

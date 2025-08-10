@@ -13,7 +13,8 @@
     /* Fallback Bootstrap-like styles for testing when CDN is blocked */
     .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
-    .col-md-8, .col-lg-8, .col-lg-10 { padding: 0 15px; }
+    .col-md-4, .col-md-8, .col-lg-8, .col-lg-10 { padding: 0 15px; }
+    .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
     .col-md-8 { flex: 0 0 66.666667%; max-width: 66.666667%; }
     .col-lg-8 { flex: 0 0 66.666667%; max-width: 66.666667%; }
     .col-lg-10 { flex: 0 0 83.333333%; max-width: 83.333333%; }
@@ -24,9 +25,15 @@
     .mb-0 { margin-bottom: 0; }
     .mb-3 { margin-bottom: 1rem; }
     .mb-4 { margin-bottom: 1.5rem; }
+    .mb-5 { margin-bottom: 3rem; }
+    .p-2 { padding: 0.5rem; }
     .p-3 { padding: 1rem; }
     .p-5 { padding: 3rem; }
     .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .px-5 { padding-left: 3rem; padding-right: 3rem; }
+    .py-3 { padding-top: 1rem; padding-bottom: 1rem; }
+    .me-3 { margin-right: 1rem; }
+    .g-3 > * { padding: 0.75rem; }
     .card { position: relative; display: flex; flex-direction: column; background-color: #fff; border: 1px solid rgba(0,0,0,.125); border-radius: 0.375rem; }
     .card-header { padding: 0.75rem 1.25rem; margin-bottom: 0; background-color: #f8f9fa; border-bottom: 1px solid rgba(0,0,0,.125); border-radius: 0.375rem 0.375rem 0 0; }
     .card-body { flex: 1 1 auto; padding: 1.25rem; }
@@ -34,18 +41,31 @@
     .card-text { margin-bottom: 1rem; }
     .shadow { box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; }
     .shadow-lg { box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important; }
+    .border-primary { border-color: #0d6efd !important; }
+    .border-secondary { border-color: #6c757d !important; }
+    .border-info { border-color: #0dcaf0 !important; }
+    .border-warning { border-color: #ffc107 !important; }
+    .border-success { border-color: #198754 !important; }
+    .border-0 { border: 0 !important; }
     .btn { display: inline-block; padding: 0.5rem 1rem; margin-bottom: 0; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; border: 1px solid transparent; border-radius: 0.375rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
     .btn-primary { color: #fff; background-color: #0d6efd; border-color: #0d6efd; }
     .btn-success { color: #fff; background-color: #198754; border-color: #198754; }
     .btn-secondary { color: #fff; background-color: #6c757d; border-color: #6c757d; }
     .btn-lg { padding: 0.75rem 1.5rem; font-size: 1.25rem; border-radius: 0.5rem; }
-    .text-primary { color: #0d6efd !important; }
-    .text-danger { color: #dc3545 !important; }
-    .text-white { color: #fff !important; }
+    .badge { display: inline-block; padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.375rem; }
     .bg-primary { background-color: #0d6efd !important; }
     .bg-success { background-color: #198754 !important; }
+    .bg-danger { background-color: #dc3545 !important; }
+    .bg-gradient { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0)) !important; }
+    .rounded-circle { border-radius: 50% !important; }
+    .text-primary { color: #0d6efd !important; }
+    .text-danger { color: #dc3545 !important; }
+    .text-dark { color: #212529 !important; }
+    .text-white { color: #fff !important; }
+    .text-white-50 { color: rgba(255, 255, 255, 0.5) !important; }
     .alert { position: relative; padding: 1rem 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: 0.375rem; }
     .alert-info { color: #055160; background-color: #cff4fc; border-color: #b6effb; }
+    .alert-warning { color: #664d03; background-color: #fff3cd; border-color: #ffecb5; }
     .alert-heading { color: inherit; }
     .form-label { margin-bottom: 0.5rem; font-weight: 500; }
     .form-control, .form-select { display: block; width: 100%; padding: 0.5rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #ced4da; border-radius: 0.375rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
@@ -55,11 +75,21 @@
     .form-check-label { color: #212529; cursor: pointer; }
     .fw-bold { font-weight: 700 !important; }
     .fw-semibold { font-weight: 600 !important; }
+    .fs-5 { font-size: 1.25rem !important; }
+    .h4 { font-size: 1.5rem; }
+    .h5 { font-size: 1.25rem; }
     .lead { font-size: 1.25rem; font-weight: 300; }
+    .display-4 { font-size: 2.5rem; font-weight: 300; line-height: 1.2; }
     .border { border: 1px solid #dee2e6 !important; }
     .rounded { border-radius: 0.375rem !important; }
+    .d-flex { display: flex !important; }
     .d-inline-block { display: inline-block !important; }
+    .align-items-start { align-items: flex-start !important; }
+    .align-items-center { align-items: center !important; }
+    .flex-grow-1 { flex-grow: 1 !important; }
     .ms-2 { margin-left: 0.5rem !important; }
+    .h-100 { height: 100% !important; }
+    .my-5 { margin-top: 3rem !important; margin-bottom: 3rem !important; }
   </style>
   
   <!-- Bootstrap 5.3 JS Bundle -->
@@ -78,6 +108,99 @@
               <button class="btn btn-primary btn-lg px-4">次へ</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Experiment Instructions Demo -->
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          
+          <!-- Main title -->
+          <h1 class="text-center text-dark mb-5 display-4 fw-bold">実験の操作説明</h1>
+          
+          <!-- Experiment overview section -->
+          <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+              <h2 class="mb-0 h4">実験全体の流れ</h2>
+            </div>
+            <div class="card-body">
+              <p class="fs-5 mb-3">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>
+              <p class="fs-5 mb-3">できるだけ<strong class="text-danger">早く</strong>、<strong class="text-danger">正確に</strong>探してください。</p>
+              <p class="fs-5 mb-0">全部終了すると、あなたのスコアが表示されます。</p>
+            </div>
+          </div>
+          
+          <!-- Experiment flow section -->
+          <div class="mb-4">
+            <h2 class="text-success mb-3 h4">実験の構成</h2>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="card text-white bg-gradient border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <div class="card-body text-center">
+                    <div class="display-4 fw-bold mb-2">1</div>
+                    <h5 class="card-title mb-2">練習</h5>
+                    <p class="card-text mb-2">9回</p>
+                    <small class="text-white-50">まずは操作に慣れましょう</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card text-white bg-gradient border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <div class="card-body text-center">
+                    <div class="display-4 fw-bold mb-2">2</div>
+                    <h5 class="card-title mb-2">前半</h5>
+                    <p class="card-text mb-2">60回</p>
+                    <small class="text-white-50">集中してがんばりましょう</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card text-white bg-gradient border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <div class="card-body text-center">
+                    <div class="display-4 fw-bold mb-2">3</div>
+                    <h5 class="card-title mb-2">後半</h5>
+                    <p class="card-text mb-2">60回</p>
+                    <small class="text-white-50">記憶課題も追加されます</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Task overview section -->
+          <div class="mb-4">
+            <h2 class="text-danger mb-3 h4">操作の説明</h2>
+            
+            <div class="card border-secondary mb-3">
+              <div class="card-body d-flex align-items-start">
+                <span class="badge bg-danger rounded-circle me-3 p-2" style="width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">1</span>
+                <div class="flex-grow-1">条件の説明が表示されます</div>
+              </div>
+            </div>
+            
+            <div class="card border-secondary mb-3">
+              <div class="card-body d-flex align-items-start">
+                <span class="badge bg-danger rounded-circle me-3 p-2" style="width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">2</span>
+                <div class="flex-grow-1">1秒間だけターゲットが表示されます。集中して見て覚えてください。</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Important message -->
+          <div class="alert alert-warning text-center mb-4" role="alert">
+            <h4 class="alert-heading">⚡ 重要なポイント</h4>
+            <p class="mb-0 fs-5 fw-bold">できるだけ早く、正確に図形を見つけてクリックしてください</p>
+          </div>
+          
+          <!-- Continue button -->
+          <div class="text-center mt-4">
+            <button class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 1.25rem; transition: transform 0.2s;">練習を開始する</button>
+          </div>
+          
         </div>
       </div>
     </div>
@@ -144,57 +267,6 @@
                   <button type="submit" class="btn btn-success btn-lg px-4">次へ進む</button>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="my-5">
-
-    <!-- Informed Consent Demo (excerpt) -->
-    <div class="container mt-4">
-      <div class="row justify-content-center">
-        <div class="col-lg-10">
-          <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-              <h1 class="mb-0">研究に関する同意事項</h1>
-            </div>
-            <div class="card-body">
-              
-              <!-- Scrollable content area -->
-              <div class="border rounded p-3 mb-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
-                
-                <h4 class="text-primary">1. 研究の目的</h4>
-                <p>本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>
-                
-                <h4 class="text-primary">2. 実験内容</h4>
-                <ul>
-                  <li>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>
-                  <li>所要時間：約 30 分（説明等を含む）</li>
-                  <li>課題内容：ご自身の PC からアクセスしていただき、画面上に表示される特定の図形の場所を探す課題に、繰り返し取り組んでいただきます。</li>
-                </ul>
-                
-                <h4 class="text-primary">3. 参加条件</h4>
-                <ul>
-                  <li>18 歳以上の方。</li>
-                  <li>正常または矯正視力を有し、課題の理解に支障がない方。</li>
-                </ul>
-                
-              </div>
-              
-              <!-- Consent checkbox and button -->
-              <div class="text-center mt-4">
-                <div class="form-check d-inline-block mb-3">
-                  <input class="form-check-input" type="checkbox" id="consent-checkbox" style="transform: scale(1.2);">
-                  <label class="form-check-label ms-2 fw-semibold" for="consent-checkbox">
-                    上記の内容を確認し、研究参加に同意します
-                  </label>
-                </div>
-                <br>
-                <button class="btn btn-secondary btn-lg" disabled>次へ進む</button>
-              </div>
-              
             </div>
           </div>
         </div>
