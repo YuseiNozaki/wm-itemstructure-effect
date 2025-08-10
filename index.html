@@ -358,10 +358,9 @@
         
         // Information about data usage
         html += '<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left; line-height: 1.6;">';
-        html += '<h4 style="color: #495057; margin-top: 0; margin-bottom: 15px;">📋 個人情報の取り扱いについて</h4>';
+        html += '<h4 style="color: #495057; margin-top: 0; margin-bottom: 15px;">個人情報の取り扱いについて</h4>';
         html += '<ul style="margin: 0; padding-left: 20px; color: #6c757d;">';
         html += '<li style="margin-bottom: 8px;"><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</li>';
-        html += '<li style="margin-bottom: 8px;">メールアドレスには <strong>r241004y@st.u-gakugei.ac.jp</strong> から謝礼のお支払いに関するご連絡をいたします。</li>';
         html += '<li style="margin-bottom: 0;">謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</li>';
         html += '</ul>';
         html += '</div>';
@@ -386,9 +385,9 @@
         html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">年齢 <span style="color: #dc3545;">*</span></label>';
         html += '<select id="age-select" name="age" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
         html += '<option value="">選択してください</option>';
-        
-        // Generate age options from 1 to 100
-        for (let i = 1; i <= 100; i++) {
+
+        // Generate age options from 18 to 100
+        for (let i = 18; i <= 100; i++) {
           html += `<option value="${i}">${i}</option>`;
         }
         
