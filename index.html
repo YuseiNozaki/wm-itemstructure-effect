@@ -233,7 +233,121 @@
       }
     };
 
-
+    // Informed consent screen
+    const informedConsent = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; font-size: 14px;">';
+        html += '<h1 style="text-align: center; color: #333; margin-bottom: 30px;">研究に関する同意事項</h1>';
+        
+        // Scrollable content area
+        html += '<div id="consent-content" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; background-color: #f9f9f9;">';
+        
+        html += '<h3>1. 研究の目的</h3>';
+        html += '<p>本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>';
+        
+        html += '<h3>2. 実験内容</h3>';
+        html += '<ul>';
+        html += '<li>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>';
+        html += '<li>所要時間：約 30 分（説明等を含む）</li>';
+        html += '<li>課題内容：ご自身の PC からアクセスしていただき、画面上に表示される特定の図形の場所を探す課題に、繰り返し取り組んでいただきます。</li>';
+        html += '<li>収集するデータ：性別、年齢、反応時間、課題の成績、カーソルの移動履歴（謝礼のお支払いに必要な氏名、連絡先）</li>';
+        html += '</ul>';
+        
+        html += '<h3>3. 参加条件</h3>';
+        html += '<ul>';
+        html += '<li>18 歳以上の方。</li>';
+        html += '<li>正常または矯正視力を有し、課題の理解に支障がない方。</li>';
+        html += '<li>静かで落ち着いた場所から自身のパソコンを使って、オンラインで実験に参加できる方。</li>';
+        html += '</ul>';
+        
+        html += '<h3>4. 予想される不利益・リスクと対処</h3>';
+        html += '<ul>';
+        html += '<li>画面注視による目の疲れ、ストレス等が生じる可能性があります。</li>';
+        html += '<li>不快・体調不良時はいつでも中断・中止できます。</li>';
+        html += '</ul>';
+        
+        html += '<h3>5. 研究成果の公開</h3>';
+        html += '<p>この研究の成果は、博士論文および心理系の学会で発表を行う予定です。その際に収集したデータを公開することがありますが、情報から個人が特定されない形式での公開を行います。</p>';
+        
+        html += '<h3>6. 謝礼・費用</h3>';
+        html += '<ul>';
+        html += '<li>謝礼として、Amazon ギフトカードなどに交換可能なデジタルギフト「デジコ」を 300 円分お支払いいたします。</li>';
+        html += '<li>「デジコ」のお支払いに必要なため、氏名とメールアドレスをご回答いただきます。</li>';
+        html += '<li>参加に費用はかかりません（通信費等は参加者負担となります）。</li>';
+        html += '</ul>';
+        
+        html += '<h3>7. 任意参加・撤回の自由</h3>';
+        html += '<ul>';
+        html += '<li>参加は完全に任意です。また理由を問わず、途中で撤回できます。</li>';
+        html += '<li>参加を撤回した場合や途中で中止とした場合にも、不利益は一切ありません。</li>';
+        html += '</ul>';
+        
+        html += '<h3>8. 個人情報とデータの取扱い</h3>';
+        html += '<ul>';
+        html += '<li>データは ID で管理し、氏名等の識別情報と分離して保管します。</li>';
+        html += '<li>データは研究実施者および指導教員のみが閲覧可能な状態で保存します。</li>';
+        html += '<li>データの第三者提供は原則行いません。学会・論文等では統計的に集計した形で公表します。</li>';
+        html += '<li>実験実施上で得られた個人情報等は、すべて守秘をお約束し、外部から閲覧不可の状態で厳重に管理いたします。</li>';
+        html += '</ul>';
+        
+        html += '<h3>9. お問い合わせ先</h3>';
+        html += '<p><strong>研究実施者：</strong>野﨑 優晴（東京学芸大学大学院 連合学校教育学研究科 博士課程）<br>';
+        html += 'E-mail：r241004y@st.u-gakugei.ac.jp</p>';
+        html += '<p><strong>指導教員：</strong>関口 貴裕（東京学芸大学 教育心理学講座 教授）<br>';
+        html += 'E-mail：sekiguti@u-gakugei.ac.jp</p>';
+        
+        html += '</div>'; // End of scrollable content
+        
+        // Consent checkbox and button
+        html += '<div style="text-align: center; margin: 20px 0;">';
+        html += '<label style="display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 20px;">';
+        html += '<input type="checkbox" id="consent-checkbox" style="margin-right: 10px; transform: scale(1.2);"> ';
+        html += '上記の内容を確認し、研究参加に同意します';
+        html += '</label>';
+        html += '<button id="consent-next-btn" disabled style="padding: 12px 24px; font-size: 16px; background-color: #ccc; color: #666; border: none; border-radius: 5px; cursor: not-allowed; transition: all 0.3s;">次へ進む</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        // Ensure no fullscreen listeners are active during consent
+        removeFullscreenListeners();
+        
+        const checkbox = document.getElementById('consent-checkbox');
+        const nextBtn = document.getElementById('consent-next-btn');
+        
+        // Enable/disable button based on checkbox state
+        checkbox.addEventListener('change', function() {
+          if (checkbox.checked) {
+            nextBtn.disabled = false;
+            nextBtn.style.backgroundColor = '#007bff';
+            nextBtn.style.color = 'white';
+            nextBtn.style.cursor = 'pointer';
+          } else {
+            nextBtn.disabled = true;
+            nextBtn.style.backgroundColor = '#ccc';
+            nextBtn.style.color = '#666';
+            nextBtn.style.cursor = 'not-allowed';
+          }
+        });
+        
+        // Add click event listener to the Next button
+        nextBtn.addEventListener('click', function() {
+          if (checkbox.checked) {
+            // Record consent in jsPsych data
+            jsPsych.data.addProperties({
+              informed_consent: true,
+              consent_timestamp: new Date().toISOString()
+            });
+            jsPsych.finishTrial();
+          }
+        });
+      }
+    };
 
     // Demographic information - Age selection with dropdown
     const demographics = {
@@ -1692,6 +1806,7 @@
     // Full experiment timeline
     const timeline = [
       welcome,
+      informedConsent,
       demographics,
       genderSelection,
       experimentInstructions,
