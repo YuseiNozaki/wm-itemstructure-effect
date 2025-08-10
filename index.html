@@ -508,135 +508,109 @@
       }
     };
 
-    // Comprehensive experiment instruction screen
+    // Comprehensive experiment instruction screen (updated according to wireframe ①)
     const experimentInstructions = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.6;">';
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
         
         // Main title
-        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px; font-size: 28px;">実験の操作説明</h1>';
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">実験の操作説明</h1>';
         
         // Experiment overview section
-        html += '<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #007bff;">';
-        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 20px;">🔍 実験の概要</h2>';
-        html += '<p style="font-size: 16px; margin: 10px 0;">この実験では、画面上に散らばった図形の中から<strong>指定された色と形の組み合わせ</strong>を見つけてクリックする課題を行います。</p>';
-        html += '<p style="font-size: 16px; margin: 10px 0;">実験は<strong>2つのブロック</strong>に分かれており、後半では記憶課題も同時に行います。</p>';
+        html += '<div style="background-color: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">';
+        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">📋 実験全体の流れ</h2>';
+        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">一瞬だけ表示される図形を覚えます。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
+        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">できるだけ<strong style="color: #e74c3c;">早く</strong>、<strong style="color: #e74c3c;">正確に</strong>探してください。</p>';
+        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">全部終了すると、あなたのスコアが表示されます。</p>';
         html += '</div>';
         
         // Experiment flow section  
-        html += '<div style="margin-bottom: 25px;">';
-        html += '<h2 style="color: #28a745; font-size: 20px; margin-bottom: 15px;">📋 実験の流れ</h2>';
-        html += '<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between;">';
+        html += '<div style="margin-bottom: 30px;">';
+        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">🚀 実験の構成</h2>';
+        html += '<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">';
         
         // Step boxes
         const steps = [
-          { num: '1', title: '練習', desc: '各条件を体験' },
-          { num: '2', title: '第1ブロック', desc: '60試行（記憶課題なし）' },
-          { num: '3', title: '第2ブロック', desc: '60試行（記憶課題あり）' }
+          { num: '1', title: '練習', desc: '9回', detail: 'まずは操作に慣れましょう' },
+          { num: '2', title: '前半', desc: '60回', detail: '集中してがんばりましょう' },
+          { num: '3', title: '後半', desc: '60回', detail: '記憶課題も追加されます' }
         ];
         
         steps.forEach(step => {
-          html += `<div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; text-align: center;">`;
-          html += `<div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">ステップ ${step.num}</div>`;
-          html += `<div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${step.title}</div>`;
-          html += `<div style="font-size: 14px; opacity: 0.9;">${step.desc}</div>`;
+          html += `<div style="flex: 1; min-width: 220px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">`;
+          html += `<div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">${step.num}</div>`;
+          html += `<div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">${step.title}</div>`;
+          html += `<div style="font-size: 16px; margin-bottom: 8px;">${step.desc}</div>`;
+          html += `<div style="font-size: 14px; opacity: 0.9;">${step.detail}</div>`;
           html += '</div>';
         });
         
         html += '</div></div>';
         
+        // Task overview section
+        html += '<div style="margin-bottom: 30px;">';
+        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">🎯 やってもらうことの概要</h2>';
+        
+        const taskSteps = [
+          { step: '1', text: '条件の説明が表示されます' },
+          { step: '2', text: '1秒間だけターゲットが表示されます。集中して見て覚えてください。' },
+          { step: '3', text: '図形を探す画面が表示されます。図形を探す画面は3パターンあり、ランダムでどれかが表示されます。' },
+          { step: '4', text: 'これを何度も繰り返します。集中力を切らさないように頑張ってください。' }
+        ];
+        
+        taskSteps.forEach(task => {
+          html += `<div style="background-color: #ffffff; border: 2px solid #dee2e6; border-radius: 8px; padding: 18px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #dc3545; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">${task.step}</div>`;
+          html += `<div style="font-size: 16px; color: #333; flex: 1;">${task.text}</div>`;
+          html += '</div>';
+        });
+        
+        html += '</div>';
+        
         // Viewing conditions section
-        html += '<div style="margin-bottom: 25px;">';
-        html += '<h2 style="color: #dc3545; font-size: 20px; margin-bottom: 15px;">👁️ 3つの表示条件</h2>';
+        html += '<div style="margin-bottom: 30px;">';
+        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">🔍 3つの表示パターン</h2>';
         
         const conditions = [
           {
-            name: '全画面条件',
+            name: '全画面',
             icon: '🖥️',
             color: '#17a2b8',
-            description: '画面全体に図形が表示されます',
-            operation: '自由にマウスカーソルを動かして図形を探します'
+            description: '覚えた図形を探してクリックしてください。'
           },
           {
-            name: 'ウィンドウ条件', 
+            name: 'ウィンドウ', 
             icon: '🪟',
             color: '#fd7e14',
-            description: '小さな窓から図形を観察します',
-            operation: 'マウスをドラッグして窓を移動させながら探します'
+            description: 'ウィンドウが表示されます。ウィンドウをドラッグすることで、隠れている範囲も見ることができます。覚えた図形を見つけたらクリックしてください。'
           },
           {
-            name: 'スクロール条件',
+            name: 'スクロール',
             icon: '↔️', 
-            color: '#6f42c1',
-            description: '一部分だけが表示されます',
-            operation: 'マウスをドラッグして背景をスクロールしながら探します'
+            color: '#28a745',
+            description: 'ウィンドウが中央に固定されています。ドラッグすると背景がスクロールされるので、覚えた図形を探し、見つけたらクリックしてください。'
           }
         ];
         
-        conditions.forEach(condition => {
-          html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
-          html += `<h3 style="color: ${condition.color}; margin: 0 0 10px 0; font-size: 18px;">${condition.icon} ${condition.name}</h3>`;
-          html += `<p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> ${condition.description}</p>`;
-          html += `<p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> ${condition.operation}</p>`;
+        conditions.forEach((condition, index) => {
+          html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 10px; padding: 20px; margin-bottom: 20px;">`;
+          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${condition.icon} ${index + 1}. ${condition.name}</h3>`;
+          html += `<p style="margin: 0; font-size: 16px; color: #333; line-height: 1.6;">${condition.description}</p>`;
           html += '</div>';
         });
         
         html += '</div>';
         
-        // Memory task section
-        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin-bottom: 25px;">';
-        html += '<h2 style="color: #856404; margin-top: 0; font-size: 20px;">🧠 記憶課題について（第2ブロックのみ）</h2>';
-        
-        // Memory task visual example
-        html += '<div style="display: flex; align-items: center; gap: 20px; margin: 15px 0;">';
-        html += '<div style="flex-shrink: 0;">';
-        html += '<div style="display: grid; grid-template-columns: repeat(4, 30px); gap: 2px; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">';
-        
-        // Create 4x4 grid example with 2 colored cells
-        for (let i = 0; i < 16; i++) {
-          const isColored = i === 5 || i === 10; // Example positions
-          const bgColor = isColored ? (i === 5 ? '#e74c3c' : '#3498db') : '#ecf0f1';
-          html += `<div style="width: 30px; height: 30px; background-color: ${bgColor}; border: 1px solid #bdc3c7; border-radius: 3px;"></div>`;
-        }
-        
-        html += '</div></div>';
-        html += '<div style="flex: 1;">';
-        html += '<p style="font-size: 15px; margin: 5px 0;"><strong>手順：</strong></p>';
-        html += '<ol style="font-size: 14px; margin: 10px 0; padding-left: 20px;">';
-        html += '<li>4×4のグリッドに<span style="color: #e74c3c;">赤</span>と<span style="color: #3498db;">青</span>の色付きセルが表示されます（3秒間）</li>';
-        html += '<li>視覚検索課題を実行します</li>';
-        html += '<li>検索完了後、色付きセルがあった位置をクリックして再現します</li>';
-        html += '</ol>';
-        html += '</div></div>';
-        html += '</div>';
-        
-        // Operation tips section
-        html += '<div style="background-color: #d1ecf1; border: 2px solid #bee5eb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">';
-        html += '<h2 style="color: #0c5460; margin-top: 0; font-size: 20px;">💡 操作のコツ</h2>';
-        html += '<ul style="font-size: 15px; margin: 10px 0; padding-left: 20px;">';
-        html += '<li><strong>ターゲット探し：</strong> 指定された色と形の組み合わせを正確に見つけてクリック</li>';
-        html += '<li><strong>ウィンドウ条件：</strong> 窓の外にも図形があります。窓をドラッグして全体を確認</li>';
-        html += '<li><strong>スクロール条件：</strong> マウスドラッグで画面をスクロールして隠れた部分も探索</li>';
-        html += '<li><strong>記憶課題：</strong> 検索に集中しすぎず、色付きセルの位置も覚えておく</li>';
-        html += '<li><strong>集中力：</strong> 疲れたら適度に休憩をとって集中力を保つ</li>';
-        html += '</ul>';
-        html += '</div>';
-        
-        // Important notes
-        html += '<div style="background-color: #f8d7da; border: 2px solid #f5c6cb; border-radius: 8px; padding: 15px; margin-bottom: 25px;">';
-        html += '<h3 style="color: #721c24; margin-top: 0; font-size: 18px;">⚠️ 重要な注意事項</h3>';
-        html += '<ul style="font-size: 14px; color: #721c24; margin: 10px 0; padding-left: 20px;">';
-        html += '<li>実験中はフルスクリーンモードで行います</li>';
-        html += '<li>ブラウザの戻るボタンやリロードは避けてください</li>';
-        html += '<li>静かな環境で集中して取り組んでください</li>';
-        html += '<li>練習でしっかり操作方法を理解してから本実験に進んでください</li>';
-        html += '</ul>';
+        // Important message
+        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center;">';
+        html += '<h3 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">⚡ 重要なポイント</h3>';
+        html += '<p style="margin: 0; font-size: 18px; color: #856404; font-weight: bold;">できるだけ早く、正確に図形を見つけてクリックしてください</p>';
         html += '</div>';
         
         // Continue button
-        html += '<div style="text-align: center; margin-top: 30px;">';
-        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; font-size: 18px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">練習を開始する</button>';
+        html += '<div style="text-align: center; margin-top: 40px;">';
+        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">練習を開始する</button>';
         html += '</div>';
         
         html += '</div>';
@@ -1704,24 +1678,128 @@
       }
     };
     
-    // WM task explanation
+    // WM task explanation (updated according to wireframe ②)
     const wmTaskExplanation = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <h1>記憶課題の説明</h1>
-        <p>これからは追加で、記憶課題も行います。</p>
-        <p>2つの色のついたセルの位置を記憶してください。</p>
-        <p><strong>下の「次へ」ボタンをクリックして次に進みます。</strong></p>
-        <div style="margin: 20px 0;">
-          <button id="wm-task-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
-        </div>
-      `,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        
+        // Title
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">後半の実験について</h1>';
+        
+        // Completion message
+        html += '<div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">';
+        html += '<h2 style="color: #155724; margin: 0 0 15px 0; font-size: 24px;">🎉 前半が終了です</h2>';
+        html += '<p style="font-size: 18px; margin: 0; color: #155724;">お疲れさまでした！ここからは、あなたのワーキングメモリにさらに負荷をかけていきます。</p>';
+        html += '<p style="font-size: 18px; margin: 10px 0 0 0; color: #155724; font-weight: bold;">集中力を切らさないように頑張ってください。</p>';
+        html += '</div>';
+        
+        // Memory task explanation
+        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
+        html += '<h2 style="color: #856404; margin: 0 0 20px 0; font-size: 22px;">🧠 新しく追加される記憶課題</h2>';
+        
+        // Step-by-step explanation
+        const memorySteps = [
+          { 
+            step: '1', 
+            text: 'ターゲットが表示される前に、4×4のパネルが表示されます。',
+            detail: 'パネルはランダムな3箇所に色がついているので、場所を記憶してください。'
+          },
+          { 
+            step: '2', 
+            text: 'そのまま、前半と同じ課題に取り組みます。',
+            detail: '図形を探してクリックする作業は前半と全く同じです。'
+          },
+          { 
+            step: '3', 
+            text: 'その後、先ほど記憶したパネルの場所を回答します。',
+            detail: '色のついていた位置をクリックで選択してください。'
+          },
+          { 
+            step: '4', 
+            text: 'これを何度も繰り返します。',
+            detail: '記憶と視覚検索の両方に集中してください。'
+          }
+        ];
+        
+        memorySteps.forEach(step => {
+          html += `<div style="background-color: #ffffff; border: 2px solid #e2e2e2; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #856404; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 18px;">${step.step}</div>`;
+          html += `<div style="flex: 1;">`;
+          html += `<div style="font-size: 17px; color: #333; font-weight: bold; margin-bottom: 8px;">${step.text}</div>`;
+          html += `<div style="font-size: 15px; color: #666; line-height: 1.6;">${step.detail}</div>`;
+          html += `</div></div>`;
+        });
+        
+        html += '</div>';
+        
+        // Visual example
+        html += '<div style="background-color: #f8f9fa; border: 2px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
+        html += '<h3 style="color: #495057; margin: 0 0 20px 0; font-size: 20px; text-align: center;">📋 4×4パネルの例</h3>';
+        
+        html += '<div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin: 20px 0;">';
+        
+        // Memory grid example
+        html += '<div style="text-align: center;">';
+        html += '<div style="display: grid; grid-template-columns: repeat(4, 50px); gap: 3px; background-color: #ffffff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 10px;">';
+        
+        // Create 4x4 grid example with 3 colored cells
+        for (let i = 0; i < 16; i++) {
+          let bgColor = '#f8f9fa';
+          if (i === 2) bgColor = '#e74c3c'; // Red
+          if (i === 7) bgColor = '#3498db'; // Blue  
+          if (i === 13) bgColor = '#f39c12'; // Orange
+          
+          html += `<div style="width: 50px; height: 50px; background-color: ${bgColor}; border: 2px solid #bdc3c7; border-radius: 5px;"></div>`;
+        }
+        
+        html += '</div>';
+        html += '<p style="font-size: 14px; color: #666; margin: 0;">色のついた3つの位置を覚えてください</p>';
+        html += '</div>';
+        
+        html += '<div style="font-size: 24px; color: #666;">→</div>';
+        
+        // Arrow and explanation
+        html += '<div style="text-align: center; max-width: 300px;">';
+        html += '<div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border: 2px solid #2196f3;">';
+        html += '<p style="margin: 0; font-size: 16px; color: #1976d2; font-weight: bold;">視覚検索課題を実行</p>';
+        html += '<p style="margin: 8px 0 0 0; font-size: 14px; color: #424242;">記憶した位置を頭に置きながら<br>図形を探してクリック</p>';
+        html += '</div>';
+        html += '</div>';
+        
+        html += '</div>';
+        html += '</div>';
+        
+        // Important reminder
+        html += '<div style="background-color: #f8d7da; border: 2px solid #f5c6cb; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;">';
+        html += '<h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 20px;">⚠️ 重要なポイント</h3>';
+        html += '<p style="margin: 0; font-size: 16px; color: #721c24; line-height: 1.6;">記憶課題と視覚検索課題の両方に集中してください。<br>どちらも同じぐらい重要です。</p>';
+        html += '</div>';
+        
+        // Continue button
+        html += '<div style="text-align: center; margin-top: 40px;">';
+        html += '<button id="wm-task-next-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">後半を開始する</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
       choices: "NO_KEYS",
       on_load: function() {
         // Add click event listener to the Next button
         const nextBtn = document.getElementById('wm-task-next-btn');
         nextBtn.addEventListener('click', function() {
           jsPsych.finishTrial();
+        });
+        
+        // Add hover effect to button
+        nextBtn.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-2px)';
+        });
+        
+        nextBtn.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
         });
       }
     };
