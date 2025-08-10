@@ -575,19 +575,16 @@
         const conditions = [
           {
             name: '全画面',
-            icon: '🖥️',
             color: '#17a2b8',
             description: '覚えた図形を探してクリックしてください。'
           },
           {
             name: 'ウィンドウ', 
-            icon: '🪟',
             color: '#fd7e14',
             description: 'ウィンドウが表示されます。ウィンドウをドラッグすることで、隠れている範囲も見ることができます。覚えた図形を見つけたらクリックしてください。'
           },
           {
             name: 'スクロール',
-            icon: '↔️', 
             color: '#28a745',
             description: 'ウィンドウが中央に固定されています。ドラッグすると背景がスクロールされるので、覚えた図形を探し、見つけたらクリックしてください。'
           }
@@ -595,7 +592,7 @@
         
         conditions.forEach((condition, index) => {
           html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 10px; padding: 20px; margin-bottom: 20px;">`;
-          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${condition.icon} ${index + 1}. ${condition.name}</h3>`;
+          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${index + 1}. ${condition.name}</h3>`;
           html += `<p style="margin: 0; font-size: 16px; color: #333; line-height: 1.6;">${condition.description}</p>`;
           html += '</div>';
         });
@@ -1687,13 +1684,6 @@
         // Title
         html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">後半の実験について</h1>';
         
-        // Completion message
-        html += '<div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">';
-        html += '<h2 style="color: #155724; margin: 0 0 15px 0; font-size: 24px;">前半が終了です</h2>';
-        html += '<p style="font-size: 18px; margin: 0; color: #155724;">お疲れさまでした！ここからは、あなたのワーキングメモリにさらに負荷をかけていきます。</p>';
-        html += '<p style="font-size: 18px; margin: 10px 0 0 0; color: #155724; font-weight: bold;">集中力を切らさないように頑張ってください。</p>';
-        html += '</div>';
-        
         // Memory task explanation
         html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
         html += '<h2 style="color: #856404; margin: 0 0 20px 0; font-size: 22px;">新しく追加される記憶課題</h2>';
@@ -1735,7 +1725,7 @@
         
         // Visual example
         html += '<div style="background-color: #f8f9fa; border: 2px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
-        html += '<h3 style="color: #495057; margin: 0 0 20px 0; font-size: 20px; text-align: center;">📋 4×4パネルの例</h3>';
+        html += '<h3 style="color: #495057; margin: 0 0 20px 0; font-size: 20px; text-align: center;">4×4パネルの例</h3>';
         
         html += '<div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin: 20px 0;">';
         
@@ -1743,12 +1733,12 @@
         html += '<div style="text-align: center;">';
         html += '<div style="display: grid; grid-template-columns: repeat(4, 50px); gap: 3px; background-color: #ffffff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 10px;">';
         
-        // Create 4x4 grid example with 3 colored cells
+        // Create 4x4 grid example with 3 yellow cells
         for (let i = 0; i < 16; i++) {
           let bgColor = '#f8f9fa';
-          if (i === 2) bgColor = '#e74c3c'; // Red
-          if (i === 7) bgColor = '#3498db'; // Blue  
-          if (i === 13) bgColor = '#f39c12'; // Orange
+          if (i === 2) bgColor = '#f1c40f'; // Yellow
+          if (i === 7) bgColor = '#f1c40f'; // Yellow
+          if (i === 13) bgColor = '#f1c40f'; // Yellow
           
           html += `<div style="width: 50px; height: 50px; background-color: ${bgColor}; border: 2px solid #bdc3c7; border-radius: 5px;"></div>`;
         }
@@ -1773,6 +1763,11 @@
         // Important reminder
         html += '<div style="background-color: #f8d7da; border: 2px solid #f5c6cb; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;">';
         html += '<h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 20px;">重要なポイント</h3>';
+        html += '<ul style="text-align: left; color: #721c24; font-size: 16px; margin: 0; padding-left: 20px;">';
+        html += '<li style="margin-bottom: 8px;">記憶課題と視覚検索課題の両方に集中してください</li>';
+        html += '<li style="margin-bottom: 8px;">できるだけ早く、正確に図形を見つけてクリックしてください</li>';
+        html += '<li style="margin-bottom: 8px;">色がついた位置を正確に記憶し、後で思い出してください</li>';
+        html += '</ul>';
         html += '</div>';
         
         // Continue button
