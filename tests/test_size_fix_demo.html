@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Size Fix Demonstration</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .comparison { display: flex; gap: 50px; margin: 20px 0; }
+    .demo-section { border: 2px solid #ccc; padding: 20px; border-radius: 10px; text-align: center; }
+    .before { border-color: #dc3545; background-color: #f8d7da; }
+    .after { border-color: #28a745; background-color: #d4edda; }
+    .object-demo { margin: 20px 0; }
+    .target-presentation { border: 2px solid #007bff; padding: 10px; margin: 10px; display: inline-block; }
+    .search-objects { border: 2px solid #6c757d; padding: 10px; margin: 10px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>Size Consistency Fix Demonstration</h1>
+  
+  <div class="comparison">
+    <div class="demo-section before">
+      <h2>🚫 Before Fix (Bug)</h2>
+      <p><strong>Target Presentation:</strong></p>
+      <div class="target-presentation">
+        <svg width="50" height="50">
+          <circle cx="25" cy="25" r="20" fill="red" stroke="black" stroke-width="2" />
+        </svg>
+        <br>Size: 50px (hardcoded)
+      </div>
+      
+      <p><strong>Search Objects:</strong></p>
+      <div class="search-objects">
+        <svg width="30" height="30">
+          <circle cx="15" cy="15" r="12" fill="red" stroke="black" stroke-width="2" />
+        </svg>
+        <svg width="30" height="30">
+          <rect x="3" y="3" width="24" height="24" fill="blue" stroke="black" stroke-width="2" />
+        </svg>
+        <br>Size: 30px (calculated)
+      </div>
+      
+      <p style="color: #dc3545; font-weight: bold;">❌ Size Mismatch: 50px vs 30px</p>
+    </div>
+    
+    <div class="demo-section after">
+      <h2>✅ After Fix (Consistent)</h2>
+      <p><strong>Target Presentation:</strong></p>
+      <div class="target-presentation">
+        <svg width="30" height="30">
+          <circle cx="15" cy="15" r="12" fill="red" stroke="black" stroke-width="2" />
+        </svg>
+        <br>Size: 30px (calculated)
+      </div>
+      
+      <p><strong>Search Objects:</strong></p>
+      <div class="search-objects">
+        <svg width="30" height="30">
+          <circle cx="15" cy="15" r="12" fill="red" stroke="black" stroke-width="2" />
+        </svg>
+        <svg width="30" height="30">
+          <rect x="3" y="3" width="24" height="24" fill="blue" stroke="black" stroke-width="2" />
+        </svg>
+        <br>Size: 30px (calculated)
+      </div>
+      
+      <p style="color: #28a745; font-weight: bold;">✓ Size Consistent: 30px for both</p>
+    </div>
+  </div>
+  
+  <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+    <h3>Technical Details</h3>
+    <ul>
+      <li><strong>Parameters:</strong> objectMinSize: 20px, objectMaxSize: 40px</li>
+      <li><strong>Calculation:</strong> (40 + 20) / 2 = 30px</li>
+      <li><strong>Before Fix:</strong> Target used hardcoded 50px, search objects used calculated 30px</li>
+      <li><strong>After Fix:</strong> Both target and search objects use calculated 30px</li>
+    </ul>
+  </div>
+  
+  <div style="background: #d1ecf1; padding: 20px; border-radius: 10px; margin: 20px 0;">
+    <h3>Code Changes</h3>
+    <p><strong>Added uniform size function:</strong></p>
+    <code style="background: #f8f9fa; padding: 5px; border-radius: 3px;">
+      function getUniformObjectSize() { return (params.objectMaxSize + params.objectMinSize) / 2; }
+    </code>
+    
+    <p><strong>Updated target presentation:</strong></p>
+    <code style="background: #f8f9fa; padding: 5px; border-radius: 3px;">
+      drawShape(targetShape, targetColor, 100, 100, getUniformObjectSize()) // was: 50
+    </code>
+  </div>
+</body>
+</html>
