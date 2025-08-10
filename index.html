@@ -730,13 +730,23 @@
     const practiceExplanation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-          <p style="font-size: 18px; margin: 20px 0;">はじめに9回練習を行います</p>
-          <p style="font-size: 16px; margin: 20px 0;">
-            <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
-          </p>
-          <div style="margin: 20px 0;">
-            <button id="practice-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-8">
+          <div class="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">
+            <div class="mb-8">
+              <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z"></path>
+                </svg>
+              </div>
+              <h1 class="text-4xl font-bold text-gray-800 mb-6">練習セッション</h1>
+              <p class="text-xl text-gray-600 mb-4">はじめに9回練習を行います</p>
+              <p class="text-lg text-gray-700 leading-relaxed">
+                下のボタンをクリックして練習を開始してください
+              </p>
+            </div>
+            <button id="practice-next-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+              練習を開始
+            </button>
           </div>
         </div>
       `,
@@ -762,21 +772,44 @@
         if (!isPractice) {
           // Increment trial counter for main trials
           currentMainTrialNumber++;
-          progressDisplay = `<p style="font-size: 16px; margin: 10px 0; font-weight: bold; color: #007bff;">${currentMainTrialNumber}回/${totalMainTrials}回</p>`;
+          progressDisplay = `<div class="mb-4 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-lg font-bold inline-block">${currentMainTrialNumber}回/${totalMainTrials}回</div>`;
+        }
+        
+        // Determine condition styling and icon
+        let conditionColor, conditionIcon, conditionName, conditionDesc;
+        if (viewCondition === 'window') {
+          conditionColor = 'from-orange-500 to-red-600';
+          conditionIcon = '🪟';
+          conditionName = 'ウィンドウ条件';
+          conditionDesc = 'ウィンドウを動かして探索します';
+        } else if (viewCondition === 'scroll') {
+          conditionColor = 'from-green-500 to-emerald-600';
+          conditionIcon = '🔄';
+          conditionName = 'スクロール条件';
+          conditionDesc = '背景をスクロールして探索します';
+        } else {
+          conditionColor = 'from-cyan-500 to-blue-600';
+          conditionIcon = '🖥️';
+          conditionName = '全画面条件';
+          conditionDesc = '全画面で探索をします';
         }
         
         return `
-          ${progressDisplay}
-          <p>次は<strong>${viewCondition === 'window' ? 'ウィンドウ条件' : 
-            viewCondition === 'scroll' ? 'スクロール条件' : '全画面条件'}</strong></p>
-          <p>${viewCondition === 'window' ? 
-            'ウィンドウを動かして探索します。' : 
-            viewCondition === 'scroll' ? 
-            '背景をスクロールして探索します。' : 
-            '全画面で探索をします'}</p>
-          <p><strong>下の「次へ」ボタンをクリックして開始します。</strong></p>
-          <div style="margin: 20px 0;">
-            <button id="visual-search-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+          <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-8">
+            <div class="max-w-xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">
+              ${progressDisplay}
+              <div class="mb-8">
+                <div class="w-20 h-20 bg-gradient-to-r ${conditionColor} rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">
+                  ${conditionIcon}
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">次は${conditionName}</h1>
+                <p class="text-xl text-gray-600 leading-relaxed mb-6">${conditionDesc}</p>
+                <p class="text-lg text-gray-700">下のボタンをクリックして開始します</p>
+              </div>
+              <button id="visual-search-next-btn" class="bg-gradient-to-r ${conditionColor} hover:opacity-90 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                開始する
+              </button>
+            </div>
           </div>
         `;
       },
@@ -811,8 +844,17 @@
         }
         
         // Create the grid HTML
-        let gridHTML = '<h1>記憶課題</h1>';
-        gridHTML += '<p>以下のグリッド内の色のついたセルの位置を記憶してください。</p>';
+        let gridHTML = '<div class="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center p-8">';
+        gridHTML += '<div class="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">';
+        gridHTML += '<div class="mb-8">';
+        gridHTML += '<div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center">';
+        gridHTML += '<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+        gridHTML += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        gridHTML += '</svg>';
+        gridHTML += '</div>';
+        gridHTML += '<h1 class="text-3xl font-bold text-gray-800 mb-4">記憶課題</h1>';
+        gridHTML += '<p class="text-lg text-gray-600 mb-8">以下のグリッド内の色のついたセルの位置を記憶してください</p>';
+        gridHTML += '</div>';
         gridHTML += '<div id="memory-grid">';
         
         for (let i = 0; i < gridSize * gridSize; i++) {
@@ -821,7 +863,9 @@
         }
         
         gridHTML += '</div>';
-        gridHTML += '<p>3秒間表示された後、自動的に次へ進みます。</p>';
+        gridHTML += '<p class="text-base text-gray-500 mt-8">3秒間表示された後、自動的に次へ進みます</p>';
+        gridHTML += '</div>';
+        gridHTML += '</div>';
         
         return gridHTML;
       },
@@ -840,8 +884,17 @@
         const gridSize = params.memoryGridSize;
         
         // Create the HTML with a blank interactive grid
-        let gridHTML = '<h1>記憶課題 - 回答</h1>';
-        gridHTML += '<p>記憶した位置をクリックして再現してください。</p>';
+        let gridHTML = '<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex items-center justify-center p-8">';
+        gridHTML += '<div class="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">';
+        gridHTML += '<div class="mb-8">';
+        gridHTML += '<div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center">';
+        gridHTML += '<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+        gridHTML += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+        gridHTML += '</svg>';
+        gridHTML += '</div>';
+        gridHTML += '<h1 class="text-3xl font-bold text-gray-800 mb-4">記憶課題 - 回答</h1>';
+        gridHTML += '<p class="text-lg text-gray-600 mb-8">記憶した位置をクリックして再現してください</p>';
+        gridHTML += '</div>';
         gridHTML += '<div id="memory-reproduction-grid" class="memory-reproduction-grid">';
         
         for (let i = 0; i < gridSize * gridSize; i++) {
@@ -849,9 +902,13 @@
         }
         
         gridHTML += '</div>';
+        gridHTML += '<div class="flex justify-center gap-4 mb-6">';
         gridHTML += '<button id="memory-reset-btn" class="memory-reset-btn">リセット</button>';
         gridHTML += '<button id="memory-submit-btn" class="memory-submit-btn" disabled>決定</button>';
-        gridHTML += '<p id="selection-info">3つのセルを選択してください。</p>';
+        gridHTML += '</div>';
+        gridHTML += '<p id="selection-info" class="text-base text-gray-600">3つのセルを選択してください</p>';
+        gridHTML += '</div>';
+        gridHTML += '</div>';
         
         return gridHTML;
       },
@@ -1644,7 +1701,7 @@
         const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
         
         // Calculate overall memory task accuracy if applicable
-        let memoryAccuracyText = '';
+        let memoryAccuracyCard = '';
         const memoryScores = jsPsych.data.get().select('memory_correct').values;
         
         if (memoryScores && memoryScores.length > 0) {
@@ -1653,18 +1710,52 @@
           if (filteredScores.length > 0) {
             const avgMemoryAccuracy = filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length;
             const memoryAccuracy = Math.round(avgMemoryAccuracy * 100);
-            memoryAccuracyText = `<p>記憶課題の正答率: ${memoryAccuracy}%</p>`;
+            memoryAccuracyCard = `
+              <div class="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                <h3 class="text-purple-800 font-bold text-xl mb-2 flex items-center">
+                  <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  記憶課題の正答率
+                </h3>
+                <p class="text-3xl font-bold text-purple-700">${memoryAccuracy}%</p>
+              </div>
+            `;
           }
         }
         
         return `
-          <h1>実験終了</h1>
-          <p>実験にご参加いただき、ありがとうございました。</p>
-          <p>探索課題の正答率: ${searchAccuracy}%</p>
-          ${memoryAccuracyText}
-          <p><strong>下の「終了」ボタンをクリックして終了します。</strong></p>
-          <div style="margin: 20px 0;">
-            <button id="end-screen-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">終了</button>
+          <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center p-8">
+            <div class="max-w-3xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">
+              <div class="mb-8">
+                <div class="w-24 h-24 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-6">実験終了</h1>
+                <p class="text-xl text-gray-600 mb-8">実験にご参加いただき、ありがとうございました。</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <h3 class="text-blue-800 font-bold text-xl mb-2 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    探索課題の正答率
+                  </h3>
+                  <p class="text-3xl font-bold text-blue-700">${searchAccuracy}%</p>
+                </div>
+                ${memoryAccuracyCard}
+              </div>
+              
+              <p class="text-lg text-gray-700 mb-8">下のボタンをクリックして終了します</p>
+              <button id="end-screen-next-btn" class="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                実験を終了
+              </button>
+            </div>
           </div>
         `;
       },
@@ -1716,18 +1807,29 @@
     const mainExperimentStart = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-          <h1>本番開始</h1>
-          <p style="font-size: 18px; margin: 20px 0;">ここから本番です</p>
-          <p style="font-size: 16px; margin: 20px 0;">
-            練習で体験した内容と同じ課題を行います。<br>
-            集中して取り組んでください。
-          </p>
-          <p style="font-size: 16px; margin: 20px 0;">
-            <strong>下の「次へ」ボタンをクリックして本番を開始してください。</strong>
-          </p>
-          <div style="margin: 20px 0;">
-            <button id="main-experiment-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        <div class="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 flex items-center justify-center p-8">
+          <div class="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">
+            <div class="mb-8">
+              <div class="w-20 h-20 bg-gradient-to-r from-red-500 to-orange-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <h1 class="text-4xl font-bold text-gray-800 mb-6">本番開始</h1>
+              <p class="text-xl text-gray-600 mb-4">ここから本番です</p>
+              <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-6">
+                <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                  練習で体験した内容と同じ課題を行います。
+                </p>
+                <p class="text-lg text-gray-700 font-semibold">
+                  集中して取り組んでください。
+                </p>
+              </div>
+              <p class="text-lg text-gray-700">下のボタンをクリックして本番を開始してください</p>
+            </div>
+            <button id="main-experiment-next-btn" class="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+              本番開始
+            </button>
           </div>
         </div>
       `,
@@ -1745,12 +1847,27 @@
     const midpointMessage = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <h1>半分終了</h1>
-        <p>お疲れさまでした。ここで半分終了です。</p>
-        <p>ここからは記憶についての課題を追加します。</p>
-        <p><strong>下の「次へ」ボタンをクリックして次に進みます。</strong></p>
-        <div style="margin: 20px 0;">
-          <button id="midpoint-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
+        <div class="min-h-screen bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center p-8">
+          <div class="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-xl p-12">
+            <div class="mb-8">
+              <div class="w-20 h-20 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h1 class="text-4xl font-bold text-gray-800 mb-6">半分終了</h1>
+              <p class="text-xl text-gray-600 mb-6">お疲れさまでした。ここで半分終了です。</p>
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+                <p class="text-lg text-gray-700 font-semibold">
+                  ここからは記憶についての課題を追加します。
+                </p>
+              </div>
+              <p class="text-lg text-gray-700">下のボタンをクリックして次に進みます</p>
+            </div>
+            <button id="midpoint-next-btn" class="bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+              後半へ進む
+            </button>
+          </div>
         </div>
       `,
       choices: "NO_KEYS",
@@ -1767,81 +1884,92 @@
     const wmTaskExplanation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        let html = '<div class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 py-12 px-4">';
+        html += '<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">';
         
-        // Title
-        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">後半の実験について</h1>';
+        // Header
+        html += '<div class="bg-gradient-to-r from-purple-600 to-pink-700 text-white p-8">';
+        html += '<h1 class="text-4xl font-bold text-center">後半の実験について</h1>';
+        html += '</div>';
+        
+        html += '<div class="p-8">';
         
         // Memory task explanation
-        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
-        html += '<h2 style="color: #856404; margin: 0 0 20px 0; font-size: 22px;">新しく追加される記憶課題</h2>';
+        html += '<div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 mb-8">';
+        html += '<h2 class="text-yellow-800 font-bold text-2xl mb-6 flex items-center">';
+        html += '<div class="w-8 h-8 bg-yellow-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">新</div>';
+        html += '新しく追加される記憶課題</h2>';
         
         // Step-by-step explanation
         const memorySteps = [
           { 
             step: '1', 
             text: 'ターゲットが表示される前に、4×4のパネルが表示されます。',
-            detail: 'パネルはランダムな3箇所に色がついているので、場所を記憶してください。'
+            detail: 'パネルはランダムな3箇所に色がついているので、場所を記憶してください。',
+            color: 'bg-blue-600'
           },
           { 
             step: '2', 
             text: 'そのまま、前半と同じ課題に取り組みます。',
-            detail: '図形を探してクリックする作業は前半と全く同じです。'
+            detail: '図形を探してクリックする作業は前半と全く同じです。',
+            color: 'bg-green-600'
           },
           { 
             step: '3', 
             text: 'その後、先ほど記憶したパネルの場所を回答します。',
-            detail: '色のついていた位置をクリックで選択してください。'
+            detail: '色のついていた位置をクリックで選択してください。',
+            color: 'bg-purple-600'
           },
           { 
             step: '4', 
             text: 'これを何度も繰り返します。',
-            detail: '記憶と視覚検索の両方に集中してください。'
+            detail: '記憶と視覚検索の両方に集中してください。',
+            color: 'bg-red-600'
           }
         ];
         
         memorySteps.forEach(step => {
-          html += `<div style="background-color: #ffffff; border: 2px solid #e2e2e2; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
-          html += `<div style="background-color: #856404; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 18px;">${step.step}</div>`;
-          html += `<div style="flex: 1;">`;
-          html += `<div style="font-size: 17px; color: #333; font-weight: bold; margin-bottom: 8px;">${step.text}</div>`;
-          html += `<div style="font-size: 15px; color: #666; line-height: 1.6;">${step.detail}</div>`;
+          html += `<div class="bg-white border-2 border-gray-200 rounded-xl p-6 mb-4 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow duration-200">`;
+          html += `<div class="${step.color} text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">${step.step}</div>`;
+          html += `<div class="flex-1">`;
+          html += `<div class="text-lg font-bold text-gray-800 mb-2">${step.text}</div>`;
+          html += `<div class="text-gray-600 leading-relaxed">${step.detail}</div>`;
           html += `</div></div>`;
         });
         
         html += '</div>';
         
         // Visual example
-        html += '<div style="background-color: #f8f9fa; border: 2px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
-        html += '<h3 style="color: #495057; margin: 0 0 20px 0; font-size: 20px; text-align: center;">4×4パネルの例</h3>';
+        html += '<div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-8">';
+        html += '<h3 class="text-gray-700 font-bold text-xl mb-6 text-center">4×4パネルの例</h3>';
         
-        html += '<div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin: 20px 0;">';
+        html += '<div class="flex justify-center items-center gap-8 flex-wrap">';
         
         // Memory grid example
-        html += '<div style="text-align: center;">';
-        html += '<div style="display: grid; grid-template-columns: repeat(4, 50px); gap: 3px; background-color: #ffffff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 10px;">';
+        html += '<div class="text-center">';
+        html += '<div class="grid grid-cols-4 gap-1 bg-white p-4 rounded-lg border-2 border-gray-300 mb-3 mx-auto" style="width: fit-content;">';
         
         // Create 4x4 grid example with 3 yellow cells
         for (let i = 0; i < 16; i++) {
-          let bgColor = '#f8f9fa';
-          if (i === 2) bgColor = '#f1c40f'; // Yellow
-          if (i === 7) bgColor = '#f1c40f'; // Yellow
-          if (i === 13) bgColor = '#f1c40f'; // Yellow
+          let bgColor = 'bg-gray-100';
+          if (i === 2) bgColor = 'bg-yellow-400'; // Yellow
+          if (i === 7) bgColor = 'bg-yellow-400'; // Yellow
+          if (i === 13) bgColor = 'bg-yellow-400'; // Yellow
           
-          html += `<div style="width: 50px; height: 50px; background-color: ${bgColor}; border: 2px solid #bdc3c7; border-radius: 5px;"></div>`;
+          html += `<div class="w-12 h-12 ${bgColor} border-2 border-gray-300 rounded"></div>`;
         }
         
         html += '</div>';
-        html += '<p style="font-size: 14px; color: #666; margin: 0;">色のついた3つの位置を覚えてください</p>';
+        html += '<p class="text-sm text-gray-600">色のついた3つの位置を覚えてください</p>';
         html += '</div>';
         
-        html += '<div style="font-size: 24px; color: #666;">→</div>';
+        html += '<div class="text-2xl text-gray-400 transform rotate-0 lg:rotate-90">→</div>';
         
         // Arrow and explanation
-        html += '<div style="text-align: center; max-width: 300px;">';
-        html += '<div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border: 2px solid #2196f3;">';
-        html += '<p style="margin: 0; font-size: 16px; color: #1976d2; font-weight: bold;">視覚検索課題を実行</p>';
-        html += '<p style="margin: 8px 0 0 0; font-size: 14px; color: #424242;">記憶した位置を頭に置きながら<br>図形を探してクリック</p>';
+        html += '<div class="text-center max-w-xs">';
+        html += '<div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">';
+        html += '<p class="font-bold text-blue-800 text-lg mb-2">視覚検索課題を実行</p>';
+        html += '<p class="text-gray-700 text-sm">記憶した位置を頭に置きながら<br>図形を探してクリック</p>';
         html += '</div>';
         html += '</div>';
         
@@ -1849,21 +1977,27 @@
         html += '</div>';
         
         // Important reminder
-        html += '<div style="background-color: #f8d7da; border: 2px solid #f5c6cb; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;">';
-        html += '<h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 20px;">重要なポイント</h3>';
-        html += '<ul style="text-align: left; color: #721c24; font-size: 16px; margin: 0; padding-left: 20px;">';
-        html += '<li style="margin-bottom: 8px;">記憶課題と視覚検索課題の両方に集中してください</li>';
-        html += '<li style="margin-bottom: 8px;">できるだけ早く、正確に図形を見つけてクリックしてください</li>';
-        html += '<li style="margin-bottom: 8px;">色がついた位置を正確に記憶し、後で思い出してください</li>';
+        html += '<div class="bg-red-50 border-2 border-red-300 rounded-xl p-6 mb-8">';
+        html += '<h3 class="text-red-800 font-bold text-xl mb-4 text-center flex items-center justify-center">';
+        html += '<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+        html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>';
+        html += '</svg>';
+        html += '重要なポイント</h3>';
+        html += '<ul class="text-red-800 space-y-2">';
+        html += '<li class="flex items-start"><span class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>記憶課題と視覚検索課題の両方に集中してください</li>';
+        html += '<li class="flex items-start"><span class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>できるだけ早く、正確に図形を見つけてクリックしてください</li>';
+        html += '<li class="flex items-start"><span class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>色がついた位置を正確に記憶し、後で思い出してください</li>';
         html += '</ul>';
         html += '</div>';
         
         // Continue button
-        html += '<div style="text-align: center; margin-top: 40px;">';
-        html += '<button id="wm-task-next-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">後半を開始する</button>';
+        html += '<div class="text-center">';
+        html += '<button id="wm-task-next-btn" class="bg-gradient-to-r from-purple-600 to-pink-700 hover:from-purple-700 hover:to-pink-800 text-white font-bold py-6 px-12 text-xl rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200">後半を開始する</button>';
         html += '</div>';
         
-        html += '</div>';
+        html += '</div>'; // End of padding container
+        html += '</div>'; // End of white container
+        html += '</div>'; // End of background
         
         return html;
       },
