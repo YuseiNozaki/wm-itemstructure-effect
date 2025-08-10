@@ -162,8 +162,7 @@
       
       // Objects
       numObjects: 25, // Total number of objects per trial
-      objectMinSize: 20,
-      objectMaxSize: 40,
+      objectSize: 40, // Fixed size for all objects
       
       // Target detection tolerance
       targetTolerance: 0.8, // Additional tolerance as multiplier of object size (0.8 = 80% of object size)
@@ -181,13 +180,14 @@
     };
 
     // Generate random object size within the specified range
-    function getRandomObjectSize() {
-      return Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize;
+    // Get fixed object size (all objects are same size)
+    function getObjectSize() {
+      return params.objectSize;
     }
 
-    // Get a representative size for target presentation (larger for visibility)
+    // Get a representative size for target presentation (same as search objects)
     function getTargetPresentationSize() {
-      return 45; // Slightly smaller than original 50px but larger than random sizes
+      return params.objectSize; // Same as search objects - 40px
     }
 
     // Trial factors
@@ -1276,8 +1276,8 @@
       objects = [];
       let positions = [];
       
-      // Use average object size for positioning calculations (to avoid overlaps)
-      const avgObjectSize = (params.objectMaxSize + params.objectMinSize) / 2;
+      // Use fixed object size for positioning calculations (to avoid overlaps)
+      const avgObjectSize = params.objectSize;
       
       let targetX, targetY;
       
@@ -1391,7 +1391,7 @@
       targetObject = {
         x: targetX,
         y: targetY,
-        size: getRandomObjectSize(),
+        size: getObjectSize(),
         color: targetColor,
         shape: targetShape,
         isTarget: true
@@ -1429,7 +1429,7 @@
         objects.push({
           x: positions[i].x,
           y: positions[i].y,
-          size: getRandomObjectSize(),
+          size: getObjectSize(),
           color: distractorColor,
           shape: distractorShape,
           isTarget: false

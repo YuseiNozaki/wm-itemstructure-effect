@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Object Sizes Test</title>
+    <title>Fixed Object Sizes Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,47 +46,50 @@
         button:hover {
             background-color: #0056b3;
         }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Random Object Sizes Test</h1>
+        <h1>Fixed Object Sizes Test</h1>
         
         <div class="test-section">
             <h2>Target Presentation Size</h2>
-            <p>Target presentation size: <span id="target-size">45px</span></p>
+            <p>Target presentation size: <span id="target-size">40px</span> <span class="success">✓ Fixed</span></p>
             <div id="target-display" style="margin: 20px auto; width: 100px; height: 100px;"></div>
         </div>
         
         <div class="test-section">
-            <h2>Random Search Object Sizes</h2>
-            <p>Range: 20px - 40px</p>
-            <button onclick="generateRandomSizes()">Generate New Random Sizes</button>
-            <div id="random-sizes-display"></div>
+            <h2>Search Object Sizes</h2>
+            <p><strong>All objects are fixed at 40px</strong> <span class="success">✓ No variation</span></p>
+            <button onclick="generateFixedSizes()">Generate Sample Objects</button>
+            <div id="fixed-sizes-display"></div>
         </div>
         
         <div class="test-section">
-            <h2>Size Distribution (10 samples)</h2>
-            <div id="size-distribution"></div>
-            <button onclick="showDistribution()">Show Size Distribution</button>
+            <h2>Size Validation (10 samples)</h2>
+            <div id="size-validation"></div>
+            <button onclick="validateSizes()">Validate All Objects Are 40px</button>
         </div>
     </div>
 
     <script>
         // Copy the size functions from the main experiment
         const params = {
-            objectMinSize: 20,
-            objectMaxSize: 40,
+            objectSize: 40, // Fixed size for all objects
             colors: ['red', 'blue', 'green', 'yellow', 'purple'],
             shapes: ['circle', 'triangle', 'square', 'diamond']
         };
         
-        function getRandomObjectSize() {
-            return Math.random() * (params.objectMaxSize - params.objectMinSize) + params.objectMinSize;
+        function getObjectSize() {
+            return params.objectSize;
         }
 
         function getTargetPresentationSize() {
-            return 45;
+            return params.objectSize; // Same as search objects - 40px
         }
         
         function drawShape(shape, color, canvasWidth, canvasHeight, size) {
@@ -138,12 +141,12 @@
             return canvas.outerHTML;
         }
         
-        function generateRandomSizes() {
-            const display = document.getElementById('random-sizes-display');
+        function generateFixedSizes() {
+            const display = document.getElementById('fixed-sizes-display');
             display.innerHTML = '';
             
             for (let i = 0; i < 10; i++) {
-                const size = getRandomObjectSize();
+                const size = getObjectSize(); // Always returns 40px
                 const color = params.colors[Math.floor(Math.random() * params.colors.length)];
                 const shape = params.shapes[Math.floor(Math.random() * params.shapes.length)];
                 
@@ -151,31 +154,32 @@
                 sizeDiv.className = 'size-display';
                 sizeDiv.innerHTML = `
                     ${drawShape(shape, color, 60, 60, size)}
-                    <br>Size: ${size.toFixed(1)}px
+                    <br>Size: ${size}px <span class="success">✓</span>
                 `;
                 display.appendChild(sizeDiv);
             }
         }
         
-        function showDistribution() {
-            const display = document.getElementById('size-distribution');
+        function validateSizes() {
+            const display = document.getElementById('size-validation');
             const sizes = [];
             
+            // Generate 100 objects and check all are 40px
             for (let i = 0; i < 100; i++) {
-                sizes.push(getRandomObjectSize());
+                sizes.push(getObjectSize());
             }
             
+            const allSame = sizes.every(size => size === 40);
             const min = Math.min(...sizes);
             const max = Math.max(...sizes);
-            const avg = sizes.reduce((a, b) => a + b) / sizes.length;
             
             display.innerHTML = `
-                <p><strong>100 samples:</strong></p>
-                <p>Min: ${min.toFixed(1)}px</p>
-                <p>Max: ${max.toFixed(1)}px</p>
-                <p>Average: ${avg.toFixed(1)}px</p>
-                <p>Expected range: 20px - 40px</p>
-                <p>Expected average: 30px</p>
+                <p><strong>100 samples validation:</strong></p>
+                <p>All objects are 40px: <span class="${allSame ? 'success' : 'error'}">${allSame ? '✓ YES' : '✗ NO'}</span></p>
+                <p>Min size: ${min}px</p>
+                <p>Max size: ${max}px</p>
+                <p>Target presentation: ${getTargetPresentationSize()}px</p>
+                <p>Expected: All objects should be exactly 40px</p>
             `;
         }
         
@@ -184,7 +188,7 @@
             const targetDisplay = document.getElementById('target-display');
             targetDisplay.innerHTML = drawShape('circle', 'red', 100, 100, getTargetPresentationSize());
             
-            generateRandomSizes();
+            generateFixedSizes();
         });
     </script>
 </body>
