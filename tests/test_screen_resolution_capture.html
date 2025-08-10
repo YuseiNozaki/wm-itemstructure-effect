@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Screen Resolution Capture Test</title>
+    <script src="https://unpkg.com/jspsych@7"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+    <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+        .resolution-display { font-size: 18px; font-weight: bold; margin: 20px 0; }
+        .data-preview { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        pre { background: #f1f3f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Screen Resolution Capture Test</h1>
+    <p>This test validates that screen resolution is automatically captured by jsPsych.</p>
+    
+    <div id="test-results"></div>
+    <div id="jspsych-target"></div>
+    
+    <script>
+        // Initialize jsPsych with screen resolution capture (same as main experiment)
+        const jsPsych = initJsPsych({
+            display_element: 'jspsych-target',
+            on_finish: function() {
+                // Show the complete data including screen resolution
+                displayTestResults();
+            }
+        });
+
+        // Automatically capture participant's screen resolution (same as main experiment)
+        jsPsych.data.addProperties({
+            screen_width: window.screen.width,
+            screen_height: window.screen.height
+        });
+
+        function displayTestResults() {
+            const allData = jsPsych.data.get();
+            // Find the first trial with task === 'resolution_test'
+            const filtered = allData.filter({task: 'resolution_test'}).values();
+            const globalData = filtered.length > 0 ? filtered[0] : {};
+            
+            let html = '<div class="data-preview"><h2>Screen Resolution Capture Test Results</h2>';
+            
+            // Check if screen resolution was captured
+            const hasWidth = globalData.hasOwnProperty('screen_width');
+            const hasHeight = globalData.hasOwnProperty('screen_height');
+            const widthValue = globalData.screen_width;
+            const heightValue = globalData.screen_height;
+            
+            // Test 1: Check if properties exist
+            html += `<div class="test-result ${hasWidth ? 'pass' : 'fail'}">
+                <strong>Test 1: Screen Width Captured</strong><br>
+                Expected: Property 'screen_width' should exist<br>
+                Actual: ${hasWidth ? 'Property exists' : 'Property missing'}<br>
+                Value: ${hasWidth ? widthValue : 'N/A'}
+            </div>`;
+            
+            html += `<div class="test-result ${hasHeight ? 'pass' : 'fail'}">
+                <strong>Test 2: Screen Height Captured</strong><br>
+                Expected: Property 'screen_height' should exist<br>
+                Actual: ${hasHeight ? 'Property exists' : 'Property missing'}<br>
+                Value: ${hasHeight ? heightValue : 'N/A'}
+            </div>`;
+            
+            // Test 3: Check if values are reasonable numbers
+            const widthValid = typeof widthValue === 'number' && widthValue > 0 && widthValue < 10000;
+            const heightValid = typeof heightValue === 'number' && heightValue > 0 && heightValue < 10000;
+            
+            html += `<div class="test-result ${widthValid ? 'pass' : 'fail'}">
+                <strong>Test 3: Screen Width Value Validation</strong><br>
+                Expected: Positive number between 1 and 10000<br>
+                Actual: ${typeof widthValue} (${widthValue})<br>
+                Valid: ${widthValid}
+            </div>`;
+            
+            html += `<div class="test-result ${heightValid ? 'pass' : 'fail'}">
+                <strong>Test 4: Screen Height Value Validation</strong><br>
+            const widthValid = typeof widthValue === 'number' && widthValue > 0 && widthValue < MAX_REASONABLE_SCREEN_DIMENSION;
+            const heightValid = typeof heightValue === 'number' && heightValue > 0 && heightValue < MAX_REASONABLE_SCREEN_DIMENSION;
+            
+            html += `<div class="test-result ${widthValid ? 'pass' : 'fail'}">
+                <strong>Test 3: Screen Width Value Validation</strong><br>
+                Expected: Positive number between 1 and ${MAX_REASONABLE_SCREEN_DIMENSION}<br>
+                Actual: ${typeof widthValue} (${widthValue})<br>
+                Valid: ${widthValid}
+            </div>`;
+            
+            html += `<div class="test-result ${heightValid ? 'pass' : 'fail'}">
+                <strong>Test 4: Screen Height Value Validation</strong><br>
+                Expected: Positive number between 1 and ${MAX_REASONABLE_SCREEN_DIMENSION}<br>
+                Actual: ${typeof heightValue} (${heightValue})<br>
+                Valid: ${heightValid}
+            </div>`;
+            
+            // Display current screen info
+            html += `<div class="resolution-display">
+                <strong>Current Screen Resolution:</strong> ${window.screen.width} × ${window.screen.height}
+            </div>`;
+            
+            // Test 5: Check data consistency
+            const consistent = (widthValue === window.screen.width) && (heightValue === window.screen.height);
+            html += `<div class="test-result ${consistent ? 'pass' : 'fail'}">
+                <strong>Test 5: Data Consistency</strong><br>
+                Expected: Captured values should match window.screen values<br>
+                Captured: ${widthValue} × ${heightValue}<br>
+                Window.screen: ${window.screen.width} × ${window.screen.height}<br>
+                Match: ${consistent}
+            </div>`;
+            
+            // Overall result
+            const allPassed = hasWidth && hasHeight && widthValid && heightValid && consistent;
+            html += `<div class="test-result ${allPassed ? 'pass' : 'fail'}">
+                <strong>Overall Result: ${allPassed ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED'}</strong>
+            </div>`;
+            
+            // Show raw data
+            html += '<h3>Complete jsPsych Data Output:</h3>';
+            html += `<pre>${JSON.stringify(allData.values(), null, 2)}</pre>`;
+            
+            html += '</div>';
+            
+            document.getElementById('test-results').innerHTML = html;
+        }
+
+        // Simple test trial to generate data
+        const testTrial = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<p>Screen resolution capture test in progress...</p><p>Press any key to complete the test.</p>',
+            data: {
+                task: 'resolution_test'
+            }
+        };
+
+        // Run the test
+        jsPsych.run([testTrial]);
+    </script>
+</body>
+</html>
