@@ -227,6 +227,8 @@
 
     // Trial progress tracking variables
     let currentMainTrialNumber = 0;
+    let currentBlockNumber = 1; // Track which block we're in (1=without memory, 2=with memory)
+    let currentTrialInBlock = 0; // Track trial number within current block
     const totalMainTrials = 120; // 3 viewConditions × 2 structures × 10 trialsPerCondition × 2 blocks
 
     // Welcome screen
@@ -770,7 +772,10 @@
       trial_duration: 3000, // Display for 3 seconds
       data: {
         task: 'memory_display',
-        memory_positions: function() { return memoryPositions; }
+        memory_positions: function() { return memoryPositions; },
+        trial_block: function() { return currentBlockNumber; },
+        trial_phase: 'main_with_memory',
+        timestamp: function() { return Date.now(); }
       }
     };
 
@@ -841,7 +846,12 @@
               memory_selected_positions: selectedMemoryPositions,
               memory_correct_positions: memoryPositions,
               memory_accuracy: accuracy,
-              memory_correct: isCorrect ? 1 : 0
+              memory_correct: isCorrect ? 1 : 0,
+              task: 'memory_recall',
+              trial_block: currentBlockNumber,
+              trial_number_in_block: currentTrialInBlock,
+              trial_number_overall: currentMainTrialNumber,
+              timestamp: Date.now()
             });
           }
         });
@@ -1267,6 +1277,17 @@
           // Finish trial
           const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
           const isPracticeCondition = jsPsych.timelineVariable('isPractice') || false;
+          
+          // Determine trial phase for clearer data analysis
+          let trialPhase;
+          if (isPracticeCondition) {
+            trialPhase = 'practice';
+          } else if (memoryLoadCondition === 'without-memory') {
+            trialPhase = 'main_without_memory';
+          } else {
+            trialPhase = 'main_with_memory';
+          }
+          
           const trialData = {
             reaction_time: rt,
             correct: correct,
@@ -1275,16 +1296,24 @@
             memory_load: memoryLoadCondition,
             wm_load: memoryLoadCondition === 'with-memory', // Boolean indicator for WM load presence
             practice_trial: isPracticeCondition, // Boolean indicator for practice trial
+            trial_phase: trialPhase, // Clear phase identifier for analysis
+            trial_block: currentBlockNumber, // Block number (1=without memory, 2=with memory)
+            trial_number_in_block: currentTrialInBlock, // Position within current block
+            trial_number_overall: currentMainTrialNumber, // Overall trial position
             target_color: targetColor,
             target_shape: targetShape,
             total_movement: totalMovement,
             mouse_path: mousePath,
             task: 'visual_search',
-            is_practice: jsPsych.timelineVariable('isPractice') || false
+            is_practice: jsPsych.timelineVariable('isPractice') || false,
+            timestamp: Date.now() // Add timestamp for temporal analysis
           };
           
           // Only save data if not in practice mode
           if (!jsPsych.timelineVariable('isPractice')) {
+            // Update trial counters for main trials
+            currentMainTrialNumber++;
+            currentTrialInBlock++;
             jsPsych.finishTrial(trialData);
           } else {
             // For practice, still finish trial but don't save to main data
@@ -1696,6 +1725,10 @@
       `,
       choices: "NO_KEYS",
       on_load: function() {
+        // Transition to second block (with memory)
+        currentBlockNumber = 2;
+        currentTrialInBlock = 0; // Reset trial counter for new block
+        
         // Add click event listener to the Next button
         const nextBtn = document.getElementById('midpoint-next-btn');
         nextBtn.addEventListener('click', function() {
