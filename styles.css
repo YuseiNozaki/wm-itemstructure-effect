@@ -8,7 +8,9 @@ body {
   align-items: center;
   justify-content: center;
   background: #fff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+
 #jspsych-target {
   width: 100vw;
   height: 100vh;
@@ -21,6 +23,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
 }
+
 .jspsych-content {
   max-width: 100vw;
   width: 100%;
@@ -31,18 +34,20 @@ body {
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
-  min-height: 0; /* Allows flex item to shrink below its intrinsic minimum height when space is constrained (flexbox quirk) */
+  min-height: 0;
 }
+
 #jspsych-visual-search-canvas {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw !important;
   height: 100vh !important;
-  z-index: 5; /* Lower z-index to avoid interfering with main content */
+  z-index: 5;
   margin: 0 auto;
-  pointer-events: none; /* Initially disable pointer events */
+  pointer-events: none;
 }
+
 #search-window {
   position: fixed;
   border: 2px solid black;
@@ -53,117 +58,190 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Modern Memory Grid Components */
 #memory-grid {
   display: grid;
   grid-template-columns: repeat(4, 100px);
   grid-template-rows: repeat(4, 100px);
-  gap: 5px;
+  gap: 8px;
   margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+
 .memory-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+
+.memory-cell:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
 .memory-cell.highlighted {
-  background-color: #ffcc00;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-color: #d97706;
+  color: white;
+  font-weight: bold;
 }
+
 .memory-cell.selected {
-  background-color: #66aaff;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: #1e40af;
+  color: white;
+  font-weight: bold;
 }
+
 .memory-reproduction-grid {
   display: grid;
   grid-template-columns: repeat(4, 100px);
   grid-template-rows: repeat(4, 100px);
-  gap: 5px;
+  gap: 8px;
   margin: 20px auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+
 .reproduction-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+
 .reproduction-cell:hover {
-  background-color: #e0e0e0;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
+
 .reproduction-cell.selected {
-  background-color: #66aaff;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: #1e40af;
+  color: white;
+  font-weight: bold;
 }
+
 .memory-submit-btn {
-  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
   font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  font-weight: 600;
   cursor: pointer;
-  margin: 20px auto;
+  margin: 24px auto;
   display: block;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  min-width: 120px;
 }
-.memory-submit-btn:hover {
-  background-color: #0056b3;
+
+.memory-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
+
 .memory-submit-btn:disabled {
-  background-color: #ccc;
+  background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
+
 .memory-reset-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  background-color: #6c757d;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  margin: 10px auto;
+  margin: 16px auto;
   display: block;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
 }
+
 .memory-reset-btn:hover {
-  background-color: #545b62;
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
+
 .memory-choice-container {
   display: flex;
   justify-content: center;
-  gap: 50px;
-  margin: 20px 0;
+  gap: 64px;
+  margin: 32px 0;
+  flex-wrap: wrap;
 }
+
 .memory-choice-grid {
   display: grid;
   grid-template-columns: repeat(4, 80px);
   grid-template-rows: repeat(4, 80px);
-  gap: 3px;
+  gap: 4px;
   margin: 0 auto;
   border: 3px solid transparent;
-  padding: 10px;
+  padding: 16px;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
 .memory-choice-grid:hover {
-  border-color: #ccc;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
 }
+
 .memory-choice-grid.selected {
-  border-color: #007bff;
-  background-color: #f8f9fa;
+  border-color: #1d4ed8;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.2);
 }
+
 .choice-cell {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.1s ease;
 }
+
 .choice-cell.highlighted {
-  background-color: #ffcc00;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-color: #d97706;
+  color: white;
+  font-weight: bold;
 }
+
 .hidden {
   display: none !important;
 }
