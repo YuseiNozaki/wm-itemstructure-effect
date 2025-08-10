@@ -227,7 +227,10 @@
 
     // Trial progress tracking variables
     let currentMainTrialNumber = 0;
-    let currentBlockNumber = 1; // Track which block we're in (1=without memory, 2=with memory)
+    // Dynamically track block order for counterbalancing memory conditions
+    // Example: blockOrder = ['memory', 'no-memory'] or ['no-memory', 'memory']
+    let blockOrder = Math.random() < 0.5 ? ['memory', 'no-memory'] : ['no-memory', 'memory'];
+    let currentBlockIndex = 0; // Index into blockOrder array
     let currentTrialInBlock = 0; // Track trial number within current block
     const totalMainTrials = 120; // 3 viewConditions × 2 structures × 10 trialsPerCondition × 2 blocks
 
