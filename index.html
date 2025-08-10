@@ -251,7 +251,7 @@
         html += '<li>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>';
         html += '<li>所要時間：約 30 分（説明等を含む）</li>';
         html += '<li>課題内容：ご自身の PC からアクセスしていただき、画面上に表示される特定の図形の場所を探す課題に、繰り返し取り組んでいただきます。</li>';
-        html += '<li>収集するデータ：性別、年齢、反応時間、課題の成績、カーソルの移動履歴（謝礼のお支払いに必要な氏名、連絡先）</li>';
+        html += '<li>収集するデータ：氏名、メールアドレス（謝礼支払い目的のみ）、性別、年齢、反応時間、課題の成績、カーソルの移動履歴</li>';
         html += '</ul>';
         
         html += '<h3>3. 参加条件</h3>';
@@ -349,79 +349,64 @@
       }
     };
 
-    // Demographic information - Age selection with dropdown
+    // Combined demographic information - Name, Email, Age, and Gender
     const demographics = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
-        html += '<h2>年齢を選択してください</h2>';
-        html += '<form id="age-form" style="margin: 20px 0;">';
-        html += '<div style="margin: 20px 0;">';
-        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 18px;">年齢:</label>';
-        html += '<select id="age-select" name="age" required style="padding: 10px; font-size: 16px; width: 200px; border: 2px solid #ccc; border-radius: 5px;">';
-        html += '<option value="">選択してください</option>';
+        let html = '<div style="max-width: 700px; margin: 0 auto; padding: 20px; text-align: center; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif;">';
+        html += '<h2 style="margin-bottom: 30px; color: #333;">基本情報の入力</h2>';
         
-        // Generate age options from 1 to 100
-        for (let i = 1; i <= 100; i++) {
+        // Information about data usage
+        html += '<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left; line-height: 1.6;">';
+        html += '<h4 style="color: #495057; margin-top: 0; margin-bottom: 15px;">個人情報の取り扱いについて</h4>';
+        html += '<ul style="margin: 0; padding-left: 20px; color: #6c757d;">';
+        html += '<li style="margin-bottom: 8px;"><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</li>';
+        html += '<li style="margin-bottom: 0;">謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</li>';
+        html += '</ul>';
+        html += '</div>';
+        
+        html += '<form id="demographics-form" style="margin: 20px 0;">';
+        
+        // Name field
+        html += '<div style="margin: 20px 0; text-align: left;">';
+        html += '<label for="name-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">氏名 <span style="color: #dc3545;">*</span></label>';
+        html += '<input type="text" id="name-input" name="name" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="お名前を入力してください">';
+        html += '</div>';
+        
+        // Email field
+        html += '<div style="margin: 20px 0; text-align: left;">';
+        html += '<label for="email-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">メールアドレス <span style="color: #dc3545;">*</span></label>';
+        html += '<input type="email" id="email-input" name="email" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="example@example.com">';
+        html += '<small style="color: #6c757d; font-size: 14px; display: block; margin-top: 5px;">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>';
+        html += '</div>';
+        
+        // Age field
+        html += '<div style="margin: 20px 0; text-align: left;">';
+        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">年齢 <span style="color: #dc3545;">*</span></label>';
+        html += '<select id="age-select" name="age" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
+        html += '<option value="">選択してください</option>';
+
+        // Generate age options from 18 to 100
+        for (let i = 18; i <= 100; i++) {
           html += `<option value="${i}">${i}</option>`;
         }
         
         html += '</select>';
         html += '</div>';
-        html += '<div style="margin: 20px 0;">';
-        html += '<button type="submit" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>';
-        html += '</div>';
-        html += '</form>';
-        html += '</div>';
         
-        return html;
-      },
-      choices: "NO_KEYS",
-      on_load: function() {
-        // Ensure no fullscreen listeners are active during demographics
-        removeFullscreenListeners();
-        
-        const form = document.getElementById('age-form');
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          const ageSelect = document.getElementById('age-select');
-          const selectedAge = ageSelect.value;
-          
-          if (selectedAge) {
-            // Store the age data
-            jsPsych.data.addProperties({
-              age: selectedAge
-            });
-            
-            // Finish the trial
-            jsPsych.finishTrial({
-              age: selectedAge
-            });
-          } else {
-            alert('年齢を選択してください。');
-          }
-        });
-      }
-    };
-
-    // Gender selection with dropdown
-    const genderSelection = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: function() {
-        let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
-        html += '<h2>性別を選択してください</h2>';
-        html += '<form id="gender-form" style="margin: 20px 0;">';
-        html += '<div style="margin: 20px 0;">';
-        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 18px;">性別:</label>';
-        html += '<select id="gender-select" name="gender" required style="padding: 10px; font-size: 16px; width: 200px; border: 2px solid #ccc; border-radius: 5px;">';
+        // Gender field
+        html += '<div style="margin: 20px 0; text-align: left;">';
+        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">性別 <span style="color: #dc3545;">*</span></label>';
+        html += '<select id="gender-select" name="gender" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
         html += '<option value="">選択してください</option>';
         html += '<option value="男性">男性</option>';
         html += '<option value="女性">女性</option>';
         html += '<option value="その他">その他</option>';
         html += '</select>';
         html += '</div>';
-        html += '<div style="margin: 20px 0;">';
-        html += '<button type="submit" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>';
+        
+        html += '<div style="margin: 30px 0; text-align: center;">';
+        html += '<button type="submit" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">次へ進む</button>';
         html += '</div>';
         html += '</form>';
         html += '</div>';
@@ -433,25 +418,68 @@
         // Ensure no fullscreen listeners are active during demographics
         removeFullscreenListeners();
         
-        const form = document.getElementById('gender-form');
+        const form = document.getElementById('demographics-form');
         form.addEventListener('submit', function(e) {
           e.preventDefault();
-          const genderSelect = document.getElementById('gender-select');
-          const selectedGender = genderSelect.value;
           
-          if (selectedGender) {
-            // Store the gender data
-            jsPsych.data.addProperties({
-              gender: selectedGender
-            });
-            
-            // Finish the trial
-            jsPsych.finishTrial({
-              gender: selectedGender
-            });
-          } else {
-            alert('性別を選択してください。');
+          const nameInput = document.getElementById('name-input');
+          const emailInput = document.getElementById('email-input');
+          const ageSelect = document.getElementById('age-select');
+          const genderSelect = document.getElementById('gender-select');
+          
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const age = ageSelect.value;
+          const gender = genderSelect.value;
+          
+          // Validate all fields
+          if (!name) {
+            alert('氏名を入力してください。');
+            nameInput.focus();
+            return;
           }
+          
+          if (!email) {
+            alert('メールアドレスを入力してください。');
+            emailInput.focus();
+            return;
+          }
+          
+          // Basic email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            alert('有効なメールアドレスを入力してください。');
+            emailInput.focus();
+            return;
+          }
+          
+          if (!age) {
+            alert('年齢を選択してください。');
+            ageSelect.focus();
+            return;
+          }
+          
+          if (!gender) {
+            alert('性別を選択してください。');
+            genderSelect.focus();
+            return;
+          }
+          
+          // Store all demographic data
+          jsPsych.data.addProperties({
+            participant_name: name,
+            participant_email: email,
+            age: age,
+            gender: gender
+          });
+          
+          // Finish the trial with the collected data
+          jsPsych.finishTrial({
+            participant_name: name,
+            participant_email: email,
+            age: age,
+            gender: gender
+          });
         });
       },
       on_finish: function() {
@@ -1808,7 +1836,6 @@
       welcome,
       informedConsent,
       demographics,
-      genderSelection,
       experimentInstructions,
       practiceExplanation,
       practiceProcedure,
