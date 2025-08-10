@@ -519,15 +519,15 @@
         
         // Experiment overview section
         html += '<div style="background-color: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">';
-        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">📋 実験全体の流れ</h2>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">一瞬だけ表示される図形を覚えます。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
+        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">実験全体の流れ</h2>';
+        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
         html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">できるだけ<strong style="color: #e74c3c;">早く</strong>、<strong style="color: #e74c3c;">正確に</strong>探してください。</p>';
         html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">全部終了すると、あなたのスコアが表示されます。</p>';
         html += '</div>';
         
         // Experiment flow section  
         html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">🚀 実験の構成</h2>';
+        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">実験の構成</h2>';
         html += '<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">';
         
         // Step boxes
@@ -550,7 +550,7 @@
         
         // Task overview section
         html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">🎯 やってもらうことの概要</h2>';
+        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">操作の説明</h2>';
         
         const taskSteps = [
           { step: '1', text: '条件の説明が表示されます' },
@@ -570,7 +570,7 @@
         
         // Viewing conditions section
         html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">🔍 3つの表示パターン</h2>';
+        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">3つの表示パターン</h2>';
         
         const conditions = [
           {
@@ -1689,14 +1689,14 @@
         
         // Completion message
         html += '<div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">';
-        html += '<h2 style="color: #155724; margin: 0 0 15px 0; font-size: 24px;">🎉 前半が終了です</h2>';
+        html += '<h2 style="color: #155724; margin: 0 0 15px 0; font-size: 24px;">前半が終了です</h2>';
         html += '<p style="font-size: 18px; margin: 0; color: #155724;">お疲れさまでした！ここからは、あなたのワーキングメモリにさらに負荷をかけていきます。</p>';
         html += '<p style="font-size: 18px; margin: 10px 0 0 0; color: #155724; font-weight: bold;">集中力を切らさないように頑張ってください。</p>';
         html += '</div>';
         
         // Memory task explanation
         html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
-        html += '<h2 style="color: #856404; margin: 0 0 20px 0; font-size: 22px;">🧠 新しく追加される記憶課題</h2>';
+        html += '<h2 style="color: #856404; margin: 0 0 20px 0; font-size: 22px;">新しく追加される記憶課題</h2>';
         
         // Step-by-step explanation
         const memorySteps = [
@@ -1772,8 +1772,7 @@
         
         // Important reminder
         html += '<div style="background-color: #f8d7da; border: 2px solid #f5c6cb; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;">';
-        html += '<h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 20px;">⚠️ 重要なポイント</h3>';
-        html += '<p style="margin: 0; font-size: 16px; color: #721c24; line-height: 1.6;">記憶課題と視覚検索課題の両方に集中してください。<br>どちらも同じぐらい重要です。</p>';
+        html += '<h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 20px;">重要なポイント</h3>';
         html += '</div>';
         
         // Continue button
