@@ -2,6 +2,13 @@
 <html>
 <head>
   <title>visual search task</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  
+  <!-- jsPsych and plugins -->
   <script src="https://unpkg.com/jspsych@7"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-survey-text@1"></script>
@@ -11,6 +18,9 @@
   <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
   <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
   <link href="styles.css" rel="stylesheet" type="text/css" />
+  
+  <!-- Bootstrap 5.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </head>
 <body>
   <script>
@@ -232,11 +242,15 @@
     // Welcome screen
     const welcome = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
-                '<p>下の「次へ」ボタンをクリックして実験を開始してください。</p>' +
-                '<div style="margin: 20px 0;">' +
-                '<button id="welcome-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>' +
-                '</div>',
+      stimulus: '<div class="container mt-5">' +
+                '<div class="row justify-content-center">' +
+                '<div class="col-md-8 text-center">' +
+                '<div class="card shadow-lg">' +
+                '<div class="card-body p-5">' +
+                '<h1 class="card-title text-primary mb-4">実験に参加していただきありがとうございます。</h1>' +
+                '<p class="card-text lead mb-4">下の「次へ」ボタンをクリックして実験を開始してください。</p>' +
+                '<button id="welcome-next-btn" class="btn btn-primary btn-lg px-4">次へ</button>' +
+                '</div></div></div></div></div>',
       choices: "NO_KEYS",
       on_load: function() {
         // Ensure no fullscreen listeners are active during welcome
@@ -254,16 +268,22 @@
     const informedConsent = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; font-size: 14px;">';
-        html += '<h1 style="text-align: center; color: #333; margin-bottom: 30px;">研究に関する同意事項</h1>';
+        let html = '<div class="container mt-4">';
+        html += '<div class="row justify-content-center">';
+        html += '<div class="col-lg-10">';
+        html += '<div class="card shadow">';
+        html += '<div class="card-header bg-primary text-white text-center">';
+        html += '<h1 class="mb-0">研究に関する同意事項</h1>';
+        html += '</div>';
+        html += '<div class="card-body">';
         
         // Scrollable content area
-        html += '<div id="consent-content" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; background-color: #f9f9f9; text-align: left;">';
+        html += '<div id="consent-content" class="border rounded p-3 mb-3" style="max-height: 500px; overflow-y: auto; background-color: #f8f9fa;">';
         
-        html += '<h3>1. 研究の目的</h3>';
+        html += '<h4 class="text-primary">1. 研究の目的</h4>';
         html += '<p>本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>';
         
-        html += '<h3>2. 実験内容</h3>';
+        html += '<h4 class="text-primary">2. 実験内容</h4>';
         html += '<ul>';
         html += '<li>実施場所：実験に集中できる環境（Zoom でオンラインセッションを行います）</li>';
         html += '<li>所要時間：約 30 分（説明等を含む）</li>';
@@ -271,36 +291,36 @@
         html += '<li>収集するデータ：氏名、メールアドレス（謝礼支払い目的のみ）、性別、年齢、反応時間、課題の成績、カーソルの移動履歴</li>';
         html += '</ul>';
         
-        html += '<h3>3. 参加条件</h3>';
+        html += '<h4 class="text-primary">3. 参加条件</h4>';
         html += '<ul>';
         html += '<li>18 歳以上の方。</li>';
         html += '<li>正常または矯正視力を有し、課題の理解に支障がない方。</li>';
         html += '<li>静かで落ち着いた場所から自身のパソコンを使って、オンラインで実験に参加できる方。</li>';
         html += '</ul>';
         
-        html += '<h3>4. 予想される不利益・リスクと対処</h3>';
+        html += '<h4 class="text-primary">4. 予想される不利益・リスクと対処</h4>';
         html += '<ul>';
         html += '<li>画面注視による目の疲れ、ストレス等が生じる可能性があります。</li>';
         html += '<li>不快・体調不良時はいつでも中断・中止できます。</li>';
         html += '</ul>';
         
-        html += '<h3>5. 研究成果の公開</h3>';
+        html += '<h4 class="text-primary">5. 研究成果の公開</h4>';
         html += '<p>この研究の成果は、博士論文および心理系の学会で発表を行う予定です。その際に収集したデータを公開することがありますが、情報から個人が特定されない形式での公開を行います。</p>';
         
-        html += '<h3>6. 謝礼・費用</h3>';
+        html += '<h4 class="text-primary">6. 謝礼・費用</h4>';
         html += '<ul>';
         html += '<li>謝礼として、PayPayなどに交換可能なデジタルギフト「デジコ」を 300 円分お支払いいたします。</li>';
         html += '<li>「デジコ」のお支払いに必要なため、氏名とメールアドレスをご回答いただきます。</li>';
         html += '<li>参加に費用はかかりません（通信費等は参加者負担となります）。</li>';
         html += '</ul>';
         
-        html += '<h3>7. 任意参加・撤回の自由</h3>';
+        html += '<h4 class="text-primary">7. 任意参加・撤回の自由</h4>';
         html += '<ul>';
         html += '<li>参加は完全に任意です。また理由を問わず、途中で撤回できます。</li>';
         html += '<li>参加を撤回した場合や途中で中止とした場合にも、不利益は一切ありません。</li>';
         html += '</ul>';
         
-        html += '<h3>8. 個人情報とデータの取扱い</h3>';
+        html += '<h4 class="text-primary">8. 個人情報とデータの取扱い</h4>';
         html += '<ul>';
         html += '<li>データは ID で管理し、氏名等の識別情報と分離して保管します。</li>';
         html += '<li>データは研究実施者および指導教員のみが閲覧可能な状態で保存します。</li>';
@@ -308,7 +328,7 @@
         html += '<li>実験実施上で得られた個人情報等は、すべて守秘をお約束し、外部から閲覧不可の状態で厳重に管理いたします。</li>';
         html += '</ul>';
         
-        html += '<h3>9. お問い合わせ先</h3>';
+        html += '<h4 class="text-primary">9. お問い合わせ先</h4>';
         html += '<p><strong>研究実施者：</strong>野﨑 優晴（東京学芸大学大学院 連合学校教育学研究科 博士課程）<br>';
         html += 'E-mail：r241004y@st.u-gakugei.ac.jp</p>';
         html += '<p><strong>指導教員：</strong>関口 貴裕（東京学芸大学 教育心理学講座 教授）<br>';
@@ -317,15 +337,22 @@
         html += '</div>'; // End of scrollable content
         
         // Consent checkbox and button
-        html += '<div style="text-align: center; margin: 20px 0;">';
-        html += '<label style="display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 20px;">';
-        html += '<input type="checkbox" id="consent-checkbox" style="margin-right: 10px; transform: scale(1.2);"> ';
+        html += '<div class="text-center mt-4">';
+        html += '<div class="form-check d-inline-block mb-3">';
+        html += '<input class="form-check-input" type="checkbox" id="consent-checkbox" style="transform: scale(1.2);">';
+        html += '<label class="form-check-label ms-2 fw-semibold" for="consent-checkbox">';
         html += '上記の内容を確認し、研究参加に同意します';
         html += '</label>';
-        html += '<button id="consent-next-btn" disabled style="padding: 12px 24px; font-size: 16px; background-color: #ccc; color: #666; border: none; border-radius: 5px; cursor: not-allowed; transition: all 0.3s;">次へ進む</button>';
+        html += '</div>';
+        html += '<br>';
+        html += '<button id="consent-next-btn" class="btn btn-secondary btn-lg" disabled>次へ進む</button>';
         html += '</div>';
         
-        html += '</div>';
+        html += '</div>'; // End card-body
+        html += '</div>'; // End card
+        html += '</div>'; // End col
+        html += '</div>'; // End row
+        html += '</div>'; // End container
         
         return html;
       },
@@ -341,14 +368,10 @@
         checkbox.addEventListener('change', function() {
           if (checkbox.checked) {
             nextBtn.disabled = false;
-            nextBtn.style.backgroundColor = '#007bff';
-            nextBtn.style.color = 'white';
-            nextBtn.style.cursor = 'pointer';
+            nextBtn.className = 'btn btn-primary btn-lg';
           } else {
             nextBtn.disabled = true;
-            nextBtn.style.backgroundColor = '#ccc';
-            nextBtn.style.color = '#666';
-            nextBtn.style.cursor = 'not-allowed';
+            nextBtn.className = 'btn btn-secondary btn-lg';
           }
         });
         
@@ -370,37 +393,43 @@
     const demographics = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 700px; margin: 0 auto; padding: 20px; text-align: center; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif;">';
-        html += '<h2 style="margin-bottom: 30px; color: #333;">基本情報の入力</h2>';
+        let html = '<div class="container mt-4">';
+        html += '<div class="row justify-content-center">';
+        html += '<div class="col-lg-8">';
+        html += '<div class="card shadow">';
+        html += '<div class="card-header bg-success text-white text-center">';
+        html += '<h2 class="mb-0">基本情報の入力</h2>';
+        html += '</div>';
+        html += '<div class="card-body">';
         
         // Information about data usage
-        html += '<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left; line-height: 1.6;">';
-        html += '<h4 style="color: #495057; margin-top: 0; margin-bottom: 15px;">個人情報の取り扱いについて</h4>';
-        html += '<ul style="margin: 0; padding-left: 20px; color: #6c757d;">';
-        html += '<li style="margin-bottom: 8px;"><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</li>';
-        html += '<li style="margin-bottom: 0;">謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</li>';
+        html += '<div class="alert alert-info" role="alert">';
+        html += '<h5 class="alert-heading">個人情報の取り扱いについて</h5>';
+        html += '<ul class="mb-0">';
+        html += '<li class="mb-2"><strong>氏名・メールアドレス</strong>は謝礼のお支払い目的のみに利用し、実験データとは分離して管理いたします。</li>';
+        html += '<li>謝礼のお支払いのため、入力いただいたアドレスに後日ご連絡いたします。</li>';
         html += '</ul>';
         html += '</div>';
         
-        html += '<form id="demographics-form" style="margin: 20px 0;">';
+        html += '<form id="demographics-form">';
         
         // Name field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="name-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">氏名 <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="text" id="name-input" name="name" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="お名前を入力してください">';
+        html += '<div class="mb-3">';
+        html += '<label for="name-input" class="form-label fw-bold">氏名 <span class="text-danger">*</span></label>';
+        html += '<input type="text" id="name-input" name="name" class="form-control" required placeholder="お名前を入力してください">';
         html += '</div>';
         
         // Email field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="email-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">メールアドレス <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="email" id="email-input" name="email" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="example@example.com">';
-        html += '<small style="color: #6c757d; font-size: 14px; display: block; margin-top: 5px;">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>';
+        html += '<div class="mb-3">';
+        html += '<label for="email-input" class="form-label fw-bold">メールアドレス <span class="text-danger">*</span></label>';
+        html += '<input type="email" id="email-input" name="email" class="form-control" required placeholder="example@example.com">';
+        html += '<div class="form-text">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</div>';
         html += '</div>';
         
         // Age field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">年齢 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="age-select" name="age" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
+        html += '<div class="mb-3">';
+        html += '<label for="age-select" class="form-label fw-bold">年齢 <span class="text-danger">*</span></label>';
+        html += '<select id="age-select" name="age" class="form-select" required>';
         html += '<option value="">選択してください</option>';
 
         // Generate age options from 18 to 100
@@ -412,9 +441,9 @@
         html += '</div>';
         
         // Gender field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">性別 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="gender-select" name="gender" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
+        html += '<div class="mb-3">';
+        html += '<label for="gender-select" class="form-label fw-bold">性別 <span class="text-danger">*</span></label>';
+        html += '<select id="gender-select" name="gender" class="form-select" required>';
         html += '<option value="">選択してください</option>';
         html += '<option value="男性">男性</option>';
         html += '<option value="女性">女性</option>';
@@ -422,11 +451,15 @@
         html += '</select>';
         html += '</div>';
         
-        html += '<div style="margin: 30px 0; text-align: center;">';
-        html += '<button type="submit" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">次へ進む</button>';
+        html += '<div class="text-center mt-4">';
+        html += '<button type="submit" class="btn btn-success btn-lg px-4">次へ進む</button>';
         html += '</div>';
         html += '</form>';
-        html += '</div>';
+        html += '</div>'; // End card-body
+        html += '</div>'; // End card
+        html += '</div>'; // End col
+        html += '</div>'; // End row
+        html += '</div>'; // End container
         
         return html;
       },
