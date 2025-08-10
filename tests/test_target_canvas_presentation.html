@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Target Presentation Canvas Test</title>
+    <script src="https://unpkg.com/jspsych@7"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+    <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { margin: 0; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div id="jspsych-target"></div>
+    
+    <script>
+        // Parameters from main experiment
+        const params = {
+            colors: ['red', 'blue', 'green', 'yellow', 'purple'],
+            shapes: ['circle', 'triangle', 'square', 'diamond'],
+            objectSize: 40
+        };
+        
+        function getTargetPresentationSize() {
+            return params.objectSize;
+        }
+        
+        // Draw an object on canvas (copied from main experiment)
+        function drawObject(ctx, x, y, size, color, shape) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            switch (shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(x, y - size / 2);
+                    ctx.lineTo(x + size / 2, y + size / 2);
+                    ctx.lineTo(x - size / 2, y + size / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.beginPath();
+                    ctx.rect(x - size / 2, y - size / 2, size, size);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    ctx.moveTo(x, y - size / 2);
+                    ctx.lineTo(x + size / 2, y);
+                    ctx.lineTo(x, y + size / 2);
+                    ctx.lineTo(x - size / 2, y);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+        }
+        
+        // Initialize jsPsych
+        const jsPsych = initJsPsych({
+            on_finish: function() {
+                jsPsych.data.displayData();
+            }
+        });
+        
+        // Display target object (exact copy from main experiment)
+        const showTarget = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+                // Randomly select target color and shape
+                const targetColor = jsPsych.randomization.sampleWithoutReplacement(params.colors, 1)[0];
+                const targetShape = jsPsych.randomization.sampleWithoutReplacement(params.shapes, 1)[0];
+                
+                // Store in data for the visual search task
+                jsPsych.data.addProperties({
+                    target_color: targetColor,
+                    target_shape: targetShape
+                });
+                
+                return `
+                    <div style="margin: 20px auto; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="target-canvas" width="60" height="60" style="border: 1px solid #ccc;"></canvas>
+                    </div>
+                    <p>Target: ${targetColor} ${targetShape} (Press any key to continue)</p>
+                `;
+            },
+            choices: "ALL_KEYS",
+            data: {
+                task: 'show_target'
+            },
+            on_load: function() {
+                // Get target information from data
+                const data = jsPsych.data.get().last(1).values()[0];
+                const targetColor = data.target_color;
+                const targetShape = data.target_shape;
+                
+                // Draw target on canvas using the same method as search objects
+                const canvas = document.getElementById('target-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw target object at center of canvas using same drawObject function
+                drawObject(ctx, 30, 30, getTargetPresentationSize(), targetColor, targetShape);
+            }
+        };
+        
+        // Create timeline
+        const timeline = [showTarget];
+        
+        // Run experiment
+        jsPsych.run(timeline);
+    </script>
+</body>
+</html>

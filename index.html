@@ -910,8 +910,8 @@
         });
         
         return `
-          <div style="margin: 20px auto; width: 40px; height: 40px;">
-            ${drawShape(targetShape, targetColor, 20, 20, getTargetPresentationSize())}
+          <div style="margin: 20px auto; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="target-canvas" width="60" height="60" style="border: 1px solid #ccc;"></canvas>
           </div>
         `;
       },
@@ -919,6 +919,22 @@
       trial_duration: 1000,
       data: {
         task: 'show_target'
+      },
+      on_load: function() {
+        // Get target information from data
+        const data = jsPsych.data.get().last(1).values()[0];
+        const targetColor = data.target_color;
+        const targetShape = data.target_shape;
+        
+        // Draw target on canvas using the same method as search objects
+        const canvas = document.getElementById('target-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw target object at center of canvas using same drawObject function
+        drawObject(ctx, 30, 30, getTargetPresentationSize(), targetColor, targetShape);
       }
     };
 
