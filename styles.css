@@ -110,6 +110,21 @@ body {
   background-color: #ccc;
   cursor: not-allowed;
 }
+.memory-reset-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px auto;
+  display: block;
+  transition: background-color 0.2s;
+}
+.memory-reset-btn:hover {
+  background-color: #545b62;
+}
 .memory-choice-container {
   display: flex;
   justify-content: center;

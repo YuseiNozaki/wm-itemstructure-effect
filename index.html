@@ -177,7 +177,7 @@
       
       // Memory task
       memoryGridSize: 4, // 4x4 grid
-      memoryPositions: 2, // Number of positions to remember
+      memoryPositions: 3, // Number of positions to remember
     };
 
     // Trial factors
@@ -631,8 +631,9 @@
         }
         
         gridHTML += '</div>';
+        gridHTML += '<button id="memory-reset-btn" class="memory-reset-btn">リセット</button>';
         gridHTML += '<button id="memory-submit-btn" class="memory-submit-btn" disabled>決定</button>';
-        gridHTML += '<p id="selection-info">2つのセルを選択してください。</p>';
+        gridHTML += '<p id="selection-info">3つのセルを選択してください。</p>';
         
         return gridHTML;
       },
@@ -651,16 +652,10 @@
             const index = parseInt(this.getAttribute('data-index'));
             const isSelected = this.classList.contains('selected');
             
-            if (isSelected) {
-              // Deselect cell
-              this.classList.remove('selected');
-              selectedMemoryPositions = selectedMemoryPositions.filter(pos => pos !== index);
-            } else {
-              // Select cell only if we haven't reached the limit
-              if (selectedMemoryPositions.length < params.memoryPositions) {
-                this.classList.add('selected');
-                selectedMemoryPositions.push(index);
-              }
+            // Only allow selection if cell is not already selected and limit not reached
+            if (!isSelected && selectedMemoryPositions.length < params.memoryPositions) {
+              this.classList.add('selected');
+              selectedMemoryPositions.push(index);
             }
             
             // Update UI based on selection count
@@ -690,6 +685,20 @@
               memory_correct: isCorrect ? 1 : 0
             });
           }
+        });
+        
+        // Add reset button event listener
+        const resetBtn = document.getElementById('memory-reset-btn');
+        resetBtn.addEventListener('click', function() {
+          // Clear all selections
+          selectedMemoryPositions = [];
+          cells.forEach(cell => {
+            cell.classList.remove('selected');
+          });
+          
+          // Update UI
+          submitBtn.disabled = true;
+          selectionInfo.textContent = `0つのセルが選択されました。あと${params.memoryPositions}つ選択してください。`;
         });
       }
     };
