@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Screen Resolution Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #e2e3e5; color: #383d41; }
+        .resolution-display { font-size: 18px; font-weight: bold; margin: 20px 0; }
+        .code-sample { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #007bff; }
+        pre { background: #f1f3f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Screen Resolution API Test</h1>
+    <p>This test validates that screen resolution can be captured using window.screen properties.</p>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        function runTests() {
+            let html = '<h2>Screen Resolution API Test Results</h2>';
+            
+            // Test 1: Check if window.screen exists
+            const screenExists = typeof window.screen !== 'undefined';
+            html += `<div class="test-result ${screenExists ? 'pass' : 'fail'}">
+                <strong>Test 1: window.screen API Available</strong><br>
+                Expected: window.screen should be defined<br>
+                Actual: ${typeof window.screen}<br>
+                Result: ${screenExists ? 'PASS' : 'FAIL'}
+            </div>`;
+            
+            if (screenExists) {
+                // Test 2: Check if width property exists
+                const widthExists = typeof window.screen.width !== 'undefined';
+                html += `<div class="test-result ${widthExists ? 'pass' : 'fail'}">
+                    <strong>Test 2: screen.width Property Available</strong><br>
+                    Expected: window.screen.width should be defined<br>
+                    Actual: ${typeof window.screen.width} (${window.screen.width})<br>
+                    Result: ${widthExists ? 'PASS' : 'FAIL'}
+                </div>`;
+                
+                // Test 3: Check if height property exists
+                const heightExists = typeof window.screen.height !== 'undefined';
+                html += `<div class="test-result ${heightExists ? 'pass' : 'fail'}">
+                    <strong>Test 3: screen.height Property Available</strong><br>
+                    Expected: window.screen.height should be defined<br>
+                    Actual: ${typeof window.screen.height} (${window.screen.height})<br>
+                    Result: ${heightExists ? 'PASS' : 'FAIL'}
+                </div>`;
+                
+                // Test 4: Check if values are reasonable
+                const width = window.screen.width;
+                const height = window.screen.height;
+                const widthValid = typeof width === 'number' && width > 0 && width < 10000;
+                const heightValid = typeof height === 'number' && height > 0 && height < 10000;
+                
+                html += `<div class="test-result ${widthValid ? 'pass' : 'fail'}">
+                    <strong>Test 4: Width Value Validation</strong><br>
+                    Expected: Positive number between 1 and 10000<br>
+                    Actual: ${typeof width} (${width})<br>
+                    Result: ${widthValid ? 'PASS' : 'FAIL'}
+                </div>`;
+                
+                html += `<div class="test-result ${heightValid ? 'pass' : 'fail'}">
+                    <strong>Test 5: Height Value Validation</strong><br>
+                    Expected: Positive number between 1 and 10000<br>
+                    Actual: ${typeof height} (${height})<br>
+                    Result: ${heightValid ? 'PASS' : 'FAIL'}
+                </div>`;
+                
+                // Display current screen info
+                html += `<div class="resolution-display">
+                    <strong>Detected Screen Resolution:</strong> ${width} × ${height} pixels
+                </div>`;
+                
+                // Show code sample
+                html += `<div class="code-sample">
+                    <h3>Code Implementation for jsPsych:</h3>
+                    <pre>// Add this after jsPsych initialization:
+jsPsych.data.addProperties({
+    screen_width: window.screen.width,    // ${width}
+    screen_height: window.screen.height   // ${height}
+});</pre>
+                </div>`;
+                
+                // Overall result
+                const allPassed = screenExists && widthExists && heightExists && widthValid && heightValid;
+                html += `<div class="test-result ${allPassed ? 'pass' : 'fail'}">
+                    <strong>Overall Result: ${allPassed ? 'ALL TESTS PASSED - Ready for jsPsych integration' : 'SOME TESTS FAILED'}</strong>
+                </div>`;
+                
+                // Additional screen information
+                html += '<div class="info"><h3>Additional Screen Information:</h3>';
+                html += `<p><strong>Available Width:</strong> ${window.screen.availWidth || 'N/A'}</p>`;
+                html += `<p><strong>Available Height:</strong> ${window.screen.availHeight || 'N/A'}</p>`;
+                html += `<p><strong>Color Depth:</strong> ${window.screen.colorDepth || 'N/A'} bits</p>`;
+                html += `<p><strong>Pixel Depth:</strong> ${window.screen.pixelDepth || 'N/A'} bits</p>`;
+                if (window.devicePixelRatio) {
+                    html += `<p><strong>Device Pixel Ratio:</strong> ${window.devicePixelRatio}</p>`;
+                }
+                html += '</div>';
+            }
+            
+            document.getElementById('test-results').innerHTML = html;
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

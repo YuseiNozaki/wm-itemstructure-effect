@@ -48,6 +48,12 @@
       }
     });
 
+    // Automatically capture participant's screen resolution
+    jsPsych.data.addProperties({
+      screen_width: window.screen.width,
+      screen_height: window.screen.height
+    });
+
     // フルスクリーンモードを要求する関数
     function enterFullscreen() {
       const elem = document.documentElement;
