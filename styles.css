@@ -31,7 +31,7 @@ body {
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
-  min-height: 0; /* Allow shrinking */
+  min-height: 0; /* Allows flex item to shrink below its intrinsic minimum height when space is constrained (flexbox quirk) */
 }
 #jspsych-visual-search-canvas {
   position: fixed;
