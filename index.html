@@ -9,6 +9,8 @@
   <script src="https://unpkg.com/@jspsych/plugin-instructions@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
+  <!-- Bootstrap CSS CDN for modern, monochrome design -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUa+IIhqAGtg" crossorigin="anonymous">
   <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
   <link href="styles.css" rel="stylesheet" type="text/css" />
 </head>
@@ -382,25 +384,25 @@
         html += '</ul>';
         html += '</div>';
         
-        html += '<form id="demographics-form" style="margin: 20px 0;">';
+        html += '<form id="demographics-form" class="container-fluid px-4 py-3">';
         
         // Name field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="name-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">氏名 <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="text" id="name-input" name="name" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="お名前を入力してください">';
+        html += '<div class="mb-4">';
+        html += '<label for="name-input" class="form-label fw-bold fs-6">氏名 <span class="text-danger">*</span></label>';
+        html += '<input type="text" id="name-input" name="name" required class="form-control form-control-lg" placeholder="お名前を入力してください">';
         html += '</div>';
         
         // Email field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="email-input" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">メールアドレス <span style="color: #dc3545;">*</span></label>';
-        html += '<input type="email" id="email-input" name="email" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;" placeholder="example@example.com">';
-        html += '<small style="color: #6c757d; font-size: 14px; display: block; margin-top: 5px;">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>';
+        html += '<div class="mb-4">';
+        html += '<label for="email-input" class="form-label fw-bold fs-6">メールアドレス <span class="text-danger">*</span></label>';
+        html += '<input type="email" id="email-input" name="email" required class="form-control form-control-lg" placeholder="example@example.com">';
+        html += '<small class="form-text text-muted">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>';
         html += '</div>';
         
         // Age field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="age-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">年齢 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="age-select" name="age" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
+        html += '<div class="mb-4">';
+        html += '<label for="age-select" class="form-label fw-bold fs-6">年齢 <span class="text-danger">*</span></label>';
+        html += '<select id="age-select" name="age" required class="form-select form-select-lg">';
         html += '<option value="">選択してください</option>';
 
         // Generate age options from 18 to 100
@@ -412,9 +414,9 @@
         html += '</div>';
         
         // Gender field
-        html += '<div style="margin: 20px 0; text-align: left;">';
-        html += '<label for="gender-select" style="display: block; margin-bottom: 10px; font-size: 16px; font-weight: bold;">性別 <span style="color: #dc3545;">*</span></label>';
-        html += '<select id="gender-select" name="gender" required style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; box-sizing: border-box;">';
+        html += '<div class="mb-4">';
+        html += '<label for="gender-select" class="form-label fw-bold fs-6">性別 <span class="text-danger">*</span></label>';
+        html += '<select id="gender-select" name="gender" required class="form-select form-select-lg">';
         html += '<option value="">選択してください</option>';
         html += '<option value="男性">男性</option>';
         html += '<option value="女性">女性</option>';
@@ -422,8 +424,8 @@
         html += '</select>';
         html += '</div>';
         
-        html += '<div style="margin: 30px 0; text-align: center;">';
-        html += '<button type="submit" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">次へ進む</button>';
+        html += '<div class="text-center mt-4">';
+        html += '<button type="submit" class="btn btn-dark btn-lg px-5">次へ進む</button>';
         html += '</div>';
         html += '</form>';
         html += '</div>';
@@ -606,8 +608,8 @@
         html += '</div>';
         
         // Continue button
-        html += '<div style="text-align: center; margin-top: 40px;">';
-        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">練習を開始する</button>';
+        html += '<div class="text-center mt-5">';
+        html += '<button id="instructions-continue-btn" class="btn btn-dark btn-lg px-5 py-3 fs-5 fw-bold">練習を開始する</button>';
         html += '</div>';
         
         html += '</div>';
