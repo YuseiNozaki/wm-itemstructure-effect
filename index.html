@@ -508,106 +508,36 @@
       }
     };
 
-    // Comprehensive experiment instruction screen (updated according to wireframe ①)
-    const experimentInstructions = {
+    // Initial explanation for memory-first group (前半が記憶課題グループ)
+    const initialExplanationMemoryFirst = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
         
-        // Main title
-        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 32px; font-weight: bold;">実験の操作説明</h1>';
+        // Title
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
         
-        // Experiment overview section
-        html += '<div style="background-color: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">';
-        html += '<h2 style="color: #007bff; margin-top: 0; font-size: 22px; margin-bottom: 20px;">実験全体の流れ</h2>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">まず、画面中央に1秒だけ図形が表示されるので、覚えてください。次に、たくさんの図形が表示されるので、覚えた図形を探してクリックしてください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">できるだけ<strong style="color: #e74c3c;">早く</strong>、<strong style="color: #e74c3c;">正確に</strong>探してください。</p>';
-        html += '<p style="font-size: 18px; margin: 15px 0; color: #333;">全部終了すると、あなたのスコアが表示されます。</p>';
-        html += '</div>';
-        
-        // Experiment flow section  
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #28a745; font-size: 22px; margin-bottom: 20px;">実験の構成</h2>';
-        html += '<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">';
-        
-        // Step boxes
-        const steps = [
-          { num: '1', title: '練習', desc: '9回', detail: 'まずは操作に慣れましょう' },
-          { num: '2', title: 'ブロック1', desc: '60回', detail: '集中してがんばりましょう' },
-          { num: '3', title: 'ブロック2', desc: '60回', detail: '条件が変わります' }
+        // Step-by-step rules
+        const rules = [
+          'パネルが3秒間だけ表示されます。色のついた場所を覚えてください。',
+          'まず図形が1秒間だけ表示されます。覚えてください。',
+          '次に、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
+          'はじめに覚えたパネルの場所を回答してください。',
+          'これを何度もくり返します。最後まで集中力を切らさないように頑張りましょう！'
         ];
         
-        steps.forEach(step => {
-          html += `<div style="flex: 1; min-width: 220px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">`;
-          html += `<div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">${step.num}</div>`;
-          html += `<div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">${step.title}</div>`;
-          html += `<div style="font-size: 16px; margin-bottom: 8px;">${step.desc}</div>`;
-          html += `<div style="font-size: 14px; opacity: 0.9;">${step.detail}</div>`;
+        rules.forEach((rule, index) => {
+          html += `<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 15px;">`;
+          html += `<div style="display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #007bff; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 16px;">${index + 1}</div>`;
+          html += `<div style="font-size: 16px; color: #333; flex: 1;">${rule}</div>`;
+          html += '</div>';
           html += '</div>';
         });
-        
-        html += '</div></div>';
-        
-        // Task overview section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">操作の説明</h2>';
-        
-        const taskSteps = [
-          { step: '1', text: '条件の説明が表示されます' },
-          { step: '2', text: '1秒間だけターゲットが表示されます。集中して見て覚えてください。' },
-          { step: '3', text: '図形を探す画面が表示されます。図形を探す画面は3パターンあり、ランダムでどれかが表示されます。' },
-          { step: '4', text: 'これを何度も繰り返します。集中力を切らさないように頑張ってください。' }
-        ];
-        
-        taskSteps.forEach(task => {
-          html += `<div style="background-color: #ffffff; border: 2px solid #dee2e6; border-radius: 8px; padding: 18px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">`;
-          html += `<div style="background-color: #dc3545; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">${task.step}</div>`;
-          html += `<div style="font-size: 16px; color: #333; flex: 1;">${task.text}</div>`;
-          html += '</div>';
-        });
-        
-        html += '</div>';
-        
-        // Viewing conditions section
-        html += '<div style="margin-bottom: 30px;">';
-        html += '<h2 style="color: #6f42c1; font-size: 22px; margin-bottom: 20px;">3つの表示パターン</h2>';
-        
-        const conditions = [
-          {
-            name: '全画面',
-            color: '#17a2b8',
-            description: '覚えた図形を探してクリックしてください。'
-          },
-          {
-            name: 'ウィンドウ', 
-            color: '#fd7e14',
-            description: 'ウィンドウが表示されます。ウィンドウをドラッグすることで、隠れている範囲も見ることができます。覚えた図形を見つけたらクリックしてください。'
-          },
-          {
-            name: 'スクロール',
-            color: '#28a745',
-            description: 'ウィンドウが中央に固定されています。ドラッグすると背景がスクロールされるので、覚えた図形を探し、見つけたらクリックしてください。'
-          }
-        ];
-        
-        conditions.forEach((condition, index) => {
-          html += `<div style="background-color: ${condition.color}15; border: 2px solid ${condition.color}; border-radius: 10px; padding: 20px; margin-bottom: 20px;">`;
-          html += `<h3 style="color: ${condition.color}; margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">${index + 1}. ${condition.name}</h3>`;
-          html += `<p style="margin: 0; font-size: 16px; color: #333; line-height: 1.6;">${condition.description}</p>`;
-          html += '</div>';
-        });
-        
-        html += '</div>';
-        
-        // Important message
-        html += '<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center;">';
-        html += '<h3 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">⚡ 重要なポイント</h3>';
-        html += '<p style="margin: 0; font-size: 18px; color: #856404; font-weight: bold;">できるだけ早く、正確に図形を見つけてクリックしてください</p>';
-        html += '</div>';
         
         // Continue button
         html += '<div style="text-align: center; margin-top: 40px;">';
-        html += '<button id="instructions-continue-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 45px; font-size: 20px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; font-weight: bold;">練習を開始する</button>';
+        html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">練習に進む</button>';
         html += '</div>';
         
         html += '</div>';
@@ -616,47 +546,125 @@
       },
       choices: "NO_KEYS",
       on_load: function() {
-        // Ensure no fullscreen listeners are active during instructions
-        removeFullscreenListeners();
-        
-        // Add click event listener to continue button
-        const continueBtn = document.getElementById('instructions-continue-btn');
+        const continueBtn = document.getElementById('initial-continue-btn');
         continueBtn.addEventListener('click', function() {
-          jsPsych.finishTrial({
-            user_action: 'continue_to_practice'
-          });
-        });
-        
-        // Add hover effect to button
-        continueBtn.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-2px)';
-        });
-        
-        continueBtn.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0)';
+          // Add fullscreen request before starting practice
+          enterFullscreen();
+          // Small delay to allow fullscreen transition
+          setTimeout(() => {
+            jsPsych.finishTrial();
+          }, 500);
         });
       }
     };
 
-    // Practice explanation screen
-    const practiceExplanation = {
+    // Initial explanation for memory-second group (後半が記憶課題グループ)
+    const initialExplanationMemorySecond = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-          <p style="font-size: 18px; margin: 20px 0;">はじめに9回練習を行います</p>
-          <p style="font-size: 16px; margin: 20px 0;">
-            <strong>下の「次へ」ボタンをクリックして練習を開始してください。</strong>
-          </p>
-          <div style="margin: 20px 0;">
-            <button id="practice-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>
-          </div>
-        </div>
-      `,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        
+        // Title
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
+        
+        // Step-by-step rules
+        const rules = [
+          'まず図形が1秒間だけ表示されます。覚えてください。',
+          '次に、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
+          'これを何度もくり返します。最後まで集中力を切らさないように頑張りましょう！'
+        ];
+        
+        rules.forEach((rule, index) => {
+          html += `<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 15px;">`;
+          html += `<div style="display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #007bff; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 16px;">${index + 1}</div>`;
+          html += `<div style="font-size: 16px; color: #333; flex: 1;">${rule}</div>`;
+          html += '</div>';
+          html += '</div>';
+        });
+        
+        // Continue button
+        html += '<div style="text-align: center; margin-top: 40px;">';
+        html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">練習に進む</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
       choices: "NO_KEYS",
       on_load: function() {
-        // Add click event listener to the Next button
-        const nextBtn = document.getElementById('practice-next-btn');
-        nextBtn.addEventListener('click', function() {
+        const continueBtn = document.getElementById('initial-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          // Add fullscreen request before starting practice
+          enterFullscreen();
+          // Small delay to allow fullscreen transition
+          setTimeout(() => {
+            jsPsych.finishTrial();
+          }, 500);
+        });
+      }
+    };
+
+    // Midpoint explanation for memory-first group (前半が記憶課題グループ)
+    const midpointExplanationMemoryFirst = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+        
+        html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です。</h1>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは記憶課題がなくなり、図形を探すだけです。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">最後まで集中して頑張りましょう！</p>';
+        
+        // Continue button
+        html += '<div style="margin-top: 40px;">';
+        html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('midpoint-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
+    };
+
+    // Midpoint explanation for memory-second group (後半が記憶課題グループ)
+    const midpointExplanationMemorySecond = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+        
+        html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です。</h1>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは、さらにワーキングメモリを使う課題を追加します。</p>';
+        
+        // Step explanation
+        html += '<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin: 20px 0; text-align: left;">';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">1. まずはじめにパネルが3秒間表示されます。色のついた場所を覚えてください。</p>';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">2. 今まで通りの図形探しを行います。</p>';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">3. はじめに覚えたパネルの場所を回答します。</p>';
+        html += '</div>';
+        
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">後半もさらに集中して頑張ってください！</p>';
+        
+        // Continue button
+        html += '<div style="margin-top: 40px;">';
+        html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('midpoint-continue-btn');
+        continueBtn.addEventListener('click', function() {
           jsPsych.finishTrial();
         });
       }
@@ -1974,18 +1982,48 @@
       randomize_order: true
     };
 
+    // Conditional initial explanation based on counterbalancing
+    const conditionalInitialExplanation = {
+      timeline: [initialExplanationMemoryFirst],
+      conditional_function: function() {
+        return memoryFirstCondition;
+      }
+    };
+    
+    const conditionalInitialExplanationSecond = {
+      timeline: [initialExplanationMemorySecond],
+      conditional_function: function() {
+        return !memoryFirstCondition;
+      }
+    };
+
+    // Conditional midpoint explanation based on counterbalancing
+    const conditionalMidpointExplanation = {
+      timeline: [midpointExplanationMemoryFirst],
+      conditional_function: function() {
+        return memoryFirstCondition;
+      }
+    };
+    
+    const conditionalMidpointExplanationSecond = {
+      timeline: [midpointExplanationMemorySecond],
+      conditional_function: function() {
+        return !memoryFirstCondition;
+      }
+    };
+
     // Full experiment timeline
     const timeline = [
       welcome,
       informedConsent,
       demographics,
-      experimentInstructions,
-      practiceExplanation,
+      conditionalInitialExplanation,
+      conditionalInitialExplanationSecond,
       practiceProcedure,
       mainExperimentStart,
       firstBlockProcedure,
-      // midpointMessage, // Temporarily removed due to counterbalancing (will be re-implemented later)
-      // wmTaskExplanation, // Temporarily removed due to counterbalancing (will be re-implemented later)
+      conditionalMidpointExplanation,
+      conditionalMidpointExplanationSecond,
       secondBlockProcedure,
       endScreen
     ];
