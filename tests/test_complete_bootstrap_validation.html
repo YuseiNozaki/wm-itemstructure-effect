@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Complete Bootstrap Design Validation</title>
+  <!-- Bootstrap CSS CDN - same as main application -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUa+IIhqAGtg" crossorigin="anonymous">
+  <style>
+    /* Copy of main application monochrome styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .demo-section {
+      background: #fff;
+      margin: 2rem 0;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Memory Grid Styles */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-template-rows: repeat(4, 80px);
+      gap: 5px;
+      margin: 20px auto;
+      padding: 1rem;
+      background-color: #fff;
+      border: 2px solid #dee2e6;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      justify-content: center;
+    }
+    
+    .memory-cell {
+      background-color: #f8f9fa;
+      border: 2px solid #dee2e6;
+      border-radius: 0.25rem;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    
+    .memory-cell:hover {
+      background-color: #e9ecef;
+      border-color: #adb5bd;
+    }
+    
+    .memory-cell.highlighted {
+      background-color: #495057;
+      border-color: #343a40;
+    }
+    
+    .memory-cell.selected {
+      background-color: #6c757d;
+      border-color: #495057;
+    }
+    
+    /* Button overrides for monochrome theme */
+    .btn-dark {
+      background-color: #343a40;
+      border-color: #343a40;
+      color: #fff;
+    }
+    
+    .btn-dark:hover {
+      background-color: #495057;
+      border-color: #495057;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .btn-secondary:not(:disabled) {
+      background-color: #343a40;
+      border-color: #343a40;
+      color: #fff;
+    }
+    
+    .btn-secondary:not(:disabled):hover {
+      background-color: #495057;
+      border-color: #495057;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: #495057;
+      box-shadow: 0 0 0 0.2rem rgba(73, 80, 87, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center text-dark mb-5">Bootstrap Monochrome Design - Complete Validation</h1>
+    
+    <!-- 1. Consent Form Section -->
+    <div class="demo-section">
+      <h2 class="text-center text-dark mb-4">研究に関する同意事項</h2>
+      <div class="border rounded p-4 mb-4 bg-light" style="max-height: 200px; overflow-y: auto;">
+        <h4>実験の概要</h4>
+        <p>本研究では、ワーキングメモリとアイテム構造効果について調査いたします。実験では視覚探索課題とメモリ課題を行っていただきます。</p>
+        <h4>参加者の権利</h4>
+        <p>実験への参加は完全に任意です。いつでも実験を中止することができます。</p>
+        <h4>データの取り扱い</h4>
+        <p>収集されたデータは研究目的のみに使用され、個人を特定できる情報は含まれません。</p>
+      </div>
+      <div class="text-center my-4">
+        <label class="d-flex align-items-center justify-content-center fs-6 mb-3">
+          <input type="checkbox" id="consent-demo" class="form-check-input me-3 fs-5"> 
+          上記の内容を確認し、研究参加に同意します
+        </label>
+        <button id="consent-btn" disabled class="btn btn-secondary btn-lg">次へ進む</button>
+      </div>
+    </div>
+    
+    <!-- 2. Demographics Form Section -->
+    <div class="demo-section">
+      <h2 class="mb-4 text-dark text-center">基本情報の入力</h2>
+      <form class="container-fluid px-4 py-3">
+        <div class="mb-4">
+          <label for="demo-name" class="form-label fw-bold fs-6">氏名 <span class="text-danger">*</span></label>
+          <input type="text" id="demo-name" class="form-control form-control-lg" placeholder="お名前を入力してください">
+        </div>
+        
+        <div class="mb-4">
+          <label for="demo-email" class="form-label fw-bold fs-6">メールアドレス <span class="text-danger">*</span></label>
+          <input type="email" id="demo-email" class="form-control form-control-lg" placeholder="example@example.com">
+          <small class="form-text text-muted">r241004y@st.u-gakugei.ac.jp からの連絡を受信できるアドレスをご入力ください</small>
+        </div>
+        
+        <div class="mb-4">
+          <label for="demo-age" class="form-label fw-bold fs-6">年齢 <span class="text-danger">*</span></label>
+          <select id="demo-age" class="form-select form-select-lg">
+            <option value="">選択してください</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+          </select>
+        </div>
+        
+        <div class="text-center mt-4">
+          <button type="button" class="btn btn-dark btn-lg px-5">次へ進む</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- 3. Memory Grid Section -->
+    <div class="demo-section">
+      <h2 class="text-center text-dark mb-4">メモリ課題デモ</h2>
+      <p class="text-center text-muted">以下のグリッド内の色のついたセルの位置を記憶してください。</p>
+      
+      <div class="memory-grid">
+        <div class="memory-cell"></div>
+        <div class="memory-cell highlighted"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell highlighted"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+        <div class="memory-cell"></div>
+      </div>
+      
+      <div class="text-center">
+        <button class="btn btn-dark btn-lg me-3">記憶する</button>
+        <button class="btn btn-outline-secondary btn-lg">リセット</button>
+      </div>
+    </div>
+    
+    <!-- 4. Instructions Section -->
+    <div class="demo-section">
+      <h2 class="text-center text-dark mb-4">実験説明</h2>
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <p class="fs-6 text-center lh-lg">これから実験を開始します。画面に表示される指示に従って操作を行ってください。</p>
+          <ul class="text-muted">
+            <li>視覚探索課題では、画面上の目標物体を見つけてクリックしてください</li>
+            <li>メモリ課題では、表示された位置を正確に記憶してください</li>
+            <li>分からないことがあれば、いつでも実験者にお声がけください</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="text-center mt-5">
+        <button class="btn btn-dark btn-lg px-5 py-3 fs-5 fw-bold">練習を開始する</button>
+      </div>
+    </div>
+    
+    <!-- 5. Design Summary -->
+    <div class="demo-section">
+      <h2 class="text-center text-dark mb-4">デザイン要約</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <h5>カラーパレット</h5>
+          <div class="d-flex align-items-center mb-2">
+            <div style="width: 40px; height: 20px; background: #343a40; margin-right: 10px; border-radius: 3px;"></div>
+            <span>メインカラー (#343a40)</span>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div style="width: 40px; height: 20px; background: #f8f9fa; border: 1px solid #dee2e6; margin-right: 10px; border-radius: 3px;"></div>
+            <span>背景カラー (#f8f9fa)</span>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div style="width: 40px; height: 20px; background: #6c757d; margin-right: 10px; border-radius: 3px;"></div>
+            <span>セカンダリカラー (#6c757d)</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h5>主な改善点</h5>
+          <ul class="list-unstyled">
+            <li>✅ Bootstrap 5.3 統合</li>
+            <li>✅ モノクロデザイン</li>
+            <li>✅ レスポンシブレイアウト</li>
+            <li>✅ アクセシビリティ向上</li>
+            <li>✅ 研究機能の完全保持</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Enable consent button when checkbox is checked
+    document.getElementById('consent-demo').addEventListener('change', function() {
+      const button = document.getElementById('consent-btn');
+      if (this.checked) {
+        button.disabled = false;
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-dark');
+      } else {
+        button.disabled = true;
+        button.classList.remove('btn-dark');
+        button.classList.add('btn-secondary');
+      }
+    });
+    
+    // Add click effects to memory cells
+    document.querySelectorAll('.memory-cell').forEach(cell => {
+      cell.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+  </script>
+</body>
+</html>
