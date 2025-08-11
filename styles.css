@@ -318,3 +318,18 @@ body {
 .hidden {
   display: none !important;
 }
+
+/* Consent button state transitions */
+#consent-next-btn:not(:disabled) {
+  background-color: #343a40 !important;
+  border-color: #343a40 !important;
+  color: #fff !important;
+  cursor: pointer !important;
+}
+
+#consent-next-btn:not(:disabled):hover {
+  background-color: #495057 !important;
+  border-color: #495057 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}

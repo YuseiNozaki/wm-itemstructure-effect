@@ -236,8 +236,8 @@
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<h1>実験に参加していただきありがとうございます。</h1>' +
                 '<p>下の「次へ」ボタンをクリックして実験を開始してください。</p>' +
-                '<div style="margin: 20px 0;">' +
-                '<button id="welcome-next-btn" style="padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">次へ</button>' +
+                '<div class="text-center my-4">' +
+                '<button id="welcome-next-btn" class="btn btn-dark btn-lg">次へ</button>' +
                 '</div>',
       choices: "NO_KEYS",
       on_load: function() {
@@ -256,11 +256,11 @@
     const informedConsent = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; font-size: 14px;">';
-        html += '<h1 style="text-align: center; color: #333; margin-bottom: 30px;">研究に関する同意事項</h1>';
+        let html = '<div class="container" style="max-width: 800px;">';
+        html += '<h1 class="text-center text-dark mb-4">研究に関する同意事項</h1>';
         
         // Scrollable content area
-        html += '<div id="consent-content" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; background-color: #f9f9f9; text-align: left;">';
+        html += '<div id="consent-content" class="border rounded p-4 mb-4 bg-light" style="max-height: 500px; overflow-y: auto; text-align: left;">';
         
         html += '<h3>1. 研究の目的</h3>';
         html += '<p>本研究は、制限された視野を移動して行う視覚探索場面において、視覚的ワーキングメモリおよび物体の配置構造が探索効率に与える影響を解明することを目的とします。</p>';
@@ -319,12 +319,12 @@
         html += '</div>'; // End of scrollable content
         
         // Consent checkbox and button
-        html += '<div style="text-align: center; margin: 20px 0;">';
-        html += '<label style="display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 20px;">';
-        html += '<input type="checkbox" id="consent-checkbox" style="margin-right: 10px; transform: scale(1.2);"> ';
+        html += '<div class="text-center my-4">';
+        html += '<label class="d-flex align-items-center justify-content-center fs-6 mb-3">';
+        html += '<input type="checkbox" id="consent-checkbox" class="form-check-input me-3 fs-5"> ';
         html += '上記の内容を確認し、研究参加に同意します';
         html += '</label>';
-        html += '<button id="consent-next-btn" disabled style="padding: 12px 24px; font-size: 16px; background-color: #ccc; color: #666; border: none; border-radius: 5px; cursor: not-allowed; transition: all 0.3s;">次へ進む</button>';
+        html += '<button id="consent-next-btn" disabled class="btn btn-secondary btn-lg">次へ進む</button>';
         html += '</div>';
         
         html += '</div>';
@@ -372,8 +372,8 @@
     const demographics = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function() {
-        let html = '<div style="max-width: 700px; margin: 0 auto; padding: 20px; text-align: center; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif;">';
-        html += '<h2 style="margin-bottom: 30px; color: #333;">基本情報の入力</h2>';
+        let html = '<div class="container" style="max-width: 700px;">';
+        html += '<h2 class="mb-4 text-dark">基本情報の入力</h2>';
         
         // Information about data usage
         html += '<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left; line-height: 1.6;">';
