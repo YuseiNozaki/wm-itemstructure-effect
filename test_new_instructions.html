@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test New Instructions</title>
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="jspsych-target"></div>
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test both conditions
+    let memoryFirstCondition = false;
+
+    // Function to toggle condition for testing
+    function toggleCondition() {
+      memoryFirstCondition = !memoryFirstCondition;
+      console.log("Switched to memoryFirstCondition:", memoryFirstCondition);
+      jsPsych.endExperiment("Condition changed - restart to test other condition");
+    }
+
+    // Initial explanation for memory-first group (前半が記憶課題グループ)
+    const initialExplanationMemoryFirst = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        
+        // Title
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
+        html += '<p style="text-align: center; color: #666; margin-bottom: 30px;">前半が記憶課題グループ</p>';
+        
+        // Step-by-step rules
+        const rules = [
+          'パネルが3秒間だけ表示されます。色のついた場所を覚えてください。',
+          'まず図形が1秒間だけ表示されます。覚えてください。',
+          '次に、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
+          'はじめに覚えたパネルの場所を回答してください。',
+          'これを何度もくり返します。最後まで集中力を切らさないように頑張りましょう！'
+        ];
+        
+        rules.forEach((rule, index) => {
+          html += `<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 15px;">`;
+          html += `<div style="display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #007bff; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 16px;">${index + 1}</div>`;
+          html += `<div style="font-size: 16px; color: #333; flex: 1;">${rule}</div>`;
+          html += '</div>';
+          html += '</div>';
+        });
+        
+        // Continue button
+        html += '<div style="text-align: center; margin-top: 40px;">';
+        html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">練習に進む</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('initial-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
+    };
+
+    // Initial explanation for memory-second group (後半が記憶課題グループ)
+    const initialExplanationMemorySecond = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+        
+        // Title
+        html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
+        html += '<p style="text-align: center; color: #666; margin-bottom: 30px;">後半が記憶課題グループ</p>';
+        
+        // Step-by-step rules
+        const rules = [
+          'まず図形が1秒間だけ表示されます。覚えてください。',
+          '次に、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
+          'これを何度もくり返します。最後まで集中力を切らさないように頑張りましょう！'
+        ];
+        
+        rules.forEach((rule, index) => {
+          html += `<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 15px;">`;
+          html += `<div style="display: flex; align-items: flex-start; gap: 15px;">`;
+          html += `<div style="background-color: #007bff; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 16px;">${index + 1}</div>`;
+          html += `<div style="font-size: 16px; color: #333; flex: 1;">${rule}</div>`;
+          html += '</div>';
+          html += '</div>';
+        });
+        
+        // Continue button
+        html += '<div style="text-align: center; margin-top: 40px;">';
+        html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">練習に進む</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('initial-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
+    };
+
+    // Midpoint explanation for memory-first group
+    const midpointExplanationMemoryFirst = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+        
+        html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です。</h1>';
+        html += '<p style="text-align: center; color: #666; margin-bottom: 20px;">前半が記憶課題グループ</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは記憶課題がなくなり、図形を探すだけです。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">最後まで集中して頑張りましょう！</p>';
+        
+        // Continue button
+        html += '<div style="margin-top: 40px;">';
+        html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('midpoint-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
+    };
+
+    // Midpoint explanation for memory-second group
+    const midpointExplanationMemorySecond = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+        
+        html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です。</h1>';
+        html += '<p style="text-align: center; color: #666; margin-bottom: 20px;">後半が記憶課題グループ</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは、さらにワーキングメモリを使う課題を追加します。</p>';
+        
+        // Step explanation
+        html += '<div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin: 20px 0; text-align: left;">';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">1. まずはじめにパネルが3秒間表示されます。色のついた場所を覚えてください。</p>';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">2. 今まで通りの図形探しを行います。</p>';
+        html += '<p style="font-size: 16px; margin: 10px 0; color: #333;">3. はじめに覚えたパネルの場所を回答します。</p>';
+        html += '</div>';
+        
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">後半もさらに集中して頑張ってください！</p>';
+        
+        // Continue button
+        html += '<div style="margin-top: 40px;">';
+        html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        return html;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const continueBtn = document.getElementById('midpoint-continue-btn');
+        continueBtn.addEventListener('click', function() {
+          jsPsych.finishTrial();
+        });
+      }
+    };
+
+    // Test selection screen
+    const testSelection = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `
+          <div style="text-align: center; padding: 40px;">
+            <h1>新しい説明ページのテスト</h1>
+            <p>現在のテスト条件: <strong>${memoryFirstCondition ? '前半が記憶課題グループ' : '後半が記憶課題グループ'}</strong></p>
+            <p>下のボタンでテストしたいページを選択してください</p>
+            <div style="margin: 20px;">
+              <button id="test-initial-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin: 10px;">初期説明ページをテスト</button>
+            </div>
+            <div style="margin: 20px;">
+              <button id="test-midpoint-btn" style="background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin: 10px;">中間説明ページをテスト</button>
+            </div>
+            <div style="margin: 20px;">
+              <button id="toggle-condition-btn" style="background-color: #ffc107; color: black; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin: 10px;">条件を切り替え</button>
+            </div>
+          </div>
+        `;
+      },
+      choices: "NO_KEYS",
+      on_load: function() {
+        const testInitialBtn = document.getElementById('test-initial-btn');
+        const testMidpointBtn = document.getElementById('test-midpoint-btn');
+        const toggleConditionBtn = document.getElementById('toggle-condition-btn');
+        
+        testInitialBtn.addEventListener('click', function() {
+          jsPsych.finishTrial({test_type: 'initial'});
+        });
+        
+        testMidpointBtn.addEventListener('click', function() {
+          jsPsych.finishTrial({test_type: 'midpoint'});
+        });
+        
+        toggleConditionBtn.addEventListener('click', function() {
+          toggleCondition();
+        });
+      }
+    };
+
+    // Conditional initial explanation based on counterbalancing
+    const conditionalInitialExplanation = {
+      timeline: [initialExplanationMemoryFirst],
+      conditional_function: function() {
+        return memoryFirstCondition && jsPsych.data.getLastTrialData().values()[0].test_type === 'initial';
+      }
+    };
+    
+    const conditionalInitialExplanationSecond = {
+      timeline: [initialExplanationMemorySecond],
+      conditional_function: function() {
+        return !memoryFirstCondition && jsPsych.data.getLastTrialData().values()[0].test_type === 'initial';
+      }
+    };
+
+    // Conditional midpoint explanation based on counterbalancing
+    const conditionalMidpointExplanation = {
+      timeline: [midpointExplanationMemoryFirst],
+      conditional_function: function() {
+        return memoryFirstCondition && jsPsych.data.getLastTrialData().values()[0].test_type === 'midpoint';
+      }
+    };
+    
+    const conditionalMidpointExplanationSecond = {
+      timeline: [midpointExplanationMemorySecond],
+      conditional_function: function() {
+        return !memoryFirstCondition && jsPsych.data.getLastTrialData().values()[0].test_type === 'midpoint';
+      }
+    };
+
+    // Timeline
+    const timeline = [
+      testSelection,
+      conditionalInitialExplanation,
+      conditionalInitialExplanationSecond,
+      conditionalMidpointExplanation,
+      conditionalMidpointExplanationSecond,
+      testSelection  // Go back to selection after testing
+    ];
+
+    // Run the test
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
