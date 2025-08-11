@@ -1505,9 +1505,12 @@
         // Get the last visual search task data specifically
         const searchData = jsPsych.data.get().filter({task: 'visual_search'}).last(1).values()[0];
         const correct = searchData.correct;
+        const reactionTimeMs = searchData.reaction_time;
+        const reactionTimeSec = (reactionTimeMs / 1000).toFixed(1);
         
         return `
           <h1>${correct ? '正解!' : '不正解'}</h1>
+          <p style="font-size: 18px; margin-top: 20px;">今回のタイム：${reactionTimeSec}秒</p>
         `;
       },
       data: {
