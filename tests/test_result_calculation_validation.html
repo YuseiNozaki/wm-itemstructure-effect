@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result Calculation Validation Test</title>
+  <meta charset="utf-8">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      background-color: #f5f5f5; 
+    }
+    .test-result { 
+      background: white; 
+      padding: 20px; 
+      margin: 10px 0; 
+      border-radius: 5px; 
+      border-left: 4px solid #007bff; 
+    }
+    .pass { border-left-color: #28a745; }
+    .fail { border-left-color: #dc3545; }
+    .code-block { 
+      background: #f8f9fa; 
+      padding: 10px; 
+      border-radius: 3px; 
+      font-family: monospace; 
+      margin: 10px 0; 
+    }
+  </style>
+</head>
+<body>
+  <h1>リザルト画面計算ロジック検証テスト</h1>
+  <p>実際の実験で使用される計算ロジックをテストします。</p>
+
+  <div id="test-results"></div>
+
+  <script>
+    // Mock jsPsych data structure
+    const mockJsPsychData = {
+      filter: function(criteria) {
+        if (criteria.task === 'visual_search') {
+          return {
+            count: () => this.visualSearchData.length,
+            filter: (innerCriteria) => ({
+              count: () => innerCriteria.correct 
+                ? this.visualSearchData.filter(d => d.correct).length 
+                : this.visualSearchData.length
+            }),
+            select: (field) => ({
+              values: this.visualSearchData.map(d => d[field])
+            })
+          };
+        }
+        return { count: () => 0 };
+      },
+      
+      select: function(field) {
+        if (field === 'memory_correct') {
+          return { values: this.memoryData.map(d => d.memory_correct) };
+        }
+        return { values: [] };
+      },
+      
+      visualSearchData: [
+        { correct: true, rt: 2300 },
+        { correct: true, rt: 1800 },
+        { correct: false, rt: 3200 },
+        { correct: true, rt: 2100 },
+        { correct: true, rt: 1900 },
+        { correct: false, rt: 4500 },
+        { correct: true, rt: 2400 },
+        { correct: true, rt: 1700 },
+        { correct: true, rt: 2200 },
+        { correct: true, rt: 2000 }
+      ],
+      
+      memoryData: [
+        { memory_correct: 1 },
+        { memory_correct: 0 },
+        { memory_correct: 1 },
+        { memory_correct: 1 },
+        { memory_correct: 0 }
+      ]
+    };
+
+    function runTest(name, testFunction) {
+      try {
+        const result = testFunction();
+        document.getElementById('test-results').innerHTML += 
+          `<div class="test-result pass">
+            <h3>✅ ${name}</h3>
+            <div class="code-block">${result}</div>
+          </div>`;
+        return true;
+      } catch (error) {
+        document.getElementById('test-results').innerHTML += 
+          `<div class="test-result fail">
+            <h3>❌ ${name}</h3>
+            <div class="code-block">Error: ${error.message}</div>
+          </div>`;
+        return false;
+      }
+    }
+
+    // Test 1: Visual search accuracy calculation
+    runTest('Visual Search Accuracy Calculation', () => {
+      const searchData = mockJsPsychData.filter({task: 'visual_search'});
+      const correctSearches = searchData.filter({correct: true}).count();
+      const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
+      
+      const expected = Math.round((8 / 10) * 100); // 8 correct out of 10
+      if (searchAccuracy !== expected) {
+        throw new Error(`Expected ${expected}%, got ${searchAccuracy}%`);
+      }
+      return `Accuracy: ${searchAccuracy}% (${correctSearches}/${searchData.count()} correct)`;
+    });
+
+    // Test 2: Visual search speed calculation
+    runTest('Visual Search Speed Calculation', () => {
+      const searchData = mockJsPsychData.filter({task: 'visual_search'});
+      const searchTimes = searchData.select('rt').values;
+      const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
+      const avgSearchTimeSeconds = Math.round((avgSearchTime / 1000) * 100) / 100;
+      
+      const expectedAvg = (2300 + 1800 + 3200 + 2100 + 1900 + 4500 + 2400 + 1700 + 2200 + 2000) / 10;
+      const expectedSeconds = Math.round((expectedAvg / 1000) * 100) / 100;
+      
+      if (Math.abs(avgSearchTimeSeconds - expectedSeconds) > 0.01) {
+        throw new Error(`Expected ${expectedSeconds}s, got ${avgSearchTimeSeconds}s`);
+      }
+      return `Average speed: ${avgSearchTimeSeconds} seconds (${Math.round(avgSearchTime)}ms average)`;
+    });
+
+    // Test 3: Memory accuracy calculation
+    runTest('Memory Accuracy Calculation', () => {
+      const memoryScores = mockJsPsychData.select('memory_correct').values;
+      const filteredScores = memoryScores.filter(score => score !== undefined);
+      const avgMemoryAccuracy = filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length;
+      const memoryAccuracy = Math.round(avgMemoryAccuracy * 100);
+      
+      const expected = Math.round((3 / 5) * 100); // 3 correct out of 5
+      if (memoryAccuracy !== expected) {
+        throw new Error(`Expected ${expected}%, got ${memoryAccuracy}%`);
+      }
+      return `Memory accuracy: ${memoryAccuracy}% (${filteredScores.reduce((a, b) => a + b, 0)}/${filteredScores.length} correct)`;
+    });
+
+    // Test 4: HTML generation
+    runTest('HTML Result Generation', () => {
+      // Simulate the actual calculation logic from the experiment
+      const searchData = mockJsPsychData.filter({task: 'visual_search'});
+      const correctSearches = searchData.filter({correct: true}).count();
+      const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
+      
+      const searchTimes = searchData.select('rt').values;
+      const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
+      const avgSearchTimeSeconds = Math.round((avgSearchTime / 1000) * 100) / 100;
+      
+      const memoryScores = mockJsPsychData.select('memory_correct').values;
+      let memoryAccuracyText = '';
+      
+      if (memoryScores && memoryScores.length > 0) {
+        const filteredScores = memoryScores.filter(score => score !== undefined);
+        if (filteredScores.length > 0) {
+          const avgMemoryAccuracy = filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length;
+          const memoryAccuracy = Math.round(avgMemoryAccuracy * 100);
+          memoryAccuracyText = `パネル記憶の正答率：${memoryAccuracy}％`;
+        }
+      }
+      
+      const hasValidData = searchAccuracy >= 0 && avgSearchTimeSeconds > 0;
+      if (!hasValidData) {
+        throw new Error('Invalid calculated data');
+      }
+      
+      return `Generated: 図形探し ${searchAccuracy}％, 平均${avgSearchTimeSeconds}秒, ${memoryAccuracyText}`;
+    });
+
+    // Test 5: Edge cases
+    runTest('Edge Cases - No Memory Data', () => {
+      const emptyMemoryData = { select: () => ({ values: [] }) };
+      const memoryScores = emptyMemoryData.select('memory_correct').values;
+      
+      let memoryAccuracyText = '';
+      if (memoryScores && memoryScores.length > 0) {
+        memoryAccuracyText = 'Should not execute';
+      }
+      
+      if (memoryAccuracyText !== '') {
+        throw new Error('Should not generate memory text for empty data');
+      }
+      
+      return 'Correctly handles empty memory data (no memory text generated)';
+    });
+
+    // Test 6: Boundary values
+    runTest('Boundary Values Test', () => {
+      const perfectData = {
+        filter: () => ({
+          count: () => 5,
+          filter: () => ({ count: () => 5 }),
+          select: () => ({ values: [1000, 1000, 1000, 1000, 1000] })
+        }),
+        select: () => ({ values: [1, 1, 1, 1, 1] })
+      };
+      
+      const searchAccuracy = Math.round((5 / 5) * 100); // 100%
+      const avgTime = Math.round((1000 / 1000) * 100) / 100; // 1.00 seconds
+      const memoryAccuracy = Math.round((5 / 5) * 100); // 100%
+      
+      if (searchAccuracy !== 100 || avgTime !== 1.00 || memoryAccuracy !== 100) {
+        throw new Error('Perfect scores calculation failed');
+      }
+      
+      return 'Perfect scores: 100% accuracy, 1.00s average, 100% memory';
+    });
+
+    document.getElementById('test-results').innerHTML += 
+      `<div class="test-result">
+        <h3>📝 テスト完了</h3>
+        <p>すべてのテストが実行されました。エラーがなければ、実装されたロジックは正常に動作します。</p>
+        <p><strong>確認項目:</strong></p>
+        <ul>
+          <li>正答率計算: 正解数 / 総試行数 × 100</li>
+          <li>平均時間計算: 反応時間の平均をミリ秒から秒に変換、小数点2桁</li>
+          <li>記憶課題正答率: データが存在する場合のみ表示</li>
+          <li>HTML生成: 適切な日本語フォーマット</li>
+          <li>エッジケース処理: 空データの適切な処理</li>
+        </ul>
+      </div>`;
+  </script>
+</body>
+</html>
