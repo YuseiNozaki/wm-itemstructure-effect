@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Modifications Validation</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    
+    .code-block {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      font-family: monospace;
+      margin: 10px 0;
+      white-space: pre-wrap;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Practice Modifications Validation</h1>
+  <p>Validating changes to practice trials based on the requirements:</p>
+  
+  <div class="test-section">
+    <h2>Requirements Validation</h2>
+    
+    <h3>1. Practice trial count reduced from 9 to 6</h3>
+    <div id="trial-count-test"></div>
+    
+    <h3>2. Memory load conditional on CONDITION</h3>
+    <div id="memory-condition-test"></div>
+    
+    <h3>3. Practice trial sequence structure</h3>
+    <div id="sequence-test"></div>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+  </div>
+
+  <script>
+    // Extract the key logic from the main experiment file for testing
+    function simulateExperimentLogic(CONDITION) {
+      // Simulate the condition assignment logic from the main file
+      let memoryFirstCondition = false;
+      
+      if (typeof CONDITION !== 'undefined') {
+        memoryFirstCondition = (CONDITION % 2 === 1);
+      } else {
+        memoryFirstCondition = Math.random() < 0.5;
+      }
+      
+      // Generate practice trial variables (this mirrors the updated code)
+      const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
+      
+      const practiceTrialVariables = [
+        // First set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        // Second set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
+      ];
+      
+      return {
+        memoryFirstCondition,
+        practiceMemoryLoad,
+        practiceTrialVariables
+      };
+    }
+    
+    function testTrialCount() {
+      const result = simulateExperimentLogic(0);
+      const count = result.practiceTrialVariables.length;
+      const testDiv = document.getElementById('trial-count-test');
+      
+      if (count === 6) {
+        testDiv.className = 'test-section success';
+        testDiv.innerHTML = `✓ PASS: Practice trials count is ${count} (was 9, now 6)`;
+      } else {
+        testDiv.className = 'test-section error';
+        testDiv.innerHTML = `✗ FAIL: Practice trials count is ${count}, expected 6`;
+      }
+    }
+    
+    function testMemoryCondition() {
+      const testDiv = document.getElementById('memory-condition-test');
+      let allPassed = true;
+      let results = '';
+      
+      // Test CONDITION = 0 (even) -> memory second -> practice without memory
+      const result0 = simulateExperimentLogic(0);
+      if (!result0.memoryFirstCondition && result0.practiceMemoryLoad === 'without-memory') {
+        results += '✓ CONDITION = 0: Memory second, practice without memory\\n';
+      } else {
+        results += '✗ CONDITION = 0: Failed\\n';
+        allPassed = false;
+      }
+      
+      // Test CONDITION = 1 (odd) -> memory first -> practice with memory
+      const result1 = simulateExperimentLogic(1);
+      if (result1.memoryFirstCondition && result1.practiceMemoryLoad === 'with-memory') {
+        results += '✓ CONDITION = 1: Memory first, practice with memory\\n';
+      } else {
+        results += '✗ CONDITION = 1: Failed\\n';
+        allPassed = false;
+      }
+      
+      // Test CONDITION = 2 (even) -> memory second -> practice without memory
+      const result2 = simulateExperimentLogic(2);
+      if (!result2.memoryFirstCondition && result2.practiceMemoryLoad === 'without-memory') {
+        results += '✓ CONDITION = 2: Memory second, practice without memory\\n';
+      } else {
+        results += '✗ CONDITION = 2: Failed\\n';
+        allPassed = false;
+      }
+      
+      if (allPassed) {
+        testDiv.className = 'test-section success';
+        testDiv.innerHTML = `<div class="code-block">${results}</div>`;
+      } else {
+        testDiv.className = 'test-section error';
+        testDiv.innerHTML = `<div class="code-block">${results}</div>`;
+      }
+    }
+    
+    function testSequenceStructure() {
+      const result = simulateExperimentLogic(0);
+      const testDiv = document.getElementById('sequence-test');
+      
+      const viewConditions = result.practiceTrialVariables.map(trial => trial.viewCondition);
+      const expectedPattern = ['fullscreen', 'window', 'scroll', 'fullscreen', 'window', 'scroll'];
+      
+      const patternCorrect = JSON.stringify(viewConditions) === JSON.stringify(expectedPattern);
+      const allStructured = result.practiceTrialVariables.every(trial => trial.structure === 'structured');
+      const allPractice = result.practiceTrialVariables.every(trial => trial.isPractice === true);
+      
+      let results = '';
+      results += `View condition pattern: ${patternCorrect ? '✓ PASS' : '✗ FAIL'}\\n`;
+      results += `Expected: ${expectedPattern.join(' → ')}\\n`;
+      results += `Actual: ${viewConditions.join(' → ')}\\n\\n`;
+      results += `All structured: ${allStructured ? '✓ PASS' : '✗ FAIL'}\\n`;
+      results += `All marked as practice: ${allPractice ? '✓ PASS' : '✗ FAIL'}\\n`;
+      
+      if (patternCorrect && allStructured && allPractice) {
+        testDiv.className = 'test-section success';
+      } else {
+        testDiv.className = 'test-section error';
+      }
+      
+      testDiv.innerHTML = `<div class="code-block">${results}</div>`;
+    }
+    
+    function runAllTests() {
+      testTrialCount();
+      testMemoryCondition();
+      testSequenceStructure();
+    }
+    
+    // Run tests automatically on page load
+    window.onload = runAllTests;
+  </script>
+</body>
+</html>

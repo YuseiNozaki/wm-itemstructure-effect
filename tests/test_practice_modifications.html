@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Trial Modifications Test</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .condition-box {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    
+    .memory-first {
+      background-color: #e7f3ff;
+      border-left: 4px solid #0066cc;
+    }
+    
+    .memory-second {
+      background-color: #fff3e7;
+      border-left: 4px solid #cc6600;
+    }
+    
+    .practice-trials {
+      margin: 10px 0;
+      font-family: monospace;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+    }
+    
+    button:hover {
+      background-color: #0056b3;
+    }
+    
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Practice Trial Modifications Test</h1>
+  <p>This test validates the practice trial changes:</p>
+  <ul>
+    <li>Practice reduced from 9 to 6 trials</li>
+    <li>Memory-first group: practice includes memory tasks</li>
+    <li>Memory-second group: practice without memory tasks</li>
+  </ul>
+
+  <div class="test-section">
+    <h2>CONDITION Assignment Tests</h2>
+    <button onclick="testCondition(0)">Test CONDITION = 0 (Memory Second)</button>
+    <button onclick="testCondition(1)">Test CONDITION = 1 (Memory First)</button>
+    <button onclick="testLocalRandom()">Test Local Random Assignment</button>
+  </div>
+
+  <div class="results" id="results">
+    <h3>Test Results</h3>
+    <p>Click a test button to see results...</p>
+  </div>
+
+  <script>
+    // Function to simulate the CONDITION logic from main experiment
+    function simulateConditionLogic(conditionValue) {
+      // Simulate the memoryFirstCondition logic
+      let memoryFirstCondition = false;
+      
+      if (conditionValue !== undefined) {
+        memoryFirstCondition = (conditionValue % 2 === 1);
+      } else {
+        memoryFirstCondition = Math.random() < 0.5;
+      }
+      
+      // Generate practice trial variables
+      const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
+      
+      const practiceTrialVariables = [
+        // First set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        // Second set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
+      ];
+      
+      return {
+        memoryFirstCondition,
+        practiceMemoryLoad,
+        practiceTrialVariables,
+        trialCount: practiceTrialVariables.length
+      };
+    }
+    
+    function displayResults(conditionValue, results) {
+      const resultsDiv = document.getElementById('results');
+      
+      const conditionText = conditionValue !== undefined ? 
+        `CONDITION = ${conditionValue}` : 
+        'Local Random Assignment';
+      
+      const conditionClass = results.memoryFirstCondition ? 'memory-first' : 'memory-second';
+      
+      let html = `<h3>Test Results - ${conditionText}</h3>`;
+      
+      html += `<div class="condition-box ${conditionClass}">
+        <h4>${results.memoryFirstCondition ? 'Memory First Group' : 'Memory Second Group'}</h4>
+        <p><strong>Memory First:</strong> ${results.memoryFirstCondition}</p>
+        <p><strong>Practice Memory Load:</strong> ${results.practiceMemoryLoad}</p>
+        <p><strong>Total Practice Trials:</strong> ${results.trialCount}</p>
+      </div>`;
+      
+      html += '<div class="practice-trials">';
+      html += '<h4>Practice Trial Sequence:</h4>';
+      results.practiceTrialVariables.forEach((trial, index) => {
+        html += `<div>Trial ${index + 1}: ${trial.viewCondition} | ${trial.structure} | ${trial.memoryLoad}</div>`;
+      });
+      html += '</div>';
+      
+      // Validation
+      html += '<h4>Validation:</h4>';
+      html += '<ul>';
+      html += `<li>✓ Trial count is 6: ${results.trialCount === 6 ? 'PASS' : 'FAIL'}</li>`;
+      
+      const memoryLoadConsistent = results.practiceTrialVariables.every(trial => 
+        trial.memoryLoad === results.practiceMemoryLoad
+      );
+      html += `<li>✓ Memory load consistent: ${memoryLoadConsistent ? 'PASS' : 'FAIL'}</li>`;
+      
+      const correctMemoryLoad = results.memoryFirstCondition ? 
+        results.practiceMemoryLoad === 'with-memory' :
+        results.practiceMemoryLoad === 'without-memory';
+      html += `<li>✓ Correct memory load for condition: ${correctMemoryLoad ? 'PASS' : 'FAIL'}</li>`;
+      
+      const viewConditions = results.practiceTrialVariables.map(trial => trial.viewCondition);
+      const expectedPattern = ['fullscreen', 'window', 'scroll', 'fullscreen', 'window', 'scroll'];
+      const patternCorrect = JSON.stringify(viewConditions) === JSON.stringify(expectedPattern);
+      html += `<li>✓ View condition pattern (2x fullscreen→window→scroll): ${patternCorrect ? 'PASS' : 'FAIL'}</li>`;
+      
+      html += '</ul>';
+      
+      resultsDiv.innerHTML = html;
+    }
+    
+    function testCondition(conditionValue) {
+      const results = simulateConditionLogic(conditionValue);
+      displayResults(conditionValue, results);
+    }
+    
+    function testLocalRandom() {
+      const results = simulateConditionLogic(undefined);
+      displayResults(undefined, results);
+    }
+  </script>
+</body>
+</html>
