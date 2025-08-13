@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>visual search task</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://unpkg.com/jspsych@7"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
   <script src="https://unpkg.com/@jspsych/plugin-survey-text@1"></script>
@@ -519,9 +521,9 @@
         
         // Step-by-step rules
         const rules = [
-          'パネルが3秒間だけ表示されます。色のついた場所を覚えてください。',
-          'まず図形が1秒間だけ表示されます。覚えてください。',
-          '次に、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
+          'まず、パネルが3秒間だけ表示されます。色のついた場所を覚えてください。',
+          '次に、図形が1秒間だけ表示されます。覚えてください。',
+          'その後、たくさんの図形が表示されるので、覚えた図形を見つけてクリックしてください。（できるだけ速く、正確に見つけてください）。',
           'はじめに覚えたパネルの場所を回答してください。',
           'これを何度もくり返します。最後まで集中力を切らさないように頑張りましょう！'
         ];
@@ -613,7 +615,7 @@
         let html = '<div style="max-width: 800px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
         
         html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です。</h1>';
-        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは記憶課題がなくなり、図形を探すだけです。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">ここからはパネルの記憶がなくなり、図形を探すだけです。</p>';
         html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">最後まで集中して頑張りましょう！</p>';
         
         // Continue button
