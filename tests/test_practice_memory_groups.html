@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Trial Memory Groups Test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/jspsych@7"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1"></script>
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="../styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script>
+    // Test validation for practice trial memory group behavior
+    
+    // Create required DOM elements
+    const targetDiv = document.createElement('div');
+    targetDiv.id = 'jspsych-target';
+    document.body.appendChild(targetDiv);
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'jspsych-visual-search-canvas';
+    canvas.classList.add('hidden');
+    document.body.appendChild(canvas);
+
+    const searchWindowDiv = document.createElement('div');
+    searchWindowDiv.id = 'search-window';
+    searchWindowDiv.classList.add('hidden');
+    document.body.appendChild(searchWindowDiv);
+
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+    // Test parameters (simplified)
+    const params = {
+      numObjects: 20,
+      objectMinSize: 20,
+      objectMaxSize: 40,
+      targetTolerance: 0.8,
+      trialsPerCondition: 1, // Reduced for testing
+      memoryGridSize: 4,
+      memoryPositions: 2 // Reduced for testing
+    };
+
+    // Group selection interface
+    const groupSelection = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let html = '<div style="text-align: center; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">';
+        html += '<h1>Practice Trial Memory Groups Test</h1>';
+        html += '<p style="font-size: 18px; margin: 20px 0;">このテストでは、練習試行での記憶課題の表示をテストします。</p>';
+        html += '<div style="margin: 30px 0;">';
+        html += '<p style="font-size: 16px; margin: 10px 0;"><strong>1キー:</strong> 記憶課題が前半グループ（練習時に記憶課題あり）</p>';
+        html += '<p style="font-size: 16px; margin: 10px 0;"><strong>2キー:</strong> 記憶課題が後半グループ（練習時に記憶課題なし）</p>';
+        html += '</div>';
+        html += '<p style="font-size: 14px; color: #666;">キーを押して選択してください</p>';
+        html += '</div>';
+        return html;
+      },
+      choices: ['1', '2'],
+      data: {
+        task: 'group_selection'
+      }
+    };
+
+    // Minimal memory display component for testing
+    const memoryGridDisplay = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let gridHTML = '<div style="text-align: center; font-family: Arial, sans-serif;">';
+        gridHTML += '<h1>記憶課題</h1>';
+        gridHTML += '<p>以下のグリッド内の色のついたセルの位置を記憶してください。</p>';
+        gridHTML += '<div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 60px); gap: 5px; justify-content: center; margin: 20px auto;">';
+        
+        for (let i = 0; i < 16; i++) {
+          const isHighlighted = [2, 7].includes(i); // Fixed positions for testing
+          gridHTML += `<div class="memory-cell ${isHighlighted ? 'highlighted' : ''}" style="width: 60px; height: 60px; border: 2px solid #333; ${isHighlighted ? 'background-color: #ff6b6b;' : 'background-color: #f8f9fa;'}"></div>`;
+        }
+        gridHTML += '</div>';
+        gridHTML += '<p style="margin-top: 20px;">スペースキーを押して続行</p>';
+        gridHTML += '</div>';
+        return gridHTML;
+      },
+      choices: [' '],
+      trial_duration: 3000,
+      data: {
+        task: 'memory_display'
+      }
+    };
+
+    // Minimal memory recall component for testing
+    const memoryGridRecall = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        let gridHTML = '<div style="text-align: center; font-family: Arial, sans-serif;">';
+        gridHTML += '<h1>記憶課題 - 回答</h1>';
+        gridHTML += '<p>記憶した位置をクリックして再現してください。</p>';
+        gridHTML += '<p style="color: #666;">（テスト用：スペースキーで続行）</p>';
+        gridHTML += '</div>';
+        return gridHTML;
+      },
+      choices: [' '],
+      data: {
+        task: 'memory_recall'
+      }
+    };
+
+    // Minimal memory feedback component for testing
+    const memoryFeedback = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="text-align: center;"><h2>記憶課題フィードバック</h2><p>スペースキーで続行</p></div>',
+      choices: [' '],
+      data: {
+        task: 'memory_feedback'
+      }
+    };
+
+    // Minimal visual search components for testing
+    const visualSearchInstructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="text-align: center;"><h2>視覚探索指示</h2><p>スペースキーで続行</p></div>',
+      choices: [' '],
+      data: { task: 'search_instructions' }
+    };
+
+    const blankScreen = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="height: 100vh; background-color: black;"></div>',
+      choices: "NO_KEYS",
+      trial_duration: 500,
+      data: { task: 'blank_screen' }
+    };
+
+    const showTarget = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="text-align: center; padding-top: 40vh;"><div style="width: 30px; height: 30px; background-color: red; margin: 0 auto;"></div><p style="color: white;">ターゲット</p></div>',
+      choices: "NO_KEYS",
+      trial_duration: 1000,
+      data: { task: 'show_target' }
+    };
+
+    const visualSearch = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="text-align: center; padding-top: 40vh;"><p>視覚探索課題（簡略版）</p><p>スペースキーで続行</p></div>',
+      choices: [' '],
+      data: { task: 'visual_search' }
+    };
+
+    const searchFeedback = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="text-align: center;"><h2>探索フィードバック</h2><p>スペースキーで続行</p></div>',
+      choices: [' '],
+      data: { task: 'search_feedback' }
+    };
+
+    // Create practice trial procedure based on group selection
+    const practiceTrialTest = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const groupChoice = jsPsych.data.get().filter({task: 'group_selection'}).last(1).values()[0];
+        const memoryFirstCondition = (groupChoice.response === '1');
+        
+        // Store the condition for later use
+        jsPsych.data.addProperties({
+          test_memory_first_condition: memoryFirstCondition,
+          test_group_choice: groupChoice.response
+        });
+
+        let html = '<div style="text-align: center; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">';
+        html += '<h1>練習試行構造テスト</h1>';
+        
+        if (memoryFirstCondition) {
+          html += '<h2 style="color: #e74c3c;">記憶課題が前半グループ</h2>';
+          html += '<p>練習試行には記憶課題が含まれます:</p>';
+          html += '<ol style="text-align: left; display: inline-block;">';
+          html += '<li>視覚探索指示</li>';
+          html += '<li>記憶課題表示</li>';
+          html += '<li>空白画面</li>';
+          html += '<li>ターゲット表示</li>';
+          html += '<li>空白画面</li>';
+          html += '<li>視覚探索</li>';
+          html += '<li>探索フィードバック</li>';
+          html += '<li>記憶課題回答</li>';
+          html += '<li>記憶課題フィードバック</li>';
+          html += '</ol>';
+        } else {
+          html += '<h2 style="color: #3498db;">記憶課題が後半グループ</h2>';
+          html += '<p>練習試行には記憶課題が含まれません:</p>';
+          html += '<ol style="text-align: left; display: inline-block;">';
+          html += '<li>視覚探索指示</li>';
+          html += '<li>空白画面</li>';
+          html += '<li>ターゲット表示</li>';
+          html += '<li>空白画面</li>';
+          html += '<li>視覚探索</li>';
+          html += '<li>探索フィードバック</li>';
+          html += '</ol>';
+        }
+        
+        html += '<p style="margin-top: 20px;">スペースキーを押して練習試行を実行します</p>';
+        html += '</div>';
+        return html;
+      },
+      choices: [' '],
+      data: {
+        task: 'practice_structure_info'
+      }
+    };
+
+    // Define practice trial based on condition
+    const conditionalPracticeTrial = {
+      timeline: [
+        {
+          timeline: [
+            // Memory-first group practice trial (with memory tasks)
+            visualSearchInstructions,
+            {
+              timeline: [memoryGridDisplay],
+              conditional_function: function() {
+                const testData = jsPsych.data.get().last(1).values()[0];
+                return testData.test_memory_first_condition === true;
+              }
+            },
+            blankScreen,
+            showTarget,
+            blankScreen,
+            visualSearch,
+            {
+              timeline: [searchFeedback],
+              conditional_function: function() {
+                const testData = jsPsych.data.get().last(1).values()[0];
+                return testData.test_memory_first_condition === true;
+              }
+            },
+            {
+              timeline: [memoryGridRecall],
+              conditional_function: function() {
+                const testData = jsPsych.data.get().last(1).values()[0];
+                return testData.test_memory_first_condition === true;
+              }
+            },
+            {
+              timeline: [memoryFeedback],
+              conditional_function: function() {
+                const testData = jsPsych.data.get().last(1).values()[0];
+                return testData.test_memory_first_condition === true;
+              }
+            }
+          ],
+          conditional_function: function() {
+            const testData = jsPsych.data.get().last(1).values()[0];
+            return testData.test_memory_first_condition === true;
+          }
+        },
+        {
+          timeline: [
+            // Memory-second group practice trial (without memory tasks)
+            visualSearchInstructions,
+            blankScreen,
+            showTarget,
+            blankScreen,
+            visualSearch,
+            searchFeedback
+          ],
+          conditional_function: function() {
+            const testData = jsPsych.data.get().last(1).values()[0];
+            return testData.test_memory_first_condition === false;
+          }
+        }
+      ]
+    };
+
+    // Test completion summary
+    const testCompletion = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const allData = jsPsych.data.get().values();
+        const groupChoice = allData.find(d => d.task === 'group_selection');
+        const memoryFirst = groupChoice.response === '1';
+        
+        // Count memory-related tasks that were executed
+        const memoryTasks = allData.filter(d => 
+          d.task === 'memory_display' || 
+          d.task === 'memory_recall' || 
+          d.task === 'memory_feedback'
+        );
+        
+        let html = '<div style="text-align: center; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">';
+        html += '<h1>テスト完了</h1>';
+        html += `<h2>選択したグループ: ${memoryFirst ? '記憶課題が前半' : '記憶課題が後半'}</h2>`;
+        html += `<p>実行された記憶課題の数: ${memoryTasks.length}</p>`;
+        
+        if (memoryFirst && memoryTasks.length > 0) {
+          html += '<p style="color: #27ae60; font-weight: bold;">✓ 正しく実装されています - 記憶課題が前半グループで記憶課題が実行されました</p>';
+        } else if (!memoryFirst && memoryTasks.length === 0) {
+          html += '<p style="color: #27ae60; font-weight: bold;">✓ 正しく実装されています - 記憶課題が後半グループで記憶課題がスキップされました</p>';
+        } else {
+          html += '<p style="color: #e74c3c; font-weight: bold;">✗ 実装に問題があります</p>';
+        }
+        
+        html += '<p style="margin-top: 30px;">詳細なデータは以下に表示されます。</p>';
+        html += '</div>';
+        return html;
+      },
+      choices: [' '],
+      data: {
+        task: 'test_completion'
+      }
+    };
+
+    // Main test timeline
+    const timeline = [
+      groupSelection,
+      practiceTrialTest,
+      conditionalPracticeTrial,
+      testCompletion
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>

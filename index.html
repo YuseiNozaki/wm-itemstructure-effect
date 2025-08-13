@@ -1806,8 +1806,56 @@
       ]
     };
     
-    // Practice trial procedure (simplified version without memory tasks)
-    const practiceTrialProcedure = {
+    // Practice trial procedure - includes memory tasks for memory-first groups
+    const practiceTrialProcedure = memoryFirstCondition ? {
+      // For memory-first groups: use full trial procedure with memory tasks
+      timeline: [
+        visualSearchInstructions,
+        // Memory task is only included for 'with-memory' condition
+        {
+          timeline: [memoryGridDisplay],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        blankScreen,
+        showTarget,
+        blankScreen,
+        visualSearch,
+        // Search feedback for 'with-memory' condition comes immediately after visual search
+        {
+          timeline: [searchFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        // Memory recall only for 'with-memory' condition
+        {
+          timeline: [memoryGridRecall],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          },
+          data: {
+            task: 'memory_recall'
+          }
+        },
+        // Memory feedback only for 'with-memory' condition
+        {
+          timeline: [memoryFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'with-memory';
+          }
+        },
+        // Search feedback for 'without-memory' condition comes at the end
+        {
+          timeline: [searchFeedback],
+          conditional_function: function() {
+            return jsPsych.timelineVariable('memoryLoad') === 'without-memory';
+          }
+        }
+      ]
+    } : {
+      // For memory-second groups: simplified version without memory tasks
       timeline: [
         visualSearchInstructions,
         blankScreen,
