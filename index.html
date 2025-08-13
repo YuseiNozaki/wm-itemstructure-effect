@@ -1609,7 +1609,7 @@
       stimulus: function() {
         let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
         html += '<h1>練習完了</h1>';
-        html += '<p style="font-size: 18px; margin: 20px 0;">9回の練習が完了しました。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0;">6回の練習が完了しました。</p>';
         html += '<p style="font-size: 16px; margin: 20px 0;">以下から選択してください：</p>';
         html += '<div style="margin: 30px 0;">';
         html += '<button id="practice-again-btn" style="padding: 15px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">もう一度練習する</button>';
@@ -1667,20 +1667,35 @@
     };
 
 
-    // Practice trial variables - fixed order: fullscreen, window, scroll (repeated 3 times)
+    // Counterbalancing logic for memory load conditions (moved earlier to determine practice trial structure)
+    // Uses cognition.run CONDITION variable or falls back to random assignment for local testing
+    let memoryFirstCondition = false; // Default: without-memory first, with-memory second
+    
+    if (typeof CONDITION !== 'undefined') {
+      // cognition.run environment - use CONDITION variable for counterbalancing
+      // CONDITION should be 0 or 1 (or other even/odd assignment)
+      memoryFirstCondition = (CONDITION % 2 === 1);
+      console.log('cognition.run CONDITION detected:', CONDITION, 'Memory first:', memoryFirstCondition);
+    } else {
+      // Local testing environment - use random assignment
+      memoryFirstCondition = Math.random() < 0.5;
+      console.log('Local testing - random assignment. Memory first:', memoryFirstCondition);
+    }
+
+    // Generate practice trial variables based on memory condition
+    // Reduced from 9 to 6 trials (2 sets instead of 3)
+    // Memory load depends on whether memory tasks are in the first block
+    const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
+    
     const practiceTrialVariables = [
       // First set
-      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
+      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+      { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+      { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
       // Second set
-      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      // Third set
-      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'window', structure: 'structured', memoryLoad: 'without-memory', isPractice: true },
-      { viewCondition: 'scroll', structure: 'structured', memoryLoad: 'without-memory', isPractice: true }
+      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+      { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+      { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
     ];
 
     // Create separate factorial designs for with-memory and without-memory conditions
@@ -1700,22 +1715,7 @@
       trial.memoryLoad = 'with-memory';
     });
 
-    // Counterbalancing logic for memory load conditions
-    // Uses cognition.run CONDITION variable or falls back to random assignment for local testing
-    let memoryFirstCondition = false; // Default: without-memory first, with-memory second
-    
-    if (typeof CONDITION !== 'undefined') {
-      // cognition.run environment - use CONDITION variable for counterbalancing
-      // CONDITION should be 0 or 1 (or other even/odd assignment)
-      memoryFirstCondition = (CONDITION % 2 === 1);
-      console.log('cognition.run CONDITION detected:', CONDITION, 'Memory first:', memoryFirstCondition);
-    } else {
-      // Local testing environment - use random assignment
-      memoryFirstCondition = Math.random() < 0.5;
-      console.log('Local testing - random assignment. Memory first:', memoryFirstCondition);
-    }
-
-    // Assign first and second block procedures based on counterbalancing
+    // Assign first and second block procedures based on counterbalancing (memoryFirstCondition determined earlier)
     let firstBlockProcedureData, secondBlockProcedureData;
     if (memoryFirstCondition) {
       // Memory task first, then without memory
