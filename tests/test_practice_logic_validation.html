@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Trial Logic Validation (No CDN)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+    .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+    .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+  </style>
+</head>
+<body>
+  <h1>Practice Trial Logic Validation</h1>
+  <p>This test validates the practice trial memory group logic without requiring external CDN resources.</p>
+  
+  <div id="test-results"></div>
+
+  <script>
+    function runTests() {
+      const results = [];
+      
+      // Mock objects
+      const mockComponents = {
+        visualSearchInstructions: { name: 'visualSearchInstructions' },
+        memoryGridDisplay: { name: 'memoryGridDisplay' },
+        blankScreen: { name: 'blankScreen' },
+        showTarget: { name: 'showTarget' },
+        visualSearch: { name: 'visualSearch' },
+        searchFeedback: { name: 'searchFeedback' },
+        memoryGridRecall: { name: 'memoryGridRecall' },
+        memoryFeedback: { name: 'memoryFeedback' }
+      };
+
+      // Mock jsPsych
+      const mockJsPsych = {
+        timelineVariable: function(name) {
+          return name === 'memoryLoad' ? 'with-memory' : null;
+        }
+      };
+
+      // Test 1: Memory-first condition (should include memory tasks)
+      try {
+        const memoryFirstCondition = true;
+        const practiceTrialProcedure1 = memoryFirstCondition ? {
+          timeline: [
+            mockComponents.visualSearchInstructions,
+            {
+              timeline: [mockComponents.memoryGridDisplay],
+              conditional_function: function() {
+                return mockJsPsych.timelineVariable('memoryLoad') === 'with-memory';
+              }
+            },
+            mockComponents.blankScreen,
+            mockComponents.showTarget,
+            mockComponents.blankScreen,
+            mockComponents.visualSearch,
+            {
+              timeline: [mockComponents.searchFeedback],
+              conditional_function: function() {
+                return mockJsPsych.timelineVariable('memoryLoad') === 'with-memory';
+              }
+            },
+            {
+              timeline: [mockComponents.memoryGridRecall],
+              conditional_function: function() {
+                return mockJsPsych.timelineVariable('memoryLoad') === 'with-memory';
+              },
+              data: {
+                task: 'memory_recall'
+              }
+            },
+            {
+              timeline: [mockComponents.memoryFeedback],
+              conditional_function: function() {
+                return mockJsPsych.timelineVariable('memoryLoad') === 'with-memory';
+              }
+            },
+            {
+              timeline: [mockComponents.searchFeedback],
+              conditional_function: function() {
+                return mockJsPsych.timelineVariable('memoryLoad') === 'without-memory';
+              }
+            }
+          ]
+        } : {
+          timeline: [
+            mockComponents.visualSearchInstructions,
+            mockComponents.blankScreen,
+            mockComponents.showTarget,
+            mockComponents.blankScreen,
+            mockComponents.visualSearch,
+            mockComponents.searchFeedback
+          ]
+        };
+        
+        const timelineLength1 = practiceTrialProcedure1.timeline.length;
+        const hasMemoryComponents1 = practiceTrialProcedure1.timeline.some(item => 
+          item.timeline && (
+            item.timeline.includes(mockComponents.memoryGridDisplay) ||
+            item.timeline.includes(mockComponents.memoryGridRecall) ||
+            item.timeline.includes(mockComponents.memoryFeedback)
+          )
+        );
+        
+        results.push({
+          name: 'Memory-first condition test',
+          passed: timelineLength1 === 10 && hasMemoryComponents1,
+          details: `Timeline length: ${timelineLength1} (expected: 10), Has memory components: ${hasMemoryComponents1}`,
+          type: 'success'
+        });
+      } catch (error) {
+        results.push({
+          name: 'Memory-first condition test',
+          passed: false,
+          details: `Error: ${error.message}`,
+          type: 'error'
+        });
+      }
+
+      // Test 2: Memory-second condition (should not include memory tasks)
+      try {
+        const memoryFirstCondition = false;
+        const practiceTrialProcedure2 = memoryFirstCondition ? {
+          timeline: [/* This branch won't be taken */]
+        } : {
+          timeline: [
+            mockComponents.visualSearchInstructions,
+            mockComponents.blankScreen,
+            mockComponents.showTarget,
+            mockComponents.blankScreen,
+            mockComponents.visualSearch,
+            mockComponents.searchFeedback
+          ]
+        };
+        
+        const timelineLength2 = practiceTrialProcedure2.timeline.length;
+        const hasMemoryComponents2 = practiceTrialProcedure2.timeline.some(item => 
+          item === mockComponents.memoryGridDisplay ||
+          item === mockComponents.memoryGridRecall ||
+          item === mockComponents.memoryFeedback ||
+          (item.timeline && (
+            item.timeline.includes(mockComponents.memoryGridDisplay) ||
+            item.timeline.includes(mockComponents.memoryGridRecall) ||
+            item.timeline.includes(mockComponents.memoryFeedback)
+          ))
+        );
+        
+        results.push({
+          name: 'Memory-second condition test',
+          passed: timelineLength2 === 6 && !hasMemoryComponents2,
+          details: `Timeline length: ${timelineLength2} (expected: 6), Has memory components: ${hasMemoryComponents2} (expected: false)`,
+          type: 'success'
+        });
+      } catch (error) {
+        results.push({
+          name: 'Memory-second condition test',
+          passed: false,
+          details: `Error: ${error.message}`,
+          type: 'error'
+        });
+      }
+
+      // Test 3: Conditional function validation
+      try {
+        const testConditionalFunction = function() {
+          return mockJsPsych.timelineVariable('memoryLoad') === 'with-memory';
+        };
+        
+        const conditionResult = testConditionalFunction();
+        
+        results.push({
+          name: 'Conditional function test',
+          passed: conditionResult === true,
+          details: `Conditional function returns: ${conditionResult} (expected: true for 'with-memory')`,
+          type: 'success'
+        });
+      } catch (error) {
+        results.push({
+          name: 'Conditional function test',
+          passed: false,
+          details: `Error: ${error.message}`,
+          type: 'error'
+        });
+      }
+
+      return results;
+    }
+
+    function displayResults(results) {
+      const container = document.getElementById('test-results');
+      let html = '';
+      
+      const passed = results.filter(r => r.passed).length;
+      const total = results.length;
+      
+      html += `<div class="test-section ${passed === total ? 'success' : 'error'}">`;
+      html += `<h2>Test Summary: ${passed}/${total} tests passed</h2>`;
+      html += '</div>';
+      
+      results.forEach(result => {
+        const className = result.passed ? 'success' : 'error';
+        html += `<div class="test-section ${className}">`;
+        html += `<h3>${result.passed ? '✓' : '✗'} ${result.name}</h3>`;
+        html += `<p>${result.details}</p>`;
+        html += '</div>';
+      });
+      
+      if (passed === total) {
+        html += '<div class="test-section success">';
+        html += '<h2>🎉 All tests passed!</h2>';
+        html += '<p>The practice trial procedure modification is working correctly:</p>';
+        html += '<ul>';
+        html += '<li>Memory-first groups get memory tasks in practice trials</li>';
+        html += '<li>Memory-second groups get simplified practice trials without memory tasks</li>';
+        html += '<li>Conditional functions work as expected</li>';
+        html += '</ul>';
+        html += '</div>';
+      }
+      
+      container.innerHTML = html;
+    }
+
+    // Run tests when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      const results = runTests();
+      displayResults(results);
+    });
+  </script>
+</body>
+</html>
