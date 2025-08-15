@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enhanced Instruction Pages Preview</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      line-height: 1.6;
+    }
+    
+    .preview-header {
+      max-width: 1200px;
+      margin: 0 auto 30px auto;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .preview-header h1 {
+      margin: 0 0 15px 0;
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .preview-header p {
+      margin: 0;
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    
+    .improvement-section {
+      max-width: 1200px;
+      margin: 0 auto 40px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .improvement-header {
+      background-color: #28a745;
+      color: white;
+      padding: 15px 25px;
+      margin: -30px -30px 25px -30px;
+      border-radius: 12px 12px 0 0;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .instruction-sample {
+      max-width: 1200px;
+      margin: 0 auto 40px auto;
+      padding: 0;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .sample-header {
+      background-color: #6c757d;
+      color: white;
+      padding: 20px 30px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .sample-content {
+      padding: 30px;
+    }
+    
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .before, .after {
+      padding: 20px;
+      border-radius: 8px;
+    }
+    
+    .before {
+      background-color: #f8d7da;
+      border: 2px solid #dc3545;
+    }
+    
+    .after {
+      background-color: #d4edda;
+      border: 2px solid #28a745;
+    }
+    
+    .before h3, .after h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .feature-card {
+      background-color: #f8f9fa;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .feature-card h4 {
+      color: #495057;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    .checkmark {
+      color: #28a745;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    @media (max-width: 768px) {
+      .before-after {
+        grid-template-columns: 1fr;
+      }
+      
+      .preview-header, .improvement-section, .instruction-sample {
+        margin: 0 10px 20px 10px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="preview-header">
+    <h1>Enhanced Instruction Pages Preview</h1>
+    <p>Comprehensive improvements to make complex experimental procedures more intuitive and user-friendly</p>
+  </div>
+
+  <!-- Key Improvements Overview -->
+  <div class="improvement-section">
+    <div class="improvement-header">
+      ✅ Key Improvements Summary
+    </div>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>🚫 Emoji Removal</h4>
+        <p><span class="checkmark">✓</span> All emojis removed from headings and content</p>
+        <p><span class="checkmark">✓</span> Clean, professional text-only presentation</p>
+        <p><span class="checkmark">✓</span> Clear condition labels: 【条件A】、【条件B】、【条件C】</p>
+      </div>
+      
+      <div class="feature-card">
+        <h4>🔍 Enlarged Images</h4>
+        <p><span class="checkmark">✓</span> Main images: 200px → 400px (100% increase)</p>
+        <p><span class="checkmark">✓</span> Secondary images: 90px → 200-300px (2-3x larger)</p>
+        <p><span class="checkmark">✓</span> Memory task images: 120px → 300px (150% increase)</p>
+      </div>
+      
+      <div class="feature-card">
+        <h4>📋 Visual Operation Flow</h4>
+        <p><span class="checkmark">✓</span> Numbered step progression (1→2→3→4)</p>
+        <p><span class="checkmark">✓</span> Color-coded sections for task components</p>
+        <p><span class="checkmark">✓</span> Clear arrows showing sequence</p>
+      </div>
+      
+      <div class="feature-card">
+        <h4>⚠️ Random Selection Emphasis</h4>
+        <p><span class="checkmark">✓</span> Orange warning box for random conditions</p>
+        <p><span class="checkmark">✓</span> Clear messaging about unpredictability</p>
+        <p><span class="checkmark">✓</span> Encourages familiarity with all modes</p>
+      </div>
+      
+      <div class="feature-card">
+        <h4>🔁 Repetition Messaging</h4>
+        <p><span class="checkmark">✓</span> "この流れを何度も繰り返します" added</p>
+        <p><span class="checkmark">✓</span> Sets proper expectations</p>
+        <p><span class="checkmark">✓</span> Emphasizes repeated trial nature</p>
+      </div>
+      
+      <div class="feature-card">
+        <h4>⚡ Speed & Accuracy Emphasis</h4>
+        <p><span class="checkmark">✓</span> Red emphasis boxes on every page</p>
+        <p><span class="checkmark">✓</span> "できるだけ速く、正確に" consistently highlighted</p>
+        <p><span class="checkmark">✓</span> Strong visual impact reinforcement</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Before/After Comparison -->
+  <div class="improvement-section">
+    <div class="improvement-header">
+      🔄 Before vs After Comparison
+    </div>
+    
+    <div class="before-after">
+      <div class="before">
+        <h3>❌ Before (Issues)</h3>
+        <ul>
+          <li>Emojis in headings (🖥️, 🪟, ↔️, ✅)</li>
+          <li>Small images (200px main, 90px secondary)</li>
+          <li>No visual operation flow</li>
+          <li>No random selection emphasis</li>
+          <li>Limited repetition messaging</li>
+          <li>Inconsistent speed/accuracy emphasis</li>
+          <li>Complex text-heavy explanations</li>
+        </ul>
+      </div>
+      
+      <div class="after">
+        <h3>✅ After (Improvements)</h3>
+        <ul>
+          <li>Clean text-only presentation</li>
+          <li>Large, clearly visible images (400px main, 200-300px secondary)</li>
+          <li>Numbered step progression with arrows (1→2→3→4)</li>
+          <li>Prominent orange warning for random conditions</li>
+          <li>Clear repetition messaging on all pages</li>
+          <li>Red emphasis boxes on every instruction page</li>
+          <li>Visual, intuitive presentation with color coding</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Enhanced Instruction Page -->
+  <div class="instruction-sample">
+    <div class="sample-header">
+      📄 Sample Enhanced Instruction Page (Memory-First Group)
+    </div>
+    
+    <div class="sample-content">
+      <!-- This is a simplified version of the actual enhanced instruction page -->
+      <div style="max-width: 1100px; margin: 0 auto; font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">
+        
+        <!-- Title -->
+        <h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>
+        
+        <!-- Speed and accuracy emphasis box -->
+        <div style="background-color: #ff6b6b; color: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+          <h2 style="color: white; margin: 0; font-size: 24px; font-weight: bold;">重要：できるだけ速く、正確に回答してください</h2>
+        </div>
+        
+        <!-- Operation flow overview -->
+        <div style="background-color: #f8f9fa; border: 3px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+          <h2 style="color: #495057; margin-top: 0; font-size: 22px; text-align: center;">実験の流れ</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; flex-wrap: wrap; gap: 15px;">
+            <div style="text-align: center; flex: 1; min-width: 120px; background-color: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffeaa7;">
+              <div style="background-color: #856404; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">1</div>
+              <strong>記憶課題</strong><br>位置を覚える
+            </div>
+            <div style="font-size: 24px; color: #6c757d;">→</div>
+            <div style="text-align: center; flex: 1; min-width: 120px; background-color: #d1ecf1; padding: 15px; border-radius: 8px; border: 2px solid #bee5eb;">
+              <div style="background-color: #0c5460; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">2</div>
+              <strong>ターゲット確認</strong><br>図形を覚える
+            </div>
+            <div style="font-size: 24px; color: #6c757d;">→</div>
+            <div style="text-align: center; flex: 1; min-width: 120px; background-color: #e3f2fd; padding: 15px; border-radius: 8px; border: 2px solid #2196f3;">
+              <div style="background-color: #1976d2; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">3</div>
+              <strong>図形探索</strong><br>クリックで回答
+            </div>
+            <div style="font-size: 24px; color: #6c757d;">→</div>
+            <div style="text-align: center; flex: 1; min-width: 120px; background-color: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffeaa7;">
+              <div style="background-color: #856404; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">4</div>
+              <strong>記憶回答</strong><br>位置をクリック
+            </div>
+          </div>
+          <p style="text-align: center; font-size: 18px; margin: 15px 0; color: #dc3545; font-weight: bold;">この流れを何度も繰り返します</p>
+        </div>
+        
+        <!-- Random selection emphasis -->
+        <div style="background-color: #fff8dc; border: 3px dashed #ffa500; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+          <h3 style="color: #ff6600; margin: 0; font-size: 20px;">⚠️ 重要：表示条件はランダムに選ばれます</h3>
+          <p style="font-size: 16px; margin: 10px 0; color: #ff6600;">どの条件が出るかは予測できません。各条件に慣れておいてください。</p>
+        </div>
+        
+        <!-- Sample viewing condition -->
+        <div style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 20px;">【条件A】全画面条件</h3>
+          <div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+              <p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 全画面で図形がすべて見えます</p>
+              <p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 直接クリックして回答します</p>
+              <p style="margin: 8px 0; font-size: 16px; color: #1976d2;"><strong>目標：</strong> 一覧性を活かして、できるだけ速く正確に</p>
+            </div>
+            <div style="flex: 0 0 auto;">
+              <div style="width: 350px; height: 200px; background-color: #f5f5f5; border: 2px solid #ddd; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #666;">
+                [Large Image: 350px × 200px]<br>
+                (Previously 200px × 120px)
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Memory task section -->
+        <div style="background-color: #fff3cd; border: 2px solid #ffeaa7; border-radius: 8px; padding: 25px; margin-bottom: 30px;">
+          <h2 style="color: #856404; margin-top: 0; font-size: 22px;">【ステップ1】記憶課題について</h2>
+          <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 350px;">
+              <p style="font-size: 18px; margin: 15px 0;">まず、4×4のグリッドに色のついたセルが<strong>3秒間</strong>表示されます。その位置をしっかりと覚えてください。</p>
+              <p style="font-size: 16px; margin: 10px 0; color: #856404;"><strong>重要：</strong> 記憶課題の精度が実験の成功に重要です。</p>
+            </div>
+            <div style="flex: 0 0 auto;">
+              <div style="width: 400px; height: 300px; background-color: #f5f5f5; border: 2px solid #ddd; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #666;">
+                [Large Memory Grid Image: 400px × 300px]<br>
+                (Previously 120px × 90px)
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Final emphasis -->
+        <div style="background-color: #e8f5e8; border: 3px solid #4caf50; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">
+          <h3 style="color: #2e7d32; margin: 0 0 15px 0; font-size: 20px;">実験の進行について</h3>
+          <p style="font-size: 18px; margin: 10px 0; color: #2e7d32;">上記の4ステップを<strong>多数回繰り返し</strong>ます。</p>
+          <p style="font-size: 18px; margin: 10px 0; color: #2e7d32;">すべての試行で<strong>できるだけ速く、正確に</strong>回答することを心がけてください。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technical Implementation Details -->
+  <div class="improvement-section">
+    <div class="improvement-header">
+      🔧 Technical Implementation Details
+    </div>
+    
+    <div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 20px;">
+      <h4 style="color: #007bff; margin-top: 0;">Conditional Display Logic Maintained</h4>
+      <p>The solution preserves existing conditional display logic (<code>memoryFirstCondition</code>) while enhancing visual presentation:</p>
+      <ul>
+        <li><strong>Memory-first groups:</strong> Enhanced comprehensive explanation with full visual flow</li>
+        <li><strong>Memory-second groups:</strong> Improved simplified initial explanation with clear preview</li>
+        <li><strong>Midpoint pages:</strong> Speed/accuracy reminders and larger images</li>
+      </ul>
+    </div>
+    
+    <div style="background-color: #f8f9fa; border-left: 4px solid #28a745; padding: 20px; margin-bottom: 20px;">
+      <h4 style="color: #28a745; margin-top: 0;">Responsive Design Improvements</h4>
+      <ul>
+        <li>Container width increased: 800px → 1100px to accommodate larger images</li>
+        <li>Flexible image sizing for different screen sizes</li>
+        <li>Maintained readability across devices</li>
+      </ul>
+    </div>
+    
+    <div style="background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 20px;">
+      <h4 style="color: #dc3545; margin-top: 0;">Visual Impact Enhancements</h4>
+      <ul>
+        <li>Color-coded sections for different task components</li>
+        <li>Box shadows and rounded corners for modern appearance</li>
+        <li>Consistent typography and spacing throughout</li>
+        <li>Enhanced accessibility with larger, clearer visuals</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Testing Instructions -->
+  <div class="improvement-section">
+    <div class="improvement-header">
+      🧪 How to Test the Enhanced Instructions
+    </div>
+    
+    <ol style="font-size: 16px; line-height: 1.8;">
+      <li><strong>Start local server:</strong> <code>python3 -m http.server 8000</code></li>
+      <li><strong>Navigate to:</strong> <code>http://localhost:8000</code></li>
+      <li><strong>Go through the instruction flow:</strong>
+        <ul>
+          <li>Complete demographics form</li>
+          <li>View enhanced instruction pages</li>
+          <li>Notice the visual improvements: larger images, flow diagrams, emphasis boxes</li>
+          <li>Test both memory-first and memory-second variations (controlled by randomization)</li>
+        </ul>
+      </li>
+      <li><strong>Verify all improvements are visible:</strong>
+        <ul>
+          <li>No emojis in headings or text</li>
+          <li>Large, clear images</li>
+          <li>Step-by-step visual flow (1→2→3→4)</li>
+          <li>Orange random selection warning</li>
+          <li>Red speed/accuracy emphasis boxes</li>
+          <li>Repetition messaging throughout</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; padding: 40px; color: #6c757d; font-size: 14px;">
+    <p>This preview demonstrates all the requested improvements to the instruction pages.</p>
+    <p>The actual enhanced instruction pages are integrated into the main experiment at <code>index.html</code></p>
+  </div>
+</body>
+</html>
