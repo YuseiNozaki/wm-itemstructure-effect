@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>包括プレビューページ - 説明ページ・リザルトページ一括確認</title>
+  <title>包括プレビューページ - 実際の画面表示</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Load jsPsych CSS for proper styling -->
+  <link href="https://unpkg.com/jspsych@7/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="../styles.css" rel="stylesheet" type="text/css" />
   <style>
     body {
       font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background-color: #f5f5f5;
       line-height: 1.6;
     }
@@ -45,353 +48,57 @@
       font-weight: 500;
       text-align: left;
       transition: all 0.2s ease;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      opacity: 0.7;
     }
     
-    .nav-button:hover {
+    .nav-button:hover, .nav-button.active {
+      opacity: 1;
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     
-    .nav-button.active {
-      box-shadow: 0 0 0 2px #007bff;
+    .nav-button.result {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     }
     
-    .btn-memory-first-initial {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      color: white;
-    }
-    
-    .btn-memory-second-initial {
-      background: linear-gradient(135deg, #28a745, #1e7e34);
-      color: white;
-    }
-    
-    .btn-memory-first-midpoint {
-      background: linear-gradient(135deg, #ffc107, #e0a800);
-      color: #212529;
-    }
-    
-    .btn-memory-second-midpoint {
-      background: linear-gradient(135deg, #dc3545, #c82333);
-      color: white;
-    }
-    
-    .btn-result {
-      background: linear-gradient(135deg, #6f42c1, #5a2d91);
-      color: white;
-    }
-    
-    /* Header */
-    .preview-header {
-      max-width: 1000px;
-      margin: 0 auto 30px auto;
-      padding: 30px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    
-    .preview-header h1 {
-      margin: 0 0 10px 0;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    
-    .preview-header p {
-      margin: 0;
-      font-size: 16px;
-      opacity: 0.9;
-    }
-    
-    /* Content area */
-    .content-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-      min-height: 600px;
-      overflow: hidden;
-    }
-    
+    /* Page content */
     .page-content {
-      padding: 40px;
-      display: none;
+      margin-right: 320px;
+      background: white;
+      min-height: 100vh;
     }
     
-    .page-content.active {
+    .page {
+      display: none;
+      padding: 0;
+      min-height: 100vh;
+    }
+    
+    .page.active {
       display: block;
     }
     
-    /* Default state */
-    .welcome-content {
-      text-align: center;
-      padding: 100px 40px;
-      color: #6c757d;
-    }
-    
-    .welcome-content h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-    
-    /* Instruction page styles */
-    .instruction-content h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 40px;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    
-    .step {
-      background-color: #f8f9fa;
-      border-left: 4px solid #007bff;
-      padding: 20px;
-      margin-bottom: 15px;
-      border-radius: 0 8px 8px 0;
-    }
-    
-    .step-content {
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-    }
-    
-    .step-number {
-      background-color: #007bff;
-      color: white;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      flex-shrink: 0;
-      font-size: 16px;
-    }
-    
-    .step-text {
-      font-size: 16px;
-      color: #333;
-      flex: 1;
-    }
-    
-    .midpoint-content {
-      text-align: center;
-    }
-    
-    .midpoint-steps {
-      background-color: #f8f9fa;
-      border-left: 4px solid #007bff;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: left;
-      border-radius: 0 8px 8px 0;
-    }
-    
-    .condition-box {
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      border: 2px solid;
-    }
-    
-    .condition-fullscreen {
-      background-color: #e3f2fd;
-      border-color: #2196f3;
-    }
-    
-    .condition-window {
-      background-color: #fff3e0;
-      border-color: #ff9800;
-    }
-    
-    .condition-scroll {
-      background-color: #f3e5f5;
-      border-color: #9c27b0;
-    }
-    
-    .condition-box h3 {
-      margin: 0 0 15px 0;
-      font-size: 18px;
-    }
-    
-    .condition-content {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    
-    .condition-text {
-      flex: 1;
-      min-width: 250px;
-    }
-    
-    .condition-images {
-      flex: 0 0 auto;
-      display: flex;
-      gap: 10px;
-    }
-    
-    .condition-image {
-      max-width: 120px;
-      height: auto;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .action-button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.2s ease;
-    }
-    
-    .action-button:hover {
-      background-color: #0056b3;
-    }
-    
-    /* Result page styles */
-    .result-content .result-title {
-      color: #2c3e50;
-      margin-bottom: 30px;
-      font-size: 32px;
-      text-align: center;
-      font-weight: bold;
-    }
-    
-    .result-stats {
-      background-color: #f8f9fa;
-      padding: 25px;
-      border-radius: 10px;
-      margin: 25px 0;
-      border-left: 4px solid #28a745;
-    }
-    
-    .result-stats h3 {
-      color: #495057;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    
-    .result-stats p {
-      font-size: 18px;
-      margin: 12px 0;
-      color: #2c3e50;
-    }
-    
-    .completion-process {
-      background-color: #e7f3ff;
-      padding: 25px;
-      border-radius: 10px;
-      margin: 25px 0;
-      text-align: left;
-      border-left: 4px solid #007bff;
-    }
-    
-    .completion-process h3 {
-      color: #0056b3;
-      margin-bottom: 15px;
-      text-align: center;
-      font-size: 20px;
-    }
-    
-    .completion-process ol {
-      font-size: 16px;
+    /* Actual experiment styles - mimicking index.html */
+    .experiment-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px;
+      font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif;
       line-height: 1.8;
-      padding-left: 20px;
-    }
-    
-    .end-button {
-      text-align: center;
-      margin: 30px 0;
-    }
-    
-    .end-button button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      font-weight: bold;
-      transition: all 0.2s ease;
-    }
-    
-    .end-button button:hover {
-      background-color: #c82333;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    }
-    
-    /* Page header labels */
-    .page-label {
-      background: linear-gradient(135deg, #6c757d, #495057);
-      color: white;
-      padding: 12px 20px;
-      margin: -40px -40px 30px -40px;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-    }
-    
-    .label-memory-first-initial {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-    }
-    
-    .label-memory-second-initial {
-      background: linear-gradient(135deg, #28a745, #1e7e34);
-    }
-    
-    .label-memory-first-midpoint {
-      background: linear-gradient(135deg, #ffc107, #e0a800);
-      color: #212529;
-    }
-    
-    .label-memory-second-midpoint {
-      background: linear-gradient(135deg, #dc3545, #c82333);
-    }
-    
-    .label-result {
-      background: linear-gradient(135deg, #6f42c1, #5a2d91);
+      background-color: #ffffff;
     }
     
     @media (max-width: 768px) {
       .nav-controls {
-        position: relative;
-        top: auto;
-        right: auto;
-        margin-bottom: 20px;
+        position: static;
         max-width: none;
-      }
-      
-      .preview-header, .content-container {
-        margin: 0 10px 20px 10px;
+        margin: 10px;
       }
       
       .page-content {
-        padding: 20px;
-      }
-      
-      .condition-content {
-        flex-direction: column;
-      }
-      
-      .condition-images {
-        justify-content: center;
+        margin-right: 0;
       }
     }
   </style>
@@ -399,369 +106,559 @@
 <body>
   <!-- Navigation Controls -->
   <div class="nav-controls">
-    <h3>ページ切り替え</h3>
-    <button class="nav-button btn-memory-first-initial" onclick="showPage('memory-first-initial')">
-      📝 記憶課題先行-初期説明
+    <h3>🔍 実際の画面プレビュー</h3>
+    
+    <button class="nav-button active" onclick="showPage('memory-first-initial')">
+      📋 記憶課題先行-初期説明
     </button>
-    <button class="nav-button btn-memory-second-initial" onclick="showPage('memory-second-initial')">
-      📝 記憶課題後行-初期説明
+    
+    <button class="nav-button" onclick="showPage('memory-second-initial')">
+      📋 記憶課題後行-初期説明
     </button>
-    <button class="nav-button btn-memory-first-midpoint" onclick="showPage('memory-first-midpoint')">
-      ⏸️ 記憶課題先行-中間説明
+    
+    <button class="nav-button" onclick="showPage('memory-first-midpoint')">
+      🔄 記憶課題先行-中間説明
     </button>
-    <button class="nav-button btn-memory-second-midpoint" onclick="showPage('memory-second-midpoint')">
-      ⏸️ 記憶課題後行-中間説明
+    
+    <button class="nav-button" onclick="showPage('memory-second-midpoint')">
+      🔄 記憶課題後行-中間説明
     </button>
-    <button class="nav-button btn-result" onclick="showPage('result')">
+    
+    <button class="nav-button result" onclick="showPage('result')">
       🎯 リザルトページ
     </button>
   </div>
 
-  <!-- Header -->
-  <div class="preview-header">
-    <h1>包括プレビューページ</h1>
-    <p>説明ページ（4パターン）とリザルトページを一括で確認できます</p>
-  </div>
-
-  <!-- Content Container -->
-  <div class="content-container">
-    <!-- Welcome state -->
-    <div class="page-content welcome-content active" id="welcome">
-      <h2>ページを選択してください</h2>
-      <p>右上のナビゲーションから表示したいページを選択できます。</p>
-      <p>実際の画面表示と同じ内容・画像が表示されます。</p>
-    </div>
-
-    <!-- Memory First Initial Page -->
-    <div class="page-content instruction-content" id="memory-first-initial">
-      <div class="page-label label-memory-first-initial">
-        1. 初期説明ページ（記憶課題先行グループ）
-      </div>
-      
-      <h1>ルール説明</h1>
-      
-      <!-- Memory task explanation with image -->
-      <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #856404; margin-top: 0; font-size: 20px;">🧠 記憶課題</h2>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 300px;">
-            <p style="margin: 5px 0; font-size: 16px; color: #856404;"><strong>はじめに記憶課題を行います：</strong></p>
-            <p style="margin: 5px 0; font-size: 15px; color: #856404;">4×4のグリッドに色付きセルが3秒間表示されます</p>
-            <p style="margin: 5px 0; font-size: 15px; color: #856404;">色がついた位置を覚えてください</p>
-          </div>
-          <div style="flex: 0 0 auto;">
-            <img src="../screen_shots/7_記憶課題_呈示.png" alt="記憶課題の表示例" class="condition-image">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Target presentation with image -->
-      <div style="background-color: #d1ecf1; border: 2px solid #17a2b8; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #0c5460; margin-top: 0; font-size: 20px;">🎯 ターゲット図形</h2>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 300px;">
-            <p style="margin: 5px 0; font-size: 16px; color: #0c5460;"><strong>次にターゲット図形が表示されます：</strong></p>
-            <p style="margin: 5px 0; font-size: 15px; color: #0c5460;">1秒間だけ表示される図形を覚えてください</p>
-          </div>
-          <div style="flex: 0 0 auto;">
-            <img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" class="condition-image">
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 viewing conditions -->
-      <div style="margin-bottom: 25px;">
-        <h2 style="color: #dc3545; font-size: 20px; margin-bottom: 15px;">3つの表示条件</h2>
-        
-        <!-- Fullscreen condition -->
-        <div class="condition-box condition-fullscreen">
-          <h3 style="color: #1976d2;">🖥️ 全画面条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 画面全体に図形が表示されます</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> 自由にマウスカーソルを動かして図形を探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/2_全画面.png" alt="全画面条件の例" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <!-- Window condition -->
-        <div class="condition-box condition-window">
-          <h3 style="color: #f57c00;">🪟 ウィンドウ条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 小さな窓から図形を観察します</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> マウスをドラッグして窓を移動させながら探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/3_ウィンドウ_はじめ.png" alt="ウィンドウ条件（初期）" class="condition-image">
-              <img src="../screen_shots/4_ウィンドウ_移動後.png" alt="ウィンドウ条件（移動後）" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <!-- Scroll condition -->
-        <div class="condition-box condition-scroll">
-          <h3 style="color: #7b1fa2;">↔️ スクロール条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 一部分だけが表示されます</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> マウスをドラッグして背景をスクロールしながら探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/5_スクロール_はじめ.png" alt="スクロール条件（初期）" class="condition-image">
-              <img src="../screen_shots/6_スクロール_移動後.png" alt="スクロール条件（移動後）" class="condition-image">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Memory recall with image -->
-      <div style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #721c24; margin-top: 0; font-size: 20px;">🔄 記憶課題の回答</h2>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 300px;">
-            <p style="margin: 5px 0; font-size: 16px; color: #721c24;"><strong>図形探索後に記憶課題の回答：</strong></p>
-            <p style="margin: 5px 0; font-size: 15px; color: #721c24;">最初に覚えた色付きセルの位置をクリックして回答</p>
-          </div>
-          <div style="flex: 0 0 auto;">
-            <img src="../screen_shots/8_記憶課題_回答.png" alt="記憶課題の回答画面" class="condition-image">
-          </div>
-        </div>
-      </div>
-
-      <div style="text-align: center; margin-top: 40px;">
-        <button class="action-button">練習に進む</button>
+  <!-- Page Content Container -->
+  <div class="page-content">
+    
+    <!-- Memory-First Initial Explanation - EXACT copy from index.html -->
+    <div id="memory-first-initial" class="page active">
+      <div class="experiment-content" id="memory-first-content">
+        <!-- Content will be loaded by JavaScript -->
       </div>
     </div>
 
-    <!-- Memory Second Initial Page -->
-    <div class="page-content instruction-content" id="memory-second-initial">
-      <div class="page-label label-memory-second-initial">
-        2. 初期説明ページ（記憶課題後行グループ）
-      </div>
-      
-      <h1>ルール説明</h1>
-      
-      <!-- Target presentation first -->
-      <div style="background-color: #d1ecf1; border: 2px solid #17a2b8; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #0c5460; margin-top: 0; font-size: 20px;">🎯 ターゲット図形</h2>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 300px;">
-            <p style="margin: 5px 0; font-size: 16px; color: #0c5460;"><strong>まず図形が1秒間表示されます：</strong></p>
-            <p style="margin: 5px 0; font-size: 15px; color: #0c5460;">表示される図形をよく覚えてください</p>
-          </div>
-          <div style="flex: 0 0 auto;">
-            <img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" class="condition-image">
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 viewing conditions (same as memory-first) -->
-      <div style="margin-bottom: 25px;">
-        <h2 style="color: #dc3545; font-size: 20px; margin-bottom: 15px;">3つの表示条件</h2>
-        
-        <!-- Fullscreen condition -->
-        <div class="condition-box condition-fullscreen">
-          <h3 style="color: #1976d2;">🖥️ 全画面条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 画面全体に図形が表示されます</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> 自由にマウスカーソルを動かして図形を探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/2_全画面.png" alt="全画面条件の例" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <!-- Window condition -->
-        <div class="condition-box condition-window">
-          <h3 style="color: #f57c00;">🪟 ウィンドウ条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 小さな窓から図形を観察します</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> マウスをドラッグして窓を移動させながら探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/3_ウィンドウ_はじめ.png" alt="ウィンドウ条件（初期）" class="condition-image">
-              <img src="../screen_shots/4_ウィンドウ_移動後.png" alt="ウィンドウ条件（移動後）" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <!-- Scroll condition -->
-        <div class="condition-box condition-scroll">
-          <h3 style="color: #7b1fa2;">↔️ スクロール条件</h3>
-          <div class="condition-content">
-            <div class="condition-text">
-              <p style="margin: 5px 0; font-size: 15px;"><strong>表示：</strong> 一部分だけが表示されます</p>
-              <p style="margin: 5px 0; font-size: 15px;"><strong>操作：</strong> マウスをドラッグして背景をスクロールしながら探します</p>
-            </div>
-            <div class="condition-images">
-              <img src="../screen_shots/5_スクロール_はじめ.png" alt="スクロール条件（初期）" class="condition-image">
-              <img src="../screen_shots/6_スクロール_移動後.png" alt="スクロール条件（移動後）" class="condition-image">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Simple task flow -->
-      <div style="background-color: #f8f9fa; border: 2px solid #6c757d; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #495057; margin-top: 0; font-size: 20px;">前半の流れ</h2>
-        <p style="font-size: 16px; margin: 10px 0;">前半は図形探索のみです。ターゲット図形を見つけて正確にクリックしてください。</p>
-        <p style="font-size: 16px; margin: 10px 0; color: #6c757d;">※後半から記憶課題が追加されます</p>
-      </div>
-      
-      <div style="text-align: center; margin-top: 40px;">
-        <button class="action-button">練習に進む</button>
+    <!-- Memory-Second Initial Explanation -->
+    <div id="memory-second-initial" class="page">
+      <div class="experiment-content" id="memory-second-content">
+        <!-- Content will be loaded by JavaScript -->
       </div>
     </div>
 
-    <!-- Memory First Midpoint Page -->
-    <div class="page-content instruction-content" id="memory-first-midpoint">
-      <div class="page-label label-memory-first-midpoint">
-        3. 中間説明ページ（記憶課題先行グループ）
-      </div>
-      
-      <div class="midpoint-content">
-        <h1>これで前半が終了です</h1>
-        
-        <!-- Progress indicator -->
-        <div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-          <h2 style="color: #155724; margin-top: 0; font-size: 20px;">✅ 前半：記憶課題 + 図形探索 完了</h2>
-          <p style="font-size: 16px; margin: 10px 0; color: #155724;">お疲れ様でした！前半の記憶課題付きの試行が終了しました。</p>
-        </div>
-        
-        <!-- What changes in second half -->
-        <div style="background-color: #cff4fc; border: 2px solid #b6effb; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: left;">
-          <h2 style="color: #055160; margin-top: 0; font-size: 20px;">後半の変更点</h2>
-          <p style="font-size: 16px; margin: 10px 0; color: #055160;">後半は記憶課題がなくなり、図形探索のみになります。</p>
-          
-          <!-- Show target presentation image -->
-          <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-top: 15px;">
-            <div style="flex: 1; min-width: 300px;">
-              <p style="font-size: 15px; margin: 5px 0; color: #055160;"><strong>手順：</strong></p>
-              <p style="font-size: 15px; margin: 5px 0; color: #055160;">1. ターゲット図形の確認（1秒間）</p>
-              <p style="font-size: 15px; margin: 5px 0; color: #055160;">2. 図形探索（クリックで回答）</p>
-            </div>
-            <div style="flex: 0 0 auto;">
-              <img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <p style="font-size: 18px; margin: 20px 0; color: #333;">記憶課題がなくなるので、図形探索に集中できます！</p>
-        <p style="font-size: 18px; margin: 20px 0; color: #333;">最後まで集中して頑張りましょう！</p>
-        
-        <div style="margin-top: 40px;">
-          <button class="action-button">後半開始</button>
-        </div>
+    <!-- Memory-First Midpoint Explanation -->
+    <div id="memory-first-midpoint" class="page">
+      <div class="experiment-content" id="memory-first-midpoint-content">
+        <!-- Content will be loaded by JavaScript -->
       </div>
     </div>
 
-    <!-- Memory Second Midpoint Page -->
-    <div class="page-content instruction-content" id="memory-second-midpoint">
-      <div class="page-label label-memory-second-midpoint">
-        4. 中間説明ページ（記憶課題後行グループ）
-      </div>
-      
-      <div class="midpoint-content">
-        <h1>これで前半が終了です</h1>
-        
-        <!-- Progress indicator -->
-        <div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-          <h2 style="color: #155724; margin-top: 0; font-size: 20px;">✅ 前半：図形探索のみ 完了</h2>
-          <p style="font-size: 16px; margin: 10px 0; color: #155724;">お疲れ様でした！前半の図形探索タスクが終了しました。</p>
-        </div>
-        
-        <p style="font-size: 18px; margin: 20px 0; color: #333;">ここからは、さらにワーキングメモリを使う課題を追加します。</p>
-        
-        <div class="midpoint-steps">
-          <h3 style="color: #856404; margin-top: 0; font-size: 18px;">🧠 追加される記憶課題</h3>
-          <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-top: 15px;">
-            <div style="flex: 1; min-width: 300px;">
-              <p style="font-size: 16px; margin: 10px 0; color: #333;">1. まずはじめにパネルが3秒間表示されます。色のついた場所を覚えてください。</p>
-              <p style="font-size: 16px; margin: 10px 0; color: #333;">2. 今まで通りの図形探しを行います。</p>
-              <p style="font-size: 16px; margin: 10px 0; color: #333;">3. はじめに覚えたパネルの場所を回答します。</p>
-            </div>
-            <div style="flex: 0 0 auto;">
-              <img src="../screen_shots/7_記憶課題_呈示.png" alt="記憶課題の表示例" class="condition-image">
-            </div>
-          </div>
-        </div>
-        
-        <p style="font-size: 18px; margin: 20px 0; color: #333;">後半もさらに集中して頑張ってください！</p>
-        
-        <div style="margin-top: 40px;">
-          <button class="action-button">後半開始</button>
-        </div>
+    <!-- Memory-Second Midpoint Explanation -->
+    <div id="memory-second-midpoint" class="page">
+      <div class="experiment-content" id="memory-second-midpoint-content">
+        <!-- Content will be loaded by JavaScript -->
       </div>
     </div>
 
     <!-- Result Page -->
-    <div class="page-content result-content" id="result">
-      <div class="page-label label-result">
-        5. リザルトページ（ダミーデータ）
-      </div>
-      
-      <h1 class="result-title">実験は終了です。お疲れ様でした！</h1>
-      
-      <div class="result-stats">
-        <h3>実験結果</h3>
-        <p>図形探しの正答率：85％</p>
-        <p>図形探しのスピード：平均2.34秒</p>
-        <p>パネル記憶の正答率：75％</p>
-      </div>
-      
-      <div class="completion-process">
-        <h3>実験の終了プロセス</h3>
-        <ol>
-          <li>下の「終了する」ボタンを押すと実験データの送信が行われます。</li>
-          <li>データの送信中は、画面に英語が表示されます。送信が終わると真っ白な画面になります。</li>
-          <li>真っ白な画面になったら実験終了です。画面を閉じて構いません。</li>
-          <li>ご協力ありがとうございました！</li>
-        </ol>
-      </div>
-      
-      <div class="end-button">
-        <button>終了する</button>
+    <div id="result" class="page">
+      <div class="experiment-content" id="result-content">
+        <!-- Content will be loaded by JavaScript -->
       </div>
     </div>
   </div>
 
   <script>
+    // Function to generate memory-first initial explanation - copied from index.html
+    function generateMemoryFirstInitialExplanation() {
+      let html = '<div style="max-width: 1100px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+      
+      // Title
+      html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
+      
+      // Speed and accuracy emphasis box
+      html += '<div style="background-color: #ff6b6b; color: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">';
+      html += '<h2 style="color: white; margin: 0; font-size: 24px; font-weight: bold;">重要：できるだけ速く、正確に回答してください</h2>';
+      html += '</div>';
+      
+      // Operation flow overview
+      html += '<div style="background-color: #f8f9fa; border: 3px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #495057; margin-top: 0; font-size: 22px; text-align: center;">実験の流れ</h2>';
+      html += '<div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; flex-wrap: wrap; gap: 15px;">';
+      html += '<div style="text-align: center; flex: 1; min-width: 120px; background-color: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffeaa7;">';
+      html += '<div style="background-color: #856404; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">1</div>';
+      html += '<strong>記憶課題</strong><br>位置を覚える';
+      html += '</div>';
+      html += '<div style="font-size: 24px; color: #6c757d;">→</div>';
+      html += '<div style="text-align: center; flex: 1; min-width: 120px; background-color: #d1ecf1; padding: 15px; border-radius: 8px; border: 2px solid #bee5eb;">';
+      html += '<div style="background-color: #0c5460; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">2</div>';
+      html += '<strong>ターゲット確認</strong><br>図形を覚える';
+      html += '</div>';
+      html += '<div style="font-size: 24px; color: #6c757d;">→</div>';
+      html += '<div style="text-align: center; flex: 1; min-width: 120px; background-color: #e3f2fd; padding: 15px; border-radius: 8px; border: 2px solid #2196f3;">';
+      html += '<div style="background-color: #1976d2; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">3</div>';
+      html += '<strong>図形探索</strong><br>クリックで回答';
+      html += '</div>';
+      html += '<div style="font-size: 24px; color: #6c757d;">→</div>';
+      html += '<div style="text-align: center; flex: 1; min-width: 120px; background-color: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffeaa7;">';
+      html += '<div style="background-color: #856404; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">4</div>';
+      html += '<strong>記憶回答</strong><br>位置をクリック';
+      html += '</div>';
+      html += '</div>';
+      html += '<p style="text-align: center; font-size: 18px; margin: 15px 0; color: #dc3545; font-weight: bold;">この流れを何度も繰り返します</p>';
+      html += '</div>';
+      
+      // Memory task explanation with larger image
+      html += '<div style="background-color: #fff3cd; border: 2px solid #ffeaa7; border-radius: 8px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #856404; margin-top: 0; font-size: 22px;">【ステップ1】記憶課題について</h2>';
+      html += '<div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 350px;">';
+      html += '<p style="font-size: 18px; margin: 15px 0;">まず、4×4のグリッドに色のついたセルが<strong>3秒間</strong>表示されます。その位置をしっかりと覚えてください。</p>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #856404;"><strong>重要：</strong> 記憶課題の精度が実験の成功に重要です。</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/7_記憶課題_呈示.png" alt="記憶課題の表示例" style="max-width: 400px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Target presentation with larger image
+      html += '<div style="background-color: #d1ecf1; border: 2px solid #bee5eb; border-radius: 8px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #0c5460; margin-top: 0; font-size: 22px;">【ステップ2】ターゲット図形の確認</h2>';
+      html += '<div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 350px;">';
+      html += '<p style="font-size: 18px; margin: 15px 0;">次に、探す図形が<strong>1秒間</strong>表示されます。色と形をしっかり覚えてください。</p>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #0c5460;"><strong>重要：</strong> この図形を図形探索で見つけてクリックします。</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" style="max-width: 400px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // 3 viewing conditions with random selection emphasis
+      html += '<div style="margin-bottom: 30px;">';
+      html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">【ステップ3】図形探索 - 3つの表示条件</h2>';
+      html += '<div style="background-color: #fff8dc; border: 3px dashed #ffa500; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">';
+      html += '<h3 style="color: #ff6600; margin: 0; font-size: 20px;">⚠️ 重要：表示条件はランダムに選ばれます</h3>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #ff6600;">どの条件が出るかは予測できません。各条件に慣れておいてください。</p>';
+      html += '</div>';
+      
+      // Fullscreen condition
+      html += '<div style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+      html += '<h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 20px;">【条件A】全画面条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 画面全体に図形が表示されます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 自由にマウスカーソルを動かして図形を探します</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #1976d2;"><strong>目標：</strong> できるだけ速く、正確にターゲットをクリック</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/2_全画面.png" alt="全画面条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Window drag condition
+      html += '<div style="background-color: #fff3e0; border: 2px solid #ffb74d; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+      html += '<h3 style="color: #e65100; margin: 0 0 15px 0; font-size: 20px;">【条件B】ウィンドウドラッグ条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 限られた窓を通して図形を見ます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 窓をドラッグして移動し、図形を探します</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #e65100;"><strong>目標：</strong> 効率的に窓を動かしてターゲットを見つける</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/3_ウィンドウ.png" alt="ウィンドウドラッグ条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Scroll condition
+      html += '<div style="background-color: #f1f8e9; border: 2px solid #aed581; border-radius: 8px; padding: 20px; margin-bottom: 30px;">';
+      html += '<h3 style="color: #33691e; margin: 0 0 15px 0; font-size: 20px;">【条件C】スクロール条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 限られた領域に図形が表示されます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 領域内をクリック＆ドラッグしてスクロールします</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #33691e;"><strong>目標：</strong> スクロールを使って効率的にターゲットを探す</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/4_スクロール.png" alt="スクロール条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Memory task recall with larger image
+      html += '<div style="background-color: #fff3cd; border: 2px solid #ffeaa7; border-radius: 8px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #856404; margin-top: 0; font-size: 22px;">【ステップ4】記憶課題の回答</h2>';
+      html += '<div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 350px;">';
+      html += '<p style="font-size: 18px; margin: 15px 0;">図形探索が終わったら、最初に覚えた<strong>色のついたセルの位置</strong>をクリックして回答してください。</p>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #856404;"><strong>注意：</strong> 記憶している位置をできるだけ正確にクリックしてください。</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/8_記憶課題_回答.png" alt="記憶課題の回答画面" style="max-width: 400px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Final emphasis on repetition and speed/accuracy
+      html += '<div style="background-color: #e8f5e8; border: 3px solid #4caf50; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">';
+      html += '<h3 style="color: #2e7d32; margin: 0 0 15px 0; font-size: 20px;">実験の進行について</h3>';
+      html += '<p style="font-size: 18px; margin: 10px 0; color: #2e7d32;">上記の4ステップを<strong>多数回繰り返し</strong>ます。</p>';
+      html += '<p style="font-size: 18px; margin: 10px 0; color: #2e7d32;">すべての試行で<strong>できるだけ速く、正確に</strong>回答することを心がけてください。</p>';
+      html += '</div>';
+      
+      // Continue button
+      html += '<div style="text-align: center; margin-top: 40px;">';
+      html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 20px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">練習に進む</button>';
+      html += '</div>';
+      
+      html += '</div>';
+      
+      return html;
+    }
+
+    // Function to generate memory-second initial explanation - copied from index.html
+    function generateMemorySecondInitialExplanation() {
+      let html = '<div style="max-width: 1100px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff;">';
+      
+      // Title
+      html += '<h1 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 28px; font-weight: bold;">ルール説明</h1>';
+      
+      // Speed and accuracy emphasis box
+      html += '<div style="background-color: #ff6b6b; color: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">';
+      html += '<h2 style="color: white; margin: 0; font-size: 24px; font-weight: bold;">重要：できるだけ速く、正確に回答してください</h2>';
+      html += '</div>';
+      
+      // Operation flow overview (simplified for memory-second group)
+      html += '<div style="background-color: #f8f9fa; border: 3px solid #dee2e6; border-radius: 12px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #495057; margin-top: 0; font-size: 22px; text-align: center;">前半の流れ（シンプル）</h2>';
+      html += '<div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; flex-wrap: wrap; gap: 15px;">';
+      html += '<div style="text-align: center; flex: 1; min-width: 150px; background-color: #d1ecf1; padding: 15px; border-radius: 8px; border: 2px solid #bee5eb;">';
+      html += '<div style="background-color: #0c5460; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">1</div>';
+      html += '<strong>ターゲット確認</strong><br>図形を覚える';
+      html += '</div>';
+      html += '<div style="font-size: 24px; color: #6c757d;">→</div>';
+      html += '<div style="text-align: center; flex: 1; min-width: 150px; background-color: #e3f2fd; padding: 15px; border-radius: 8px; border: 2px solid #2196f3;">';
+      html += '<div style="background-color: #1976d2; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold;">2</div>';
+      html += '<strong>図形探索</strong><br>クリックで回答';
+      html += '</div>';
+      html += '</div>';
+      html += '<p style="text-align: center; font-size: 18px; margin: 15px 0; color: #dc3545; font-weight: bold;">この流れを何度も繰り返します</p>';
+      html += '<p style="text-align: center; font-size: 16px; margin: 15px 0; color: #6c757d;">後半では記憶課題が追加されます（詳細は後で説明）</p>';
+      html += '</div>';
+      
+      // Target presentation with larger image
+      html += '<div style="background-color: #d1ecf1; border: 2px solid #bee5eb; border-radius: 8px; padding: 25px; margin-bottom: 30px;">';
+      html += '<h2 style="color: #0c5460; margin-top: 0; font-size: 22px;">【ステップ1】ターゲット図形の確認</h2>';
+      html += '<div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 350px;">';
+      html += '<p style="font-size: 18px; margin: 15px 0;">まず、探す図形が<strong>1秒間</strong>表示されます。色と形をしっかり覚えてください。</p>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #0c5460;"><strong>重要：</strong> この図形を図形探索で見つけてクリックします。</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" style="max-width: 400px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+
+      // 3 viewing conditions with random selection emphasis
+      html += '<div style="margin-bottom: 30px;">';
+      html += '<h2 style="color: #dc3545; font-size: 22px; margin-bottom: 20px;">【ステップ2】図形探索 - 3つの表示条件</h2>';
+      html += '<div style="background-color: #fff8dc; border: 3px dashed #ffa500; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">';
+      html += '<h3 style="color: #ff6600; margin: 0; font-size: 20px;">⚠️ 重要：表示条件はランダムに選ばれます</h3>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #ff6600;">どの条件が出るかは予測できません。各条件に慣れておいてください。</p>';
+      html += '</div>';
+      
+      // Fullscreen condition
+      html += '<div style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+      html += '<h3 style="color: #1976d2; margin: 0 0 15px 0; font-size: 20px;">【条件A】全画面条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 画面全体に図形が表示されます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 自由にマウスカーソルを動かして図形を探します</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #1976d2;"><strong>目標：</strong> できるだけ速く、正確にターゲットをクリック</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/2_全画面.png" alt="全画面条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Window drag condition
+      html += '<div style="background-color: #fff3e0; border: 2px solid #ffb74d; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+      html += '<h3 style="color: #e65100; margin: 0 0 15px 0; font-size: 20px;">【条件B】ウィンドウドラッグ条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 限られた窓を通して図形を見ます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 窓をドラッグして移動し、図形を探します</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #e65100;"><strong>目標：</strong> 効率的に窓を動かしてターゲットを見つける</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/3_ウィンドウ.png" alt="ウィンドウドラッグ条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Scroll condition
+      html += '<div style="background-color: #f1f8e9; border: 2px solid #aed581; border-radius: 8px; padding: 20px; margin-bottom: 30px;">';
+      html += '<h3 style="color: #33691e; margin: 0 0 15px 0; font-size: 20px;">【条件C】スクロール条件</h3>';
+      html += '<div style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>表示：</strong> 限られた領域に図形が表示されます</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px;"><strong>操作：</strong> 領域内をクリック＆ドラッグしてスクロールします</p>';
+      html += '<p style="margin: 8px 0; font-size: 16px; color: #33691e;"><strong>目標：</strong> スクロールを使って効率的にターゲットを探す</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/4_スクロール.png" alt="スクロール条件の例" style="max-width: 350px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Continue to practice with emphasis
+      html += '<div style="background-color: #e8f5e8; border: 3px solid #4caf50; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center;">';
+      html += '<h3 style="color: #2e7d32; margin: 0 0 15px 0; font-size: 20px;">前半の練習について</h3>';
+      html += '<p style="font-size: 18px; margin: 10px 0; color: #2e7d32;">まずは上記の2ステップ（ターゲット確認→図形探索）を<strong>練習</strong>します。</p>';
+      html += '<p style="font-size: 16px; margin: 5px 0; color: #856404;"><strong>注意：</strong> 実験の後半では記憶課題が追加されます。詳細は後半開始時に説明します。</p>';
+      html += '</div>';
+      
+      // Continue button
+      html += '<div style="text-align: center; margin-top: 40px;">';
+      html += '<button id="initial-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 20px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">練習に進む</button>';
+      html += '</div>';
+      
+      html += '</div>';
+      
+      return html;
+    }
+
+    // Function to generate memory-first midpoint explanation - copied from index.html
+    function generateMemoryFirstMidpointExplanation() {
+      let html = '<div style="max-width: 900px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+      
+      html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です</h1>';
+      
+      // Speed and accuracy reminder
+      html += '<div style="background-color: #ff6b6b; color: white; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">';
+      html += '<h2 style="color: white; margin: 0; font-size: 20px; font-weight: bold;">後半でも：できるだけ速く、正確に回答してください</h2>';
+      html += '</div>';
+      
+      // Progress indicator
+      html += '<div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">';
+      html += '<h2 style="color: #155724; margin-top: 0; font-size: 20px;">前半：記憶課題 + 図形探索 完了</h2>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #155724;">お疲れ様でした！前半の記憶課題付きの試行が終了しました。</p>';
+      html += '</div>';
+      
+      // What changes in second half
+      html += '<div style="background-color: #cff4fc; border: 2px solid #b6effb; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: left;">';
+      html += '<h2 style="color: #055160; margin-top: 0; font-size: 20px;">後半の変更点</h2>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #055160;">後半は記憶課題がなくなり、図形探索のみになります。</p>';
+      
+      // Show target presentation image
+      html += '<div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-top: 15px;">';
+      html += '<div style="flex: 1; min-width: 300px;">';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #055160;"><strong>手順：</strong></p>';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #055160;">1. ターゲット図形の確認（1秒間）</p>';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #055160;">2. 図形探索（クリックで回答）</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形の表示例" style="max-width: 300px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Encouragement
+      html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">記憶課題がなくなるので、図形探索に集中できます！</p>';
+      html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">最後まで集中して頑張りましょう！</p>';
+      
+      // Continue button
+      html += '<div style="margin-top: 40px;">';
+      html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+      html += '</div>';
+      
+      html += '</div>';
+      
+      return html;
+    }
+
+    // Function to generate memory-second midpoint explanation - copied from index.html  
+    function generateMemorySecondMidpointExplanation() {
+      let html = '<div style="max-width: 900px; margin: 0 auto; padding: 40px; font-family: \'Noto Sans JP\', \'ヒラギノ角ゴ Pro\', \'Hiragino Kaku Gothic Pro\', \'メイリオ\', Meiryo, sans-serif; line-height: 1.8; background-color: #ffffff; text-align: center;">';
+      
+      html += '<h1 style="color: #2c3e50; margin-bottom: 30px; font-size: 28px; font-weight: bold;">これで前半が終了です</h1>';
+      
+      // Speed and accuracy reminder
+      html += '<div style="background-color: #ff6b6b; color: white; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">';
+      html += '<h2 style="color: white; margin: 0; font-size: 20px; font-weight: bold;">後半でも：できるだけ速く、正確に回答してください</h2>';
+      html += '</div>';
+      
+      // Progress indicator
+      html += '<div style="background-color: #d4edda; border: 2px solid #c3e6cb; border-radius: 8px; padding: 20px; margin-bottom: 25px;">';
+      html += '<h2 style="color: #155724; margin-top: 0; font-size: 20px;">前半：図形探索のみ 完了</h2>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #155724;">お疲れ様でした！前半の図形探索が終了しました。</p>';
+      html += '</div>';
+      
+      // What changes in second half - Memory task explanation with images
+      html += '<div style="background-color: #fff3cd; border: 2px solid #ffeaa7; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: left;">';
+      html += '<h2 style="color: #856404; margin-top: 0; font-size: 20px;">後半の変更点：記憶課題を追加</h2>';
+      html += '<p style="font-size: 16px; margin: 10px 0; color: #856404;">後半はワーキングメモリを使う記憶課題が追加されます。</p>';
+      
+      // Memory task presentation
+      html += '<div style="margin: 15px 0; padding: 15px; background-color: #fffbf0; border-radius: 5px;">';
+      html += '<h3 style="color: #856404; margin-top: 0; font-size: 16px;">記憶課題の流れ</h3>';
+      html += '<div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">';
+      html += '<div style="flex: 1; min-width: 200px;">';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #856404;"><strong>1. 記憶課題（3秒間）</strong></p>';
+      html += '<p style="font-size: 14px; margin: 5px 0; color: #856404;">4×4グリッドの色付きセルの位置を覚える</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/7_記憶課題_呈示.png" alt="記憶課題の表示" style="max-width: 300px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      
+      html += '<div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">';
+      html += '<div style="flex: 1; min-width: 200px;">';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #856404;"><strong>2. ターゲット確認</strong></p>';
+      html += '<p style="font-size: 14px; margin: 5px 0; color: #856404;">探す図形を1秒間確認</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/1_ターゲット呈示.png" alt="ターゲット図形" style="max-width: 300px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      
+      html += '<div style="color: #856404; font-size: 15px; margin: 10px 0;"><strong>3. 図形探索</strong> → 今まで通りの図形探索を実行</div>';
+      
+      html += '<div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">';
+      html += '<div style="flex: 1; min-width: 200px;">';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #856404;"><strong>4. 記憶課題回答</strong></p>';
+      html += '<p style="font-size: 14px; margin: 5px 0; color: #856404;">最初に覚えた色付きセルの位置をクリック</p>';
+      html += '</div>';
+      html += '<div style="flex: 0 0 auto;">';
+      html += '<img src="../screen_shots/8_記憶課題_回答.png" alt="記憶課題の回答" style="max-width: 300px; height: auto; border: 2px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      
+      // Tips
+      html += '<div style="background-color: #e2e3e5; border: 2px solid #d3d3d4; border-radius: 8px; padding: 15px; margin-bottom: 25px; text-align: left;">';
+      html += '<h3 style="color: #383d41; margin-top: 0; font-size: 18px;">💡 後半のコツ</h3>';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #383d41;">• 図形探索に集中しすぎず、記憶課題も忘れずに</p>';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #383d41;">• 色付きセルの位置は図形探索中も頭の片隅で覚えておく</p>';
+      html += '<p style="font-size: 15px; margin: 5px 0; color: #383d41;">• 両方の課題をバランスよく行うことが重要</p>';
+      html += '</div>';
+      
+      html += '<p style="font-size: 18px; margin: 20px 0; color: #333;">後半もさらに集中して頑張ってください！</p>';
+      
+      // Continue button
+      html += '<div style="margin-top: 40px;">';
+      html += '<button id="midpoint-continue-btn" style="background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">後半開始</button>';
+      html += '</div>';
+      
+      html += '</div>';
+      
+      return html;
+    }
+
+    // Function to generate result screen - copied from index.html
+    function generateResultScreen() {
+      // Generate dummy data similar to what the real experiment would show
+      const searchAccuracy = 87;
+      const avgSearchTimeSeconds = 3.2;
+      const memoryAccuracy = 73;
+      
+      let html = `
+        <div style="max-width: 700px; margin: 0 auto; padding: 40px 20px; text-align: center; line-height: 1.6;">
+          <h1 style="color: #2c3e50; margin-bottom: 30px;">実験は終了です。お疲れ様でした！</h1>
+          
+          <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
+            <h2 style="color: #495057; margin-bottom: 20px;">実験結果</h2>
+            <p style="font-size: 18px; margin: 15px 0;">図形探しの正答率：${searchAccuracy}％</p>
+            <p style="font-size: 18px; margin: 15px 0;">図形探しのスピード：平均${avgSearchTimeSeconds}秒</p>
+            <p style="font-size: 18px; margin: 15px 0;">パネル記憶の正答率：${memoryAccuracy}％</p>
+          </div>
+          
+          <div style="background-color: #e7f3ff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: left;">
+            <h3 style="color: #0056b3; margin-bottom: 15px; text-align: center;">実験の終了プロセス</h3>
+            <ol style="font-size: 16px; line-height: 1.8; padding-left: 20px;">
+              <li>下の「終了する」ボタンを押すと実験データの送信が行われます。</li>
+              <li>データの送信中は、画面に英語が表示されます。送信が終わると真っ白な画面になります。</li>
+              <li>真っ白な画面になったら実験終了です。画面を閉じて構いません。</li>
+              <li>ご協力ありがとうございました！</li>
+            </ol>
+          </div>
+          
+          <div style="margin: 30px 0;">
+            <button id="end-screen-next-btn" style="padding: 15px 30px; font-size: 18px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">終了する</button>
+          </div>
+        </div>
+      `;
+      
+      return html;
+    }
+
+    // Function to show different pages
     function showPage(pageId) {
       // Hide all pages
-      const allPages = document.querySelectorAll('.page-content');
-      allPages.forEach(page => {
-        page.classList.remove('active');
-      });
-      
-      // Remove active state from all buttons
-      const allButtons = document.querySelectorAll('.nav-button');
-      allButtons.forEach(button => {
-        button.classList.remove('active');
-      });
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(page => page.classList.remove('active'));
       
       // Show selected page
-      const selectedPage = document.getElementById(pageId);
-      if (selectedPage) {
-        selectedPage.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      
+      // Update button states
+      const buttons = document.querySelectorAll('.nav-button');
+      buttons.forEach(button => button.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Load content for the selected page
+      loadPageContent(pageId);
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    // Function to load page content
+    function loadPageContent(pageId) {
+      let contentHtml = '';
+      let targetElementId = '';
+      
+      switch(pageId) {
+        case 'memory-first-initial':
+          contentHtml = generateMemoryFirstInitialExplanation();
+          targetElementId = 'memory-first-content';
+          break;
+        case 'memory-second-initial':
+          contentHtml = generateMemorySecondInitialExplanation();
+          targetElementId = 'memory-second-content';
+          break;
+        case 'memory-first-midpoint':
+          contentHtml = generateMemoryFirstMidpointExplanation();
+          targetElementId = 'memory-first-midpoint-content';
+          break;
+        case 'memory-second-midpoint':
+          contentHtml = generateMemorySecondMidpointExplanation();
+          targetElementId = 'memory-second-midpoint-content';
+          break;
+        case 'result':
+          contentHtml = generateResultScreen();
+          targetElementId = 'result-content';
+          break;
       }
       
-      // Add active state to corresponding button
-      const activeButton = document.querySelector(`[onclick="showPage('${pageId}')"]`);
-      if (activeButton) {
-        activeButton.classList.add('active');
+      if (targetElementId && contentHtml) {
+        document.getElementById(targetElementId).innerHTML = contentHtml;
       }
     }
     
-    // Initialize with welcome page
+    // Initialize the page on load
     document.addEventListener('DOMContentLoaded', function() {
-      // Welcome page is already active by default
+      // Load initial content
+      loadPageContent('memory-first-initial');
     });
   </script>
 </body>
