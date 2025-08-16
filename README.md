@@ -90,14 +90,14 @@ wm-itemstructure-effect/
 │   ├── comprehensive_preview.html     # 包括プレビューページ（説明・結果ページ一括確認）
 │   └── ... (その他のプレビューファイル)
 ├── screen_shots/                       # 実験画面のスクリーンショット
-│   ├── 1_ターゲット呈示.png            # ターゲット図形表示例
-│   ├── 2_全画面.png                    # 全画面条件例
-│   ├── 3_ウィンドウ_はじめ.png          # ウィンドウ条件（初期状態）
-│   ├── 4_ウィンドウ_移動後.png          # ウィンドウ条件（移動後）
-│   ├── 5_スクロール_はじめ.png          # スクロール条件（初期状態）
-│   ├── 6_スクロール_移動後.png          # スクロール条件（移動後）
-│   ├── 7_記憶課題_呈示.png              # 記憶課題の表示例
-│   └── 8_記憶課題_回答.png              # 記憶課題の回答画面
+│   ├── 1_target_presentation.png            # ターゲット図形表示例
+│   ├── 2_fullscreen.png                    # 全画面条件例
+│   ├── 3_window_initial.png          # ウィンドウ条件（初期状態）
+│   ├── 4_window_after_move.png          # ウィンドウ条件（移動後）
+│   ├── 5_scroll_initial.png          # スクロール条件（初期状態）
+│   ├── 6_scroll_after_move.png          # スクロール条件（移動後）
+│   ├── 7_memory_task_presentation.png              # 記憶課題の表示例
+│   └── 8_memory_task_response.png              # 記憶課題の回答画面
 └── tests/                              # テストファイル群
     ├── test_integration.html           # 統合テスト
     ├── test_memory.html                # 記憶課題テスト
