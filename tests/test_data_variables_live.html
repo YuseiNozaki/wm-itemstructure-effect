@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Data Variables Test - wm_load and practice_trial</title>
+  <meta charset="utf-8">
+  <script src="https://unpkg.com/jspsych@7.3.1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+  <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { 
+      margin: 20px; 
+      font-family: Arial, sans-serif; 
+    }
+    .result-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .data-output {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Data Variables Test</h1>
+  <p>This test runs simplified trials to verify that wm_load and practice_trial variables work correctly.</p>
+  
+  <div id="jspsych-target"></div>
+  
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        const allData = jsPsych.data.get().values();
+        
+        // Filter for actual trial data (not instructions)
+        const trialData = allData.filter(d => d.task === 'visual_search_test');
+        
+        let html = '<div class="result-section">';
+        html += '<h2>Test Results</h2>';
+        html += `<p>Total trials collected: ${trialData.length}</p>`;
+        
+        // Check practice vs main trials
+        const practiceTrials = trialData.filter(d => d.practice_trial === true);
+        const mainTrials = trialData.filter(d => d.practice_trial === false);
+        
+        html += `<p>Practice trials: ${practiceTrials.length}</p>`;
+        html += `<p>Main trials: ${mainTrials.length}</p>`;
+        
+        // Check wm_load values
+        const withMemoryTrials = trialData.filter(d => d.wm_load === true);
+        const withoutMemoryTrials = trialData.filter(d => d.wm_load === false);
+        
+        html += `<p>Trials with wm_load=true: ${withMemoryTrials.length}</p>`;
+        html += `<p>Trials with wm_load=false: ${withoutMemoryTrials.length}</p>`;
+        
+        // Check for placeholder issues
+        const placeholderIssues = trialData.filter(d => 
+          typeof d.practice_trial === 'object' || 
+          typeof d.wm_load === 'object'
+        );
+        
+        if (placeholderIssues.length > 0) {
+          html += `<p style="color: red;">⚠️ Found ${placeholderIssues.length} trials with placeholder objects!</p>`;
+        } else {
+          html += '<p style="color: green;">✓ No placeholder objects found</p>';
+        }
+        
+        html += '<h3>Sample Trial Data:</h3>';
+        html += '<div class="data-output">';
+        html += JSON.stringify(trialData.slice(0, 3), null, 2);
+        html += '</div>';
+        
+        html += '<h3>All Trial Data:</h3>';
+        html += '<div class="data-output">';
+        html += JSON.stringify(trialData, null, 2);
+        html += '</div>';
+        
+        html += '</div>';
+        
+        document.getElementById('jspsych-target').innerHTML = html;
+      }
+    });
+
+    // Simplified visual search trial (mimics the main experiment logic)
+    function createVisualSearchTrial(memoryLoad, isPractice) {
+      return {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function() {
+          return `<div style="text-align: center; padding: 50px;">
+            <h2>Simulated Visual Search Trial</h2>
+            <p>Memory Load: ${jsPsych.timelineVariable('memoryLoad')}</p>
+            <p>Is Practice: ${jsPsych.timelineVariable('isPractice')}</p>
+            <p>Press SPACE to continue</p>
+          </div>`;
+        },
+        choices: [' '],
+        data: function() {
+          // This mimics the exact logic from the main experiment
+          const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
+          const isPracticeCondition = jsPsych.timelineVariable('isPractice') || false;
+          
+          return {
+            task: 'visual_search_test',
+            memory_load: memoryLoadCondition,
+            wm_load: memoryLoadCondition === 'with-memory', // This is the exact logic from main experiment
+            practice_trial: isPracticeCondition, // This is the exact logic from main experiment
+            is_practice: jsPsych.timelineVariable('isPractice') || false
+          };
+        }
+      };
+    }
+
+    // Create timeline variables that mimic the main experiment
+    const practiceTrialVariables = [
+      { memoryLoad: 'with-memory', isPractice: true },
+      { memoryLoad: 'without-memory', isPractice: true }
+    ];
+    
+    const mainTrialVariables = [
+      { memoryLoad: 'with-memory', isPractice: false },
+      { memoryLoad: 'without-memory', isPractice: false },
+      { memoryLoad: 'with-memory', isPractice: false },
+      { memoryLoad: 'without-memory', isPractice: false }
+    ];
+
+    // Instructions
+    const instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `<div style="text-align: center; padding: 50px;">
+        <h1>Variable Test</h1>
+        <p>This test will run simplified trials to check variable values.</p>
+        <p>Press SPACE to start</p>
+      </div>`,
+      choices: [' ']
+    };
+
+    // Practice trials
+    const practiceBlock = {
+      timeline: [createVisualSearchTrial()],
+      timeline_variables: practiceTrialVariables
+    };
+
+    // Main trials  
+    const mainBlock = {
+      timeline: [createVisualSearchTrial()],
+      timeline_variables: mainTrialVariables
+    };
+
+    // Run the test
+    const timeline = [
+      instructions,
+      practiceBlock,
+      mainBlock
+    ];
+
+    jsPsych.run(timeline);
+  </script>
+</body>
+</html>
