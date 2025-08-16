@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Minimal wm_load Test</title>
+  <meta charset="utf-8">
+  <script src="https://unpkg.com/jspsych@7.3.1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+  <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { margin: 20px; font-family: Arial, sans-serif; }
+    .result { background-color: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Minimal wm_load Test</h1>
+  <p>This test exactly mimics the data collection logic from the main experiment.</p>
+  
+  <div id="jspsych-target"></div>
+  
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        const allData = jsPsych.data.get().values();
+        const trialData = allData.filter(d => d.task === 'visual_search');
+        
+        let html = '<div class="result">';
+        html += '<h2>Test Results</h2>';
+        html += `<p>Total trials: ${trialData.length}</p>`;
+        
+        // Check wm_load values
+        const trueCount = trialData.filter(d => d.wm_load === true).length;
+        const falseCount = trialData.filter(d => d.wm_load === false).length;
+        
+        html += `<p>wm_load=true: ${trueCount}</p>`;
+        html += `<p>wm_load=false: ${falseCount}</p>`;
+        
+        // Check practice_trial values  
+        const practiceTrue = trialData.filter(d => d.practice_trial === true).length;
+        const practiceFalse = trialData.filter(d => d.practice_trial === false).length;
+        
+        html += `<p>practice_trial=true: ${practiceTrue}</p>`;
+        html += `<p>practice_trial=false: ${practiceFalse}</p>`;
+        
+        // Show raw data
+        html += '<h3>Raw Data:</h3>';
+        html += '<pre>' + JSON.stringify(trialData, null, 2) + '</pre>';
+        html += '</div>';
+        
+        document.getElementById('jspsych-target').innerHTML = html;
+      }
+    });
+
+    // This exactly mimics the visual search trial data collection logic
+    const testTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const memoryLoad = jsPsych.timelineVariable('memoryLoad');
+        const isPractice = jsPsych.timelineVariable('isPractice');
+        
+        return `<div style="text-align: center; padding: 50px;">
+          <h2>Test Trial</h2>
+          <p>memoryLoad: ${memoryLoad}</p>
+          <p>isPractice: ${isPractice}</p>
+          <p>Press SPACE to continue</p>
+        </div>`;
+      },
+      choices: [' '],
+      on_finish: function(data) {
+        // This is the EXACT logic from the main experiment (lines 1505-1521)
+        const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
+        const isPracticeCondition = jsPsych.timelineVariable('isPractice') || false;
+        
+        const trialData = {
+          memory_load: memoryLoadCondition,
+          wm_load: memoryLoadCondition === 'with-memory', // Boolean indicator for WM load presence
+          practice_trial: isPracticeCondition, // Boolean indicator for practice trial
+          task: 'visual_search',
+          is_practice: jsPsych.timelineVariable('isPractice') || false
+        };
+        
+        // Add the computed data to the trial
+        Object.assign(data, trialData);
+      }
+    };
+
+    // Test with the exact same timeline variables as the main experiment
+    const testVariables = [
+      // Practice trials (like practiceTrialVariables)
+      { memoryLoad: 'with-memory', isPractice: true },
+      { memoryLoad: 'without-memory', isPractice: true },
+      
+      // Main experiment trials (like withMemoryDesign and withoutMemoryDesign)
+      { memoryLoad: 'with-memory', isPractice: false },
+      { memoryLoad: 'without-memory', isPractice: false }
+    ];
+
+    const instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `<div style="text-align: center; padding: 50px;">
+        <h1>Exact Logic Test</h1>
+        <p>Testing the exact same data collection logic as the main experiment.</p>
+        <p>Press SPACE to start</p>
+      </div>`,
+      choices: [' ']
+    };
+
+    const testBlock = {
+      timeline: [testTrial],
+      timeline_variables: testVariables
+    };
+
+    jsPsych.run([instructions, testBlock]);
+  </script>
+</body>
+</html>
