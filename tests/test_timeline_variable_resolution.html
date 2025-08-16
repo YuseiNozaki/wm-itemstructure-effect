@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timeline Variable Resolution Test</title>
+  <meta charset="utf-8">
+  <script src="https://unpkg.com/jspsych@7.3.1"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+  <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { margin: 20px; font-family: Arial, sans-serif; }
+    .test-output { background-color: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Timeline Variable Resolution Test</h1>
+  <p>Testing if jsPsych.timelineVariable() resolves correctly for the key variables.</p>
+  
+  <div id="jspsych-target"></div>
+  
+  <script>
+    const jsPsych = initJsPsych({
+      display_element: 'jspsych-target',
+      on_finish: function() {
+        const allData = jsPsych.data.get().values();
+        const testData = allData.filter(d => d.trial_type === 'html-keyboard-response' && d.memoryLoad);
+        
+        let html = '<div class="test-output">';
+        html += '<h2>Timeline Variable Resolution Results</h2>';
+        html += `<p>Total test trials: ${testData.length}</p>`;
+        
+        // Show each trial data
+        testData.forEach((trial, index) => {
+          html += `<h3>Trial ${index + 1}:</h3>`;
+          html += '<pre>' + JSON.stringify({
+            memoryLoad: trial.memoryLoad,
+            isPractice: trial.isPractice,
+            raw_memoryLoad: trial.raw_memoryLoad,
+            raw_isPractice: trial.raw_isPractice,
+            wm_load_result: trial.wm_load_result,
+            practice_trial_result: trial.practice_trial_result
+          }, null, 2) + '</pre>';
+        });
+        
+        html += '</div>';
+        document.getElementById('jspsych-target').innerHTML = html;
+      }
+    });
+
+    // Test trial that examines timeline variable resolution
+    const testTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        const memoryLoad = jsPsych.timelineVariable('memoryLoad');
+        const isPractice = jsPsych.timelineVariable('isPractice');
+        
+        return `<div style="text-align: center; padding: 50px;">
+          <h2>Timeline Variable Test</h2>
+          <p>memoryLoad: ${memoryLoad}</p>
+          <p>isPractice: ${isPractice}</p>
+          <p>Press SPACE to continue</p>
+        </div>`;
+      },
+      choices: [' '],
+      data: function() {
+        // Test how timeline variables resolve
+        const memoryLoadValue = jsPsych.timelineVariable('memoryLoad');
+        const isPracticeValue = jsPsych.timelineVariable('isPractice');
+        
+        return {
+          memoryLoad: memoryLoadValue,
+          isPractice: isPracticeValue,
+          raw_memoryLoad: JSON.stringify(memoryLoadValue),
+          raw_isPractice: JSON.stringify(isPracticeValue),
+          wm_load_result: memoryLoadValue === 'with-memory',
+          practice_trial_result: isPracticeValue || false
+        };
+      }
+    };
+
+    // Test timeline variables
+    const testVariables = [
+      { memoryLoad: 'with-memory', isPractice: true },
+      { memoryLoad: 'without-memory', isPractice: true },
+      { memoryLoad: 'with-memory', isPractice: false },
+      { memoryLoad: 'without-memory', isPractice: false }
+    ];
+
+    const instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `<div style="text-align: center; padding: 50px;">
+        <h1>Timeline Variable Resolution Test</h1>
+        <p>This will test 4 different timeline variable combinations.</p>
+        <p>Press SPACE to start</p>
+      </div>`,
+      choices: [' ']
+    };
+
+    const testBlock = {
+      timeline: [testTrial],
+      timeline_variables: testVariables
+    };
+
+    jsPsych.run([instructions, testBlock]);
+  </script>
+</body>
+</html>

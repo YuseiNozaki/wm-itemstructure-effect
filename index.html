@@ -1223,6 +1223,10 @@
         const viewCondition = jsPsych.timelineVariable('viewCondition');
         const structure = jsPsych.timelineVariable('structure');
         
+        // Capture memory load and practice variables early to ensure they are accessible
+        const memoryLoad = jsPsych.timelineVariable('memoryLoad');
+        const isPractice = jsPsych.timelineVariable('isPractice') || false;
+        
         // Get target information
         const targetColor = jsPsych.data.get().last(1).values()[0].target_color;
         const targetShape = jsPsych.data.get().last(1).values()[0].target_shape;
@@ -1274,7 +1278,6 @@
         lastMouseY = params.screenHeight / 2;
         
         // Generate objects
-        const isPractice = jsPsych.timelineVariable('isPractice') || false;
         generateObjects(searchArea, targetColor, targetShape, structure, viewCondition, isPractice);
         
         // Initial draw
@@ -1502,8 +1505,8 @@
           searchWindow.style.display = 'none';
           
           // Finish trial
-          const memoryLoadCondition = jsPsych.timelineVariable('memoryLoad');
-          const isPracticeCondition = jsPsych.timelineVariable('isPractice') || false;
+          const memoryLoadCondition = memoryLoad; // Use captured value instead of jsPsych.timelineVariable('memoryLoad')
+          const isPracticeCondition = isPractice; // Use captured value instead of jsPsych.timelineVariable('isPractice') || false
           const trialData = {
             reaction_time: rt,
             correct: correct,
@@ -1517,11 +1520,11 @@
             total_movement: totalMovement,
             mouse_path: mousePath,
             task: 'visual_search',
-            is_practice: jsPsych.timelineVariable('isPractice') || false
+            is_practice: isPractice // Use captured value instead of jsPsych.timelineVariable('isPractice') || false
           };
           
           // Only save data if not in practice mode
-          if (!jsPsych.timelineVariable('isPractice')) {
+          if (!isPractice) { // Use captured value instead of jsPsych.timelineVariable('isPractice')
             jsPsych.finishTrial(trialData);
           } else {
             // For practice, still finish trial but don't save to main data
@@ -1992,11 +1995,13 @@
     const withoutMemoryDesign = jsPsych.randomization.factorial(viewAndStructureFactors, params.trialsPerCondition);
     withoutMemoryDesign.forEach(trial => {
       trial.memoryLoad = 'without-memory';
+      trial.isPractice = false;
     });
     
     const withMemoryDesign = jsPsych.randomization.factorial(viewAndStructureFactors, params.trialsPerCondition);
     withMemoryDesign.forEach(trial => {
       trial.memoryLoad = 'with-memory';
+      trial.isPractice = false;
     });
 
     // Assign first and second block procedures based on counterbalancing (memoryFirstCondition determined earlier)
