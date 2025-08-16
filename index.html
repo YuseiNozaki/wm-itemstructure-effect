@@ -1826,8 +1826,15 @@
         
         // Calculate average response time for visual search
         const searchTimes = searchData.select('rt').values;
-        const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
-        const avgSearchTimeSeconds = Math.round((avgSearchTime / 1000) * 100) / 100; // Convert to seconds, round to 2 decimals
+        let avgSearchTimeSeconds = 0;
+        if (searchTimes && searchTimes.length > 0) {
+          // Filter out invalid values (null, undefined, NaN)
+          const validTimes = searchTimes.filter(time => time != null && !isNaN(time) && time > 0);
+          if (validTimes.length > 0) {
+            const avgSearchTime = validTimes.reduce((a, b) => a + b, 0) / validTimes.length;
+            avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10; // Convert to seconds, truncate to 1 decimal
+          }
+        }
         
         // Calculate overall memory task accuracy if applicable
         let memoryAccuracyText = '';

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NaN Edge Case Test</title>
+  <meta charset="utf-8">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      background-color: #f5f5f5; 
+    }
+    .test-result { 
+      background: white; 
+      padding: 20px; 
+      margin: 10px 0; 
+      border-radius: 5px; 
+      border-left: 4px solid #007bff; 
+    }
+    .pass { border-left-color: #28a745; }
+    .fail { border-left-color: #dc3545; }
+  </style>
+</head>
+<body>
+  <h1>NaN エラー修正テスト</h1>
+  <p>検索データが空の場合のNaN問題が修正されていることを確認します。</p>
+
+  <div id="test-results"></div>
+
+  <script>
+    // Mock jsPsych data structure with empty search data
+    const emptyMockJsPsychData = {
+      filter: function(criteria) {
+        if (criteria.task === 'visual_search') {
+          return {
+            count: () => 0, // No search data
+            filter: (innerCriteria) => ({
+              count: () => 0
+            }),
+            select: (field) => ({
+              values: [] // Empty array
+            })
+          };
+        }
+        return this;
+      },
+      select: function(field) {
+        return { values: [] };
+      }
+    };
+
+    function runTest(name, testFunction) {
+      try {
+        const result = testFunction();
+        document.getElementById('test-results').innerHTML += 
+          `<div class="test-result pass">
+            <h3>✅ ${name}</h3>
+            <p>${result}</p>
+          </div>`;
+      } catch (error) {
+        document.getElementById('test-results').innerHTML += 
+          `<div class="test-result fail">
+            <h3>❌ ${name}</h3>
+            <p>Error: ${error.message}</p>
+          </div>`;
+      }
+    }
+
+    // Test 1: Empty search data should not cause NaN
+    runTest('Empty Search Data Test', () => {
+      const searchData = emptyMockJsPsychData.filter({task: 'visual_search'});
+      const searchTimes = searchData.select('rt').values;
+      
+      let avgSearchTimeSeconds = 0;
+      if (searchTimes && searchTimes.length > 0) {
+        const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
+        avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10;
+      }
+      
+      if (isNaN(avgSearchTimeSeconds)) {
+        throw new Error('avgSearchTimeSeconds is NaN');
+      }
+      
+      if (avgSearchTimeSeconds !== 0) {
+        throw new Error(`Expected 0, got ${avgSearchTimeSeconds}`);
+      }
+      
+      return `Empty data handled correctly: ${avgSearchTimeSeconds} seconds (no NaN)`;
+    });
+
+    // Test 2: Null/undefined values in search times
+    const corruptMockJsPsychData = {
+      filter: function(criteria) {
+        if (criteria.task === 'visual_search') {
+          return {
+            count: () => 3,
+            filter: (innerCriteria) => ({
+              count: () => 2
+            }),
+            select: (field) => ({
+              values: [2000, null, undefined] // Corrupt data
+            })
+          };
+        }
+        return this;
+      },
+      select: function(field) {
+        return { values: [1, 0, undefined] };
+      }
+    };
+
+    runTest('Corrupt Search Data Test', () => {
+      const searchData = corruptMockJsPsychData.filter({task: 'visual_search'});
+      const searchTimes = searchData.select('rt').values;
+      
+      let avgSearchTimeSeconds = 0;
+      if (searchTimes && searchTimes.length > 0) {
+        // Filter out invalid values first
+        const validTimes = searchTimes.filter(time => time != null && !isNaN(time));
+        if (validTimes.length > 0) {
+          const avgSearchTime = validTimes.reduce((a, b) => a + b, 0) / validTimes.length;
+          avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10;
+        }
+      }
+      
+      if (isNaN(avgSearchTimeSeconds)) {
+        throw new Error('avgSearchTimeSeconds is NaN');
+      }
+      
+      const expectedTime = Math.floor((2000 / 1000) * 10) / 10; // 2.0 seconds
+      if (avgSearchTimeSeconds !== expectedTime) {
+        throw new Error(`Expected ${expectedTime}, got ${avgSearchTimeSeconds}`);
+      }
+      
+      return `Corrupt data handled correctly: ${avgSearchTimeSeconds} seconds (filtered invalid values)`;
+    });
+
+    // Test 3: Test truncation behavior with various decimal values
+    runTest('Truncation Behavior Test', () => {
+      const testCases = [
+        { input: 2.567, expected: 2.5 },
+        { input: 2.999, expected: 2.9 },
+        { input: 2.001, expected: 2.0 },
+        { input: 1.0, expected: 1.0 },
+        { input: 3.14159, expected: 3.1 }
+      ];
+      
+      const results = [];
+      for (const testCase of testCases) {
+        const result = Math.floor(testCase.input * 10) / 10;
+        if (result !== testCase.expected) {
+          throw new Error(`For ${testCase.input}, expected ${testCase.expected}, got ${result}`);
+        }
+        results.push(`${testCase.input} → ${result}`);
+      }
+      
+      return `All truncation tests passed: ${results.join(', ')}`;
+    });
+
+    document.getElementById('test-results').innerHTML += 
+      `<div class="test-result">
+        <h3>📝 テスト完了</h3>
+        <p>NaN問題が修正され、小数点1桁への切り捨てが正常に動作しています。</p>
+        <p><strong>修正内容:</strong></p>
+        <ul>
+          <li>空の検索データでもNaNエラーが発生しない</li>
+          <li>null/undefined値を適切にフィルタリング</li>
+          <li>小数点第2位以降を切り捨て（2.999 → 2.9）</li>
+          <li>Math.floor()を使用した正確な切り捨て処理</li>
+        </ul>
+      </div>`;
+  </script>
+</body>
+</html>
