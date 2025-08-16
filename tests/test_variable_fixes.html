@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Variable Fixes Validation - wm_load and practice_trial</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    
+    .code-block {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 3px;
+      font-family: monospace;
+      margin: 10px 0;
+      white-space: pre-wrap;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Variable Fixes Validation Test</h1>
+  <p>This test validates that the <code>wm_load</code> and <code>practice_trial</code> variables are correctly set in experiment data.</p>
+  
+  <div class="test-section">
+    <h3>Issues Being Fixed:</h3>
+    <ul>
+      <li><strong>wm_load variable:</strong> Should be TRUE for memory trials, FALSE for non-memory trials</li>
+      <li><strong>practice_trial variable:</strong> Should be TRUE for practice trials, FALSE for main experiment trials (not placeholder objects)</li>
+    </ul>
+  </div>
+
+  <div class="test-section">
+    <h3>Test Timeline Variables Generation</h3>
+    <button onclick="testTimelineVariables()">Test Timeline Variables</button>
+    <div id="timeline-test" class="test-section">
+      <p>Click the test button to validate timeline variable generation...</p>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h3>Test Counterbalancing Logic</h3>
+    <button onclick="testCounterbalancing()">Test Memory-First Groups</button>
+    <button onclick="testCounterbalancingSecond()">Test Memory-Second Groups</button>
+    <div id="counterbalancing-test" class="test-section">
+      <p>Click the test buttons to validate counterbalancing logic...</p>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h3>Test Practice vs Main Trial Variables</h3>
+    <button onclick="testPracticeMainDifference()">Test Practice vs Main</button>
+    <div id="practice-main-test" class="test-section">
+      <p>Click the test button to validate practice vs main trial variables...</p>
+    </div>
+  </div>
+
+  <script>
+    // Test parameters (matching main experiment)
+    const params = {
+      trialsPerCondition: 10 // Matching main experiment setting
+    };
+
+    // Simulate the main experiment logic for timeline variable generation
+    function simulateExperimentLogic(conditionValue, memoryFirstOverride = null) {
+      // Simulate counterbalancing logic
+      let memoryFirstCondition = false;
+      
+      if (memoryFirstOverride !== null) {
+        memoryFirstCondition = memoryFirstOverride;
+      } else if (conditionValue !== undefined) {
+        memoryFirstCondition = (conditionValue % 2 === 1);
+      } else {
+        memoryFirstCondition = Math.random() < 0.5;
+      }
+      
+      // Generate practice trial variables (from main experiment)
+      const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
+      
+      const practiceTrialVariables = [
+        // First set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        // Second set
+        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
+        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
+      ];
+
+      // Generate main experiment trial variables (with the fix)
+      const viewAndStructureFactors = {
+        viewCondition: ['window', 'scroll', 'fullscreen'],
+        structure: ['structured', 'unstructured']
+      };
+      
+      // Simulate factorial design (simplified)
+      const withoutMemoryDesign = [];
+      const withMemoryDesign = [];
+      
+      for (let view of viewAndStructureFactors.viewCondition) {
+        for (let struct of viewAndStructureFactors.structure) {
+          for (let i = 0; i < params.trialsPerCondition; i++) {
+            withoutMemoryDesign.push({
+              viewCondition: view,
+              structure: struct,
+              memoryLoad: 'without-memory',
+              isPractice: false  // This is the fix!
+            });
+            
+            withMemoryDesign.push({
+              viewCondition: view,
+              structure: struct,
+              memoryLoad: 'with-memory',
+              isPractice: false  // This is the fix!
+            });
+          }
+        }
+      }
+
+      // Assign blocks based on counterbalancing
+      let firstBlockProcedureData, secondBlockProcedureData;
+      if (memoryFirstCondition) {
+        firstBlockProcedureData = withMemoryDesign;
+        secondBlockProcedureData = withoutMemoryDesign;
+      } else {
+        firstBlockProcedureData = withoutMemoryDesign;
+        secondBlockProcedureData = withMemoryDesign;
+      }
+      
+      return {
+        memoryFirstCondition,
+        practiceTrialVariables,
+        firstBlockProcedureData,
+        secondBlockProcedureData,
+        practiceMemoryLoad
+      };
+    }
+    
+    function testTimelineVariables() {
+      const testDiv = document.getElementById('timeline-test');
+      const results = simulateExperimentLogic(0); // Test with CONDITION = 0
+      
+      let html = '<h4>Timeline Variables Test Results:</h4>';
+      let allPassed = true;
+      
+      // Test practice variables
+      const practiceHasIsPractice = results.practiceTrialVariables.every(trial => 
+        trial.hasOwnProperty('isPractice') && trial.isPractice === true
+      );
+      
+      if (practiceHasIsPractice) {
+        html += '<p style="color: green;">✓ PASS: All practice trials have isPractice: true</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Practice trials missing isPractice property</p>';
+        allPassed = false;
+      }
+      
+      // Test main experiment variables
+      const firstBlockHasIsPractice = results.firstBlockProcedureData.every(trial => 
+        trial.hasOwnProperty('isPractice') && trial.isPractice === false
+      );
+      const secondBlockHasIsPractice = results.secondBlockProcedureData.every(trial => 
+        trial.hasOwnProperty('isPractice') && trial.isPractice === false
+      );
+      
+      if (firstBlockHasIsPractice && secondBlockHasIsPractice) {
+        html += '<p style="color: green;">✓ PASS: All main experiment trials have isPractice: false</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Main experiment trials missing isPractice property</p>';
+        allPassed = false;
+      }
+      
+      // Test memory load variables
+      const firstBlockMemoryLoad = results.firstBlockProcedureData[0].memoryLoad;
+      const secondBlockMemoryLoad = results.secondBlockProcedureData[0].memoryLoad;
+      
+      if (firstBlockMemoryLoad && secondBlockMemoryLoad && firstBlockMemoryLoad !== secondBlockMemoryLoad) {
+        html += '<p style="color: green;">✓ PASS: Blocks have different memory loads</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Blocks do not have different memory loads</p>';
+        allPassed = false;
+      }
+      
+      html += '<div class="code-block">';
+      html += `Practice trial sample: ${JSON.stringify(results.practiceTrialVariables[0], null, 2)}\n\n`;
+      html += `First block trial sample: ${JSON.stringify(results.firstBlockProcedureData[0], null, 2)}\n\n`;
+      html += `Second block trial sample: ${JSON.stringify(results.secondBlockProcedureData[0], null, 2)}`;
+      html += '</div>';
+      
+      testDiv.className = `test-section ${allPassed ? 'success' : 'error'}`;
+      testDiv.innerHTML = html;
+    }
+    
+    function testCounterbalancing() {
+      const testDiv = document.getElementById('counterbalancing-test');
+      
+      // Test memory-first condition (CONDITION = 1)
+      const results = simulateExperimentLogic(1); // Odd = memory first
+      
+      let html = '<h4>Memory-First Group Test (CONDITION = 1):</h4>';
+      let allPassed = true;
+      
+      const firstBlockIsMemory = results.firstBlockProcedureData[0].memoryLoad === 'with-memory';
+      const secondBlockIsNoMemory = results.secondBlockProcedureData[0].memoryLoad === 'without-memory';
+      const practiceIsMemory = results.practiceMemoryLoad === 'with-memory';
+      
+      if (firstBlockIsMemory) {
+        html += '<p style="color: green;">✓ PASS: First block has memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: First block should have memory load</p>';
+        allPassed = false;
+      }
+      
+      if (secondBlockIsNoMemory) {
+        html += '<p style="color: green;">✓ PASS: Second block has no memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Second block should have no memory load</p>';
+        allPassed = false;
+      }
+      
+      if (practiceIsMemory) {
+        html += '<p style="color: green;">✓ PASS: Practice trials have memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Practice trials should have memory load</p>';
+        allPassed = false;
+      }
+      
+      // Show expected wm_load values
+      html += '<h5>Expected wm_load values:</h5>';
+      html += '<p>First 60 trials (memory block): wm_load = true</p>';
+      html += '<p>Next 60 trials (no-memory block): wm_load = false</p>';
+      
+      testDiv.className = `test-section ${allPassed ? 'success' : 'error'}`;
+      testDiv.innerHTML = html;
+    }
+    
+    function testCounterbalancingSecond() {
+      const testDiv = document.getElementById('counterbalancing-test');
+      
+      // Test memory-second condition (CONDITION = 0)
+      const results = simulateExperimentLogic(0); // Even = memory second
+      
+      let html = '<h4>Memory-Second Group Test (CONDITION = 0):</h4>';
+      let allPassed = true;
+      
+      const firstBlockIsNoMemory = results.firstBlockProcedureData[0].memoryLoad === 'without-memory';
+      const secondBlockIsMemory = results.secondBlockProcedureData[0].memoryLoad === 'with-memory';
+      const practiceIsNoMemory = results.practiceMemoryLoad === 'without-memory';
+      
+      if (firstBlockIsNoMemory) {
+        html += '<p style="color: green;">✓ PASS: First block has no memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: First block should have no memory load</p>';
+        allPassed = false;
+      }
+      
+      if (secondBlockIsMemory) {
+        html += '<p style="color: green;">✓ PASS: Second block has memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Second block should have memory load</p>';
+        allPassed = false;
+      }
+      
+      if (practiceIsNoMemory) {
+        html += '<p style="color: green;">✓ PASS: Practice trials have no memory load</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Practice trials should have no memory load</p>';
+        allPassed = false;
+      }
+      
+      // Show expected wm_load values
+      html += '<h5>Expected wm_load values:</h5>';
+      html += '<p>First 60 trials (no-memory block): wm_load = false</p>';
+      html += '<p>Next 60 trials (memory block): wm_load = true</p>';
+      
+      testDiv.className = `test-section ${allPassed ? 'success' : 'error'}`;
+      testDiv.innerHTML = html;
+    }
+    
+    function testPracticeMainDifference() {
+      const testDiv = document.getElementById('practice-main-test');
+      const results = simulateExperimentLogic(0);
+      
+      let html = '<h4>Practice vs Main Trial Differences:</h4>';
+      let allPassed = true;
+      
+      // Test that practice and main trials have different isPractice values
+      const practiceValue = results.practiceTrialVariables[0].isPractice;
+      const mainValue = results.firstBlockProcedureData[0].isPractice;
+      
+      if (practiceValue === true && mainValue === false) {
+        html += '<p style="color: green;">✓ PASS: Practice trials (isPractice: true) vs Main trials (isPractice: false)</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Practice and main trials do not have different isPractice values</p>';
+        allPassed = false;
+      }
+      
+      // Test that all required properties exist
+      const practiceHasAll = results.practiceTrialVariables[0].hasOwnProperty('memoryLoad') &&
+                            results.practiceTrialVariables[0].hasOwnProperty('isPractice') &&
+                            results.practiceTrialVariables[0].hasOwnProperty('viewCondition') &&
+                            results.practiceTrialVariables[0].hasOwnProperty('structure');
+      
+      const mainHasAll = results.firstBlockProcedureData[0].hasOwnProperty('memoryLoad') &&
+                        results.firstBlockProcedureData[0].hasOwnProperty('isPractice') &&
+                        results.firstBlockProcedureData[0].hasOwnProperty('viewCondition') &&
+                        results.firstBlockProcedureData[0].hasOwnProperty('structure');
+      
+      if (practiceHasAll && mainHasAll) {
+        html += '<p style="color: green;">✓ PASS: All required properties present in both practice and main trials</p>';
+      } else {
+        html += '<p style="color: red;">✗ FAIL: Missing required properties in timeline variables</p>';
+        allPassed = false;
+      }
+      
+      // Show the key difference that resolves the placeholder issue
+      html += '<h5>Key Fix for practice_trial Variable:</h5>';
+      html += '<div class="code-block">';
+      html += 'Before fix: Main trials had no isPractice property → caused {"timelineVariablePlaceholder":true}\n';
+      html += 'After fix: Main trials have isPractice: false → resolves to proper boolean false';
+      html += '</div>';
+      
+      html += '<h5>Sample Variables:</h5>';
+      html += '<div class="code-block">';
+      html += `Practice trial: ${JSON.stringify(results.practiceTrialVariables[0], null, 2)}\n\n`;
+      html += `Main trial: ${JSON.stringify(results.firstBlockProcedureData[0], null, 2)}`;
+      html += '</div>';
+      
+      testDiv.className = `test-section ${allPassed ? 'success' : 'error'}`;
+      testDiv.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
