@@ -118,16 +118,19 @@
     runTest('Visual Search Speed Calculation', () => {
       const searchData = mockJsPsychData.filter({task: 'visual_search'});
       const searchTimes = searchData.select('rt').values;
-      const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
-      const avgSearchTimeSeconds = Math.round((avgSearchTime / 1000) * 100) / 100;
+      let avgSearchTimeSeconds = 0;
+      if (searchTimes && searchTimes.length > 0) {
+        const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
+        avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10; // Convert to seconds, truncate to 1 decimal
+      }
       
       const expectedAvg = (2300 + 1800 + 3200 + 2100 + 1900 + 4500 + 2400 + 1700 + 2200 + 2000) / 10;
-      const expectedSeconds = Math.round((expectedAvg / 1000) * 100) / 100;
+      const expectedSeconds = Math.floor((expectedAvg / 1000) * 10) / 10;
       
       if (Math.abs(avgSearchTimeSeconds - expectedSeconds) > 0.01) {
         throw new Error(`Expected ${expectedSeconds}s, got ${avgSearchTimeSeconds}s`);
       }
-      return `Average speed: ${avgSearchTimeSeconds} seconds (${Math.round(avgSearchTime)}ms average)`;
+      return `Average speed: ${avgSearchTimeSeconds} seconds (${Math.round((expectedAvg))}ms average)`;
     });
 
     // Test 3: Memory accuracy calculation
@@ -152,8 +155,11 @@
       const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
       
       const searchTimes = searchData.select('rt').values;
-      const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
-      const avgSearchTimeSeconds = Math.round((avgSearchTime / 1000) * 100) / 100;
+      let avgSearchTimeSeconds = 0;
+      if (searchTimes && searchTimes.length > 0) {
+        const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
+        avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10; // Convert to seconds, truncate to 1 decimal
+      }
       
       const memoryScores = mockJsPsychData.select('memory_correct').values;
       let memoryAccuracyText = '';
@@ -204,14 +210,14 @@
       };
       
       const searchAccuracy = Math.round((5 / 5) * 100); // 100%
-      const avgTime = Math.round((1000 / 1000) * 100) / 100; // 1.00 seconds
+      const avgTime = Math.floor((1000 / 1000) * 10) / 10; // 1.0 seconds (truncated to 1 decimal)
       const memoryAccuracy = Math.round((5 / 5) * 100); // 100%
       
-      if (searchAccuracy !== 100 || avgTime !== 1.00 || memoryAccuracy !== 100) {
+      if (searchAccuracy !== 100 || avgTime !== 1.0 || memoryAccuracy !== 100) {
         throw new Error('Perfect scores calculation failed');
       }
       
-      return 'Perfect scores: 100% accuracy, 1.00s average, 100% memory';
+      return 'Perfect scores: 100% accuracy, 1.0s average, 100% memory';
     });
 
     document.getElementById('test-results').innerHTML += 
@@ -221,7 +227,7 @@
         <p><strong>確認項目:</strong></p>
         <ul>
           <li>正答率計算: 正解数 / 総試行数 × 100</li>
-          <li>平均時間計算: 反応時間の平均をミリ秒から秒に変換、小数点2桁</li>
+          <li>平均時間計算: 反応時間の平均をミリ秒から秒に変換、小数点1桁（切り捨て）</li>
           <li>記憶課題正答率: データが存在する場合のみ表示</li>
           <li>HTML生成: 適切な日本語フォーマット</li>
           <li>エッジケース処理: 空データの適切な処理</li>

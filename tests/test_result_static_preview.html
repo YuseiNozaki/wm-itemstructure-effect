@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Static Result Screen Preview</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .button {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .primary { background-color: #007bff; color: white; }
+    .success { background-color: #28a745; color: white; }
+    .danger { background-color: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>リザルト画面プレビュー（修正版）</h1>
+    
+    <h2>修正前後の比較</h2>
+    
+    <div style="display: flex; gap: 20px;">
+      <div style="flex: 1; border: 2px solid #dc3545; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #dc3545;">修正前（問題あり）</h3>
+        <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
+          <h2 style="color: #495057; margin-bottom: 20px;">実験結果</h2>
+          <p style="font-size: 18px; margin: 15px 0;">図形探しの正答率：85％</p>
+          <p style="font-size: 18px; margin: 15px 0; color: #dc3545; font-weight: bold;">図形探しのスピード：平均NaN秒</p>
+          <p style="font-size: 18px; margin: 15px 0;">パネル記憶の正答率：75％</p>
+        </div>
+      </div>
+      
+      <div style="flex: 1; border: 2px solid #28a745; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #28a745;">修正後（正常）</h3>
+        <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
+          <h2 style="color: #495057; margin-bottom: 20px;">実験結果</h2>
+          <p style="font-size: 18px; margin: 15px 0;">図形探しの正答率：85％</p>
+          <p style="font-size: 18px; margin: 15px 0; color: #28a745; font-weight: bold;">図形探しのスピード：平均2.3秒</p>
+          <p style="font-size: 18px; margin: 15px 0;">パネル記憶の正答率：75％</p>
+        </div>
+      </div>
+    </div>
+    
+    <h2>様々なケースでの表示例</h2>
+    
+    <button class="button primary" onclick="showCase1()">ケース1: 標準的な結果</button>
+    <button class="button success" onclick="showCase2()">ケース2: 高パフォーマンス</button>
+    <button class="button primary" onclick="showCase3()">ケース3: 低パフォーマンス</button>
+    
+    <div id="case-display" style="margin-top: 20px;">
+      <!-- Cases will be displayed here -->
+    </div>
+    
+    <h2>修正内容</h2>
+    <ul style="font-size: 16px; line-height: 1.6;">
+      <li><strong>NaN問題の修正:</strong> 検索データが空またはnull/undefinedの場合でも0秒と表示される</li>
+      <li><strong>小数点表示の変更:</strong> 小数点第2位以降を切り捨てして1桁のみ表示</li>
+      <li><strong>データ検証の追加:</strong> 無効な反応時間データを自動的にフィルタリング</li>
+      <li><strong>計算式:</strong> Math.floor((time / 1000) * 10) / 10 を使用</li>
+    </ul>
+    
+    <h2>切り捨て処理の例</h2>
+    <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+      <tr style="background-color: #f8f9fa;">
+        <th style="border: 1px solid #ddd; padding: 8px;">計算結果</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">修正前（2桁四捨五入）</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">修正後（1桁切り捨て）</th>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">2.567秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">2.57秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.5秒</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">2.999秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">3.00秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.9秒</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">1.001秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">1.00秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">1.0秒</td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    function generateResult(accuracy, avgTimeMs, memoryAccuracy) {
+      const avgTimeSeconds = Math.floor((avgTimeMs / 1000) * 10) / 10;
+      
+      return `
+        <div style="max-width: 700px; margin: 0 auto; padding: 40px 20px; text-align: center; line-height: 1.6;">
+          <h1 style="color: #2c3e50; margin-bottom: 30px;">実験は終了です。お疲れ様でした！</h1>
+          
+          <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
+            <h2 style="color: #495057; margin-bottom: 20px;">実験結果</h2>
+            <p style="font-size: 18px; margin: 15px 0;">図形探しの正答率：${accuracy}％</p>
+            <p style="font-size: 18px; margin: 15px 0;">図形探しのスピード：平均${avgTimeSeconds}秒</p>
+            ${memoryAccuracy !== null ? `<p style="font-size: 18px; margin: 15px 0;">パネル記憶の正答率：${memoryAccuracy}％</p>` : ''}
+          </div>
+          
+          <div style="background-color: #e7f3ff; padding: 25px; border-radius: 10px; margin: 30px 0; text-align: left;">
+            <h3 style="color: #0056b3; margin-bottom: 15px; text-align: center;">実験の終了プロセス</h3>
+            <ol style="font-size: 16px; line-height: 1.8; padding-left: 20px;">
+              <li>下の「終了する」ボタンを押すと実験データの送信が行われます。</li>
+              <li>データの送信中は、画面に英語が表示されます。送信が終わると真っ白な画面になります。</li>
+              <li>真っ白な画面になったら実験終了です。画面を閉じて構いません。</li>
+              <li>ご協力ありがとうございました！</li>
+            </ol>
+          </div>
+          
+          <div style="margin: 30px 0;">
+            <button style="padding: 15px 30px; font-size: 18px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">終了する</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function showCase1() {
+      document.getElementById('case-display').innerHTML = 
+        '<h3>ケース1: 標準的な結果</h3>' + 
+        generateResult(85, 2340, 75);
+    }
+    
+    function showCase2() {
+      document.getElementById('case-display').innerHTML = 
+        '<h3>ケース2: 高パフォーマンス</h3>' + 
+        generateResult(92, 1870, 83);
+    }
+    
+    function showCase3() {
+      document.getElementById('case-display').innerHTML = 
+        '<h3>ケース3: 低パフォーマンス</h3>' + 
+        generateResult(67, 3456, 58);
+    }
+    
+    // Show case 1 by default
+    showCase1();
+  </script>
+</body>
+</html>
