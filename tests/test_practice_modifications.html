@@ -65,7 +65,7 @@
   <h1>Practice Trial Modifications Test</h1>
   <p>This test validates the practice trial changes:</p>
   <ul>
-    <li>Practice reduced from 9 to 6 trials</li>
+    <li>Practice reduced from 6 to 3 trials</li>
     <li>Memory-first group: practice includes memory tasks</li>
     <li>Memory-second group: practice without memory tasks</li>
   </ul>
@@ -98,11 +98,6 @@
       const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
       
       const practiceTrialVariables = [
-        // First set
-        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        // Second set
         { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
         { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
         { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
@@ -144,7 +139,7 @@
       // Validation
       html += '<h4>Validation:</h4>';
       html += '<ul>';
-      html += `<li>✓ Trial count is 6: ${results.trialCount === 6 ? 'PASS' : 'FAIL'}</li>`;
+      html += `<li>✓ Trial count is 3: ${results.trialCount === 3 ? 'PASS' : 'FAIL'}</li>`;
       
       const memoryLoadConsistent = results.practiceTrialVariables.every(trial => 
         trial.memoryLoad === results.practiceMemoryLoad
@@ -157,9 +152,9 @@
       html += `<li>✓ Correct memory load for condition: ${correctMemoryLoad ? 'PASS' : 'FAIL'}</li>`;
       
       const viewConditions = results.practiceTrialVariables.map(trial => trial.viewCondition);
-      const expectedPattern = ['fullscreen', 'window', 'scroll', 'fullscreen', 'window', 'scroll'];
+      const expectedPattern = ['fullscreen', 'window', 'scroll'];
       const patternCorrect = JSON.stringify(viewConditions) === JSON.stringify(expectedPattern);
-      html += `<li>✓ View condition pattern (2x fullscreen→window→scroll): ${patternCorrect ? 'PASS' : 'FAIL'}</li>`;
+      html += `<li>✓ View condition pattern (fullscreen→window→scroll): ${patternCorrect ? 'PASS' : 'FAIL'}</li>`;
       
       html += '</ul>';
       

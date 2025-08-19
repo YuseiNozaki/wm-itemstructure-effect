@@ -1896,7 +1896,7 @@
       stimulus: function() {
         let html = '<div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">';
         html += '<h1>練習完了</h1>';
-        html += '<p style="font-size: 18px; margin: 20px 0;">6回の練習が完了しました。</p>';
+        html += '<p style="font-size: 18px; margin: 20px 0;">3回の練習が完了しました。</p>';
         html += '<p style="font-size: 16px; margin: 20px 0;">以下から選択してください：</p>';
         html += '<div style="margin: 30px 0;">';
         html += '<button id="practice-again-btn" style="padding: 15px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 10px;">もう一度練習する</button>';
@@ -1970,16 +1970,11 @@
     }
 
     // Generate practice trial variables based on memory condition
-    // Reduced from 9 to 6 trials (2 sets instead of 3)
+    // Reduced to 3 trials (one trial per viewing condition)
     // Memory load depends on whether memory tasks are in the first block
     const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
     
     const practiceTrialVariables = [
-      // First set
-      { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-      { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-      { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-      // Second set
       { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
       { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
       { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
