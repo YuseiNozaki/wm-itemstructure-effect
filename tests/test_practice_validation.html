@@ -57,7 +57,7 @@
   <div class="test-section">
     <h2>Requirements Validation</h2>
     
-    <h3>1. Practice trial count reduced from 9 to 6</h3>
+    <h3>1. Practice trial count reduced from 6 to 3</h3>
     <div id="trial-count-test"></div>
     
     <h3>2. Memory load conditional on CONDITION</h3>
@@ -85,11 +85,6 @@
       const practiceMemoryLoad = memoryFirstCondition ? 'with-memory' : 'without-memory';
       
       const practiceTrialVariables = [
-        // First set
-        { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
-        // Second set
         { viewCondition: 'fullscreen', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
         { viewCondition: 'window', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true },
         { viewCondition: 'scroll', structure: 'structured', memoryLoad: practiceMemoryLoad, isPractice: true }
@@ -107,12 +102,12 @@
       const count = result.practiceTrialVariables.length;
       const testDiv = document.getElementById('trial-count-test');
       
-      if (count === 6) {
+      if (count === 3) {
         testDiv.className = 'test-section success';
-        testDiv.innerHTML = `✓ PASS: Practice trials count is ${count} (was 9, now 6)`;
+        testDiv.innerHTML = `✓ PASS: Practice trials count is ${count} (was 6, now 3)`;
       } else {
         testDiv.className = 'test-section error';
-        testDiv.innerHTML = `✗ FAIL: Practice trials count is ${count}, expected 6`;
+        testDiv.innerHTML = `✗ FAIL: Practice trials count is ${count}, expected 3`;
       }
     }
     
@@ -162,7 +157,7 @@
       const testDiv = document.getElementById('sequence-test');
       
       const viewConditions = result.practiceTrialVariables.map(trial => trial.viewCondition);
-      const expectedPattern = ['fullscreen', 'window', 'scroll', 'fullscreen', 'window', 'scroll'];
+      const expectedPattern = ['fullscreen', 'window', 'scroll'];
       
       const patternCorrect = JSON.stringify(viewConditions) === JSON.stringify(expectedPattern);
       const allStructured = result.practiceTrialVariables.every(trial => trial.structure === 'structured');
