@@ -1835,7 +1835,7 @@
           const validTimes = searchTimes.filter(time => time != null && !isNaN(time) && time > 0);
           if (validTimes.length > 0) {
             const avgSearchTime = validTimes.reduce((a, b) => a + b, 0) / validTimes.length;
-            avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10; // Convert to seconds, truncate to 1 decimal
+            avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 100) / 100; // Convert to seconds, truncate to 2 decimal places
           }
         }
         
