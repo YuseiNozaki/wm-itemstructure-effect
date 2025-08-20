@@ -73,39 +73,39 @@
     <h2>修正内容</h2>
     <ul style="font-size: 16px; line-height: 1.6;">
       <li><strong>NaN問題の修正:</strong> 検索データが空またはnull/undefinedの場合でも0秒と表示される</li>
-      <li><strong>小数点表示の変更:</strong> 小数点第2位以降を切り捨てして1桁のみ表示</li>
+      <li><strong>小数点表示の変更:</strong> 小数点第3位以降を切り捨てして2桁まで表示</li>
       <li><strong>データ検証の追加:</strong> 無効な反応時間データを自動的にフィルタリング</li>
-      <li><strong>計算式:</strong> Math.floor((time / 1000) * 10) / 10 を使用</li>
+      <li><strong>計算式:</strong> Math.floor((time / 1000) * 100) / 100 を使用</li>
     </ul>
     
     <h2>切り捨て処理の例</h2>
     <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
       <tr style="background-color: #f8f9fa;">
         <th style="border: 1px solid #ddd; padding: 8px;">計算結果</th>
-        <th style="border: 1px solid #ddd; padding: 8px;">修正前（2桁四捨五入）</th>
-        <th style="border: 1px solid #ddd; padding: 8px;">修正後（1桁切り捨て）</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">修正前（3桁四捨五入）</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">修正後（2桁切り捨て）</th>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px;">2.567秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">2.57秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.5秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">2.567秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.56秒</td>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px;">2.999秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">3.00秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.9秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">2.999秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">2.99秒</td>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px;">1.001秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">1.00秒</td>
-        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">1.0秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">1.001秒</td>
+        <td style="border: 1px solid #ddd; padding: 8px; background-color: #d4edda;">1.00秒</td>
       </tr>
     </table>
   </div>
 
   <script>
     function generateResult(accuracy, avgTimeMs, memoryAccuracy) {
-      const avgTimeSeconds = Math.floor((avgTimeMs / 1000) * 10) / 10;
+      const avgTimeSeconds = Math.floor((avgTimeMs / 1000) * 100) / 100;
       
       return `
         <div style="max-width: 700px; margin: 0 auto; padding: 40px 20px; text-align: center; line-height: 1.6;">

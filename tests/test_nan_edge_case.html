@@ -73,7 +73,7 @@
       let avgSearchTimeSeconds = 0;
       if (searchTimes && searchTimes.length > 0) {
         const avgSearchTime = searchTimes.reduce((a, b) => a + b, 0) / searchTimes.length;
-        avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10;
+        avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 100) / 100;
       }
       
       if (isNaN(avgSearchTimeSeconds)) {
@@ -118,7 +118,7 @@
         const validTimes = searchTimes.filter(time => time != null && !isNaN(time));
         if (validTimes.length > 0) {
           const avgSearchTime = validTimes.reduce((a, b) => a + b, 0) / validTimes.length;
-          avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 10) / 10;
+          avgSearchTimeSeconds = Math.floor((avgSearchTime / 1000) * 100) / 100;
         }
       }
       
@@ -126,7 +126,7 @@
         throw new Error('avgSearchTimeSeconds is NaN');
       }
       
-      const expectedTime = Math.floor((2000 / 1000) * 10) / 10; // 2.0 seconds
+      const expectedTime = Math.floor((2000 / 1000) * 100) / 100; // 2.00 seconds
       if (avgSearchTimeSeconds !== expectedTime) {
         throw new Error(`Expected ${expectedTime}, got ${avgSearchTimeSeconds}`);
       }
@@ -137,16 +137,16 @@
     // Test 3: Test truncation behavior with various decimal values
     runTest('Truncation Behavior Test', () => {
       const testCases = [
-        { input: 2.567, expected: 2.5 },
-        { input: 2.999, expected: 2.9 },
-        { input: 2.001, expected: 2.0 },
-        { input: 1.0, expected: 1.0 },
-        { input: 3.14159, expected: 3.1 }
+        { input: 2.567, expected: 2.56 },
+        { input: 2.999, expected: 2.99 },
+        { input: 2.001, expected: 2.00 },
+        { input: 1.0, expected: 1.00 },
+        { input: 3.14159, expected: 3.14 }
       ];
       
       const results = [];
       for (const testCase of testCases) {
-        const result = Math.floor(testCase.input * 10) / 10;
+        const result = Math.floor(testCase.input * 100) / 100;
         if (result !== testCase.expected) {
           throw new Error(`For ${testCase.input}, expected ${testCase.expected}, got ${result}`);
         }
@@ -159,12 +159,12 @@
     document.getElementById('test-results').innerHTML += 
       `<div class="test-result">
         <h3>📝 テスト完了</h3>
-        <p>NaN問題が修正され、小数点1桁への切り捨てが正常に動作しています。</p>
+        <p>NaN問題が修正され、小数点2桁への切り捨てが正常に動作しています。</p>
         <p><strong>修正内容:</strong></p>
         <ul>
           <li>空の検索データでもNaNエラーが発生しない</li>
           <li>null/undefined値を適切にフィルタリング</li>
-          <li>小数点第2位以降を切り捨て（2.999 → 2.9）</li>
+          <li>小数点第3位以降を切り捨て（2.999 → 2.99）</li>
           <li>Math.floor()を使用した正確な切り捨て処理</li>
         </ul>
       </div>`;
