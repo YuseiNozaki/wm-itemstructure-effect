@@ -1828,7 +1828,7 @@
         const searchAccuracy = Math.round((correctSearches / searchData.count()) * 100);
         
         // Calculate average response time for visual search
-        const searchTimes = searchData.select('rt').values;
+        const searchTimes = searchData.select('reaction_time').values;
         let avgSearchTimeSeconds = 0;
         if (searchTimes && searchTimes.length > 0) {
           // Filter out invalid values (null, undefined, NaN)
