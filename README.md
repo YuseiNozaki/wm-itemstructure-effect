@@ -1,6 +1,4 @@
-# Working Memory and Item Structure Effect on Visual Search
-
-**開発状況：開発完了** - 実験プログラムの開発は完了しており、すべての機能が実装されています。
+# Working Memory and Item Structure Effect on Scroll Visual Search
 
 ## 概要
 スクロール表示におけるワーキングメモリと物体の配置構造が、探索行動に及ぼす影響を調べるための心理学実験プログラムです。jsPsych v7を使用して構築されており、Web ブラウザ上で実行できます。
@@ -38,7 +36,6 @@
 
 ## 技術仕様
 ### 動作環境
-- **対応OS**: Windows, Mac, Linux
 - **必要なソフトウェア**: モダンなWebブラウザ（Chrome, Firefox, Safari, Edge）
 - **解像度**: フルスクリーン表示に対応
 
@@ -60,7 +57,7 @@ const params = {
   screenHeight: window.innerHeight,
   windowWidth: Math.floor(window.innerWidth / 3),
   windowHeight: Math.floor(window.innerHeight / 3),
-  numObjects: 30,              // 試行あたりのオブジェクト数
+  numObjects: 25,              // 試行あたりのオブジェクト数
   objectMinSize: 20,           // オブジェクトの最小サイズ
   objectMaxSize: 40,           // オブジェクトの最大サイズ
   targetTolerance: 0.8,        // ターゲット検出の許容範囲
@@ -75,9 +72,6 @@ const params = {
 1. プロジェクトをローカルにダウンロード
 2. Webブラウザで `index.html` を開く
 3. 実験を開始
-
-### Cognition.run での実行
-プロジェクトはCognition.run プラットフォームでの実行にも対応しています。詳細は `COGNITION_RUN_DEPLOYMENT.md` を参照してください。
 
 ## ファイル構成
 ```
