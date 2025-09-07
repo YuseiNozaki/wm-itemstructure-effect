@@ -1,10 +1,10 @@
-# Working Memory and Item Structure Effect on Visual Search
+# Working Memory and Item Structure Effect on Scroll Visual Search
 
 ## 概要
-視野外にも及ぶ視覚検索におけるワーキングメモリ使用とオブジェクト配置構造の効果を分析するための心理学実験プログラムです。jsPsych v7を使用して構築されており、Web ブラウザ上で実行できます。
+スクロール表示におけるワーキングメモリと物体の配置構造が、探索行動に及ぼす影響を調べるための心理学実験プログラムです。jsPsych v7を使用して構築されており、Web ブラウザ上で実行できます。
 
 ## 実験の目的
-この実験は以下の要因が視覚検索タスクに与える影響を調査します：
+この実験は、制限された視野を移動して行う視覚探索場面において、以下の要因が探索効率に与える影響を調査します：
 - **ワーキングメモリ負荷**：有り（4x4グリッドの記憶課題併用）vs. 無し
 - **オブジェクト配置構造**：構造化（グリッド配置）vs. 非構造化（ランダム配置）
 - **視野条件**：フルスクリーン vs. ウィンドウ操作 vs. スクロール操作
@@ -14,7 +14,7 @@
 - **視野条件（3種類）**
   - `fullscreen`: 画面全体表示
   - `window`: 小窓をドラッグして移動
-  - `scroll`: 背景をドラッグしてスクロール
+  - `scroll`: 背景をドラッグしてスクロール（主要条件）
 - **オブジェクト配置（2種類）**
   - `structured`: グリッド状の規則的配置
   - `unstructured`: ランダム配置
@@ -36,7 +36,6 @@
 
 ## 技術仕様
 ### 動作環境
-- **対応OS**: Windows, Mac, Linux
 - **必要なソフトウェア**: モダンなWebブラウザ（Chrome, Firefox, Safari, Edge）
 - **解像度**: フルスクリーン表示に対応
 
@@ -58,7 +57,7 @@ const params = {
   screenHeight: window.innerHeight,
   windowWidth: Math.floor(window.innerWidth / 3),
   windowHeight: Math.floor(window.innerHeight / 3),
-  numObjects: 30,              // 試行あたりのオブジェクト数
+  numObjects: 25,              // 試行あたりのオブジェクト数
   objectMinSize: 20,           // オブジェクトの最小サイズ
   objectMaxSize: 40,           // オブジェクトの最大サイズ
   targetTolerance: 0.8,        // ターゲット検出の許容範囲
@@ -73,9 +72,6 @@ const params = {
 1. プロジェクトをローカルにダウンロード
 2. Webブラウザで `index.html` を開く
 3. 実験を開始
-
-### Cognition.run での実行
-プロジェクトはCognition.run プラットフォームでの実行にも対応しています。詳細は `COGNITION_RUN_DEPLOYMENT.md` を参照してください。
 
 ## ファイル構成
 ```
